@@ -1,0 +1,264 @@
+export interface Product {
+  id: string;
+  name: string;
+  slug: string;
+  price: number;
+  originalPrice?: number;
+  category: string;
+  description: string;
+  ingredients: string;
+  storage: string;
+  weights: { label: string; price: number }[];
+  image: string;
+  badge?: string;
+  rating: number;
+  reviews: number;
+}
+
+export const products: Product[] = [
+  {
+    id: "1",
+    name: "Traditional Mysore Pak",
+    slug: "traditional-mysore-pak",
+    price: 699,
+    category: "Mysore Pak",
+    description: "The original Mysore Pak made with the finest gram flour, pure ghee, and sugar. A melt-in-mouth delicacy with a rich, buttery flavor that has been perfected over generations.",
+    ingredients: "Gram flour (Besan), Pure Ghee, Sugar, Cardamom",
+    storage: "Store in a cool, dry place. Best consumed within 15 days. Refrigerate for extended freshness.",
+    weights: [
+      { label: "250g", price: 699 },
+      { label: "500g", price: 1199 },
+      { label: "1kg", price: 2199 },
+    ],
+    image: "https://images.unsplash.com/photo-1666190020777-6210676b2699?w=600&q=80",
+    badge: "Bestseller",
+    rating: 4.9,
+    reviews: 342,
+  },
+  {
+    id: "2",
+    name: "Special Mysore Pak",
+    slug: "special-mysore-pak",
+    price: 799,
+    category: "Mysore Pak",
+    description: "A premium variation of the classic, made with extra ghee for an even more luxurious, softer texture that melts the moment it touches your tongue.",
+    ingredients: "Gram flour (Besan), Premium Ghee, Sugar, Cardamom, Saffron",
+    storage: "Store in a cool, dry place. Best consumed within 15 days.",
+    weights: [
+      { label: "250g", price: 799 },
+      { label: "500g", price: 1399 },
+      { label: "1kg", price: 2599 },
+    ],
+    image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&q=80",
+    badge: "Premium",
+    rating: 4.8,
+    reviews: 218,
+  },
+  {
+    id: "3",
+    name: "Kaju Mysore Pak",
+    slug: "kaju-mysore-pak",
+    price: 899,
+    category: "Mysore Pak",
+    description: "Kaju Mysore Pak is a rich variation of the traditional sweet made with cashews and pure ghee, offering a creamy melt-in-mouth texture.",
+    ingredients: "Cashews, Gram flour, Pure Ghee, Sugar, Cardamom",
+    storage: "Store in a cool, dry place. Refrigerate for extended freshness. Best consumed within 12 days.",
+    weights: [
+      { label: "250g", price: 899 },
+      { label: "500g", price: 1599 },
+      { label: "1kg", price: 2999 },
+    ],
+    image: "https://images.unsplash.com/photo-1587314168485-3236d6710814?w=600&q=80",
+    rating: 4.7,
+    reviews: 156,
+  },
+  {
+    id: "4",
+    name: "Carrot Mysore Pak",
+    slug: "carrot-mysore-pak",
+    price: 749,
+    category: "Mysore Pak",
+    description: "A delightful fusion of Gajar Halwa and Mysore Pak. Fresh carrots blended with gram flour and ghee create this unique seasonal treat.",
+    ingredients: "Fresh Carrots, Gram flour, Pure Ghee, Sugar, Cardamom, Nuts",
+    storage: "Refrigerate after opening. Best consumed within 10 days.",
+    weights: [
+      { label: "250g", price: 749 },
+      { label: "500g", price: 1299 },
+      { label: "1kg", price: 2399 },
+    ],
+    image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&q=80",
+    badge: "Seasonal",
+    rating: 4.6,
+    reviews: 89,
+  },
+  {
+    id: "5",
+    name: "Millet Mysore Pak",
+    slug: "millet-mysore-pak",
+    price: 849,
+    category: "Mysore Pak",
+    description: "A healthier take on the classic Mysore Pak, made with nutritious millet flour blended with pure ghee for guilt-free indulgence.",
+    ingredients: "Millet flour, Pure Ghee, Jaggery, Cardamom",
+    storage: "Store in a cool, dry place. Best consumed within 15 days.",
+    weights: [
+      { label: "250g", price: 849 },
+      { label: "500g", price: 1499 },
+      { label: "1kg", price: 2799 },
+    ],
+    image: "https://images.unsplash.com/photo-1558961363-fa8fdf82db35?w=600&q=80",
+    badge: "Healthy",
+    rating: 4.5,
+    reviews: 67,
+  },
+  {
+    id: "6",
+    name: "Mango Mysore Pak",
+    slug: "mango-mysore-pak",
+    price: 799,
+    category: "Mysore Pak",
+    description: "Summer meets tradition in this Alphonso mango-infused Mysore Pak. A fruity twist on the beloved classic.",
+    ingredients: "Alphonso Mango pulp, Gram flour, Pure Ghee, Sugar",
+    storage: "Refrigerate. Best consumed within 10 days.",
+    weights: [
+      { label: "250g", price: 799 },
+      { label: "500g", price: 1399 },
+      { label: "1kg", price: 2599 },
+    ],
+    image: "https://images.unsplash.com/photo-1563805042-7684c019e1cb?w=600&q=80",
+    badge: "Seasonal",
+    rating: 4.7,
+    reviews: 134,
+  },
+  {
+    id: "7",
+    name: "Jaggery Mysore Pak",
+    slug: "jaggery-mysore-pak",
+    price: 749,
+    category: "Mysore Pak",
+    description: "Sweetened with organic jaggery instead of sugar, this variation offers a deeper, more earthy sweetness with all the ghee richness.",
+    ingredients: "Gram flour, Pure Ghee, Organic Jaggery, Cardamom",
+    storage: "Store in a cool, dry place. Best consumed within 15 days.",
+    weights: [
+      { label: "250g", price: 749 },
+      { label: "500g", price: 1299 },
+      { label: "1kg", price: 2399 },
+    ],
+    image: "https://images.unsplash.com/photo-1590080875515-8a3a8dc5735e?w=600&q=80",
+    rating: 4.6,
+    reviews: 98,
+  },
+  {
+    id: "8",
+    name: "Roasted Almond Mysore Pak",
+    slug: "roasted-almond-mysore-pak",
+    price: 949,
+    category: "Mysore Pak",
+    description: "Packed with roasted California almonds, this premium Mysore Pak offers a crunchy texture with every bite.",
+    ingredients: "Roasted Almonds, Gram flour, Pure Ghee, Sugar, Cardamom",
+    storage: "Store in a cool, dry place. Best consumed within 12 days.",
+    weights: [
+      { label: "250g", price: 949 },
+      { label: "500g", price: 1699 },
+      { label: "1kg", price: 3199 },
+    ],
+    image: "https://images.unsplash.com/photo-1599599810769-bcde93a92e6f?w=600&q=80",
+    rating: 4.8,
+    reviews: 112,
+  },
+  {
+    id: "9",
+    name: "Chocolate Mysore Pak",
+    slug: "chocolate-mysore-pak",
+    price: 849,
+    category: "Mysore Pak",
+    description: "Belgian chocolate meets Mysore Pak in this modern fusion. Rich cocoa blended with traditional gram flour and ghee.",
+    ingredients: "Belgian Chocolate, Gram flour, Pure Ghee, Sugar, Cocoa",
+    storage: "Refrigerate. Best consumed within 10 days.",
+    weights: [
+      { label: "250g", price: 849 },
+      { label: "500g", price: 1499 },
+      { label: "1kg", price: 2799 },
+    ],
+    image: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=600&q=80",
+    badge: "New",
+    rating: 4.7,
+    reviews: 76,
+  },
+  {
+    id: "10",
+    name: "Coffee Mysore Pak",
+    slug: "coffee-mysore-pak",
+    price: 799,
+    category: "Mysore Pak",
+    description: "Infused with authentic Coorg coffee, this Mysore Pak is a caffeine lover's dream dessert.",
+    ingredients: "Coorg Coffee, Gram flour, Pure Ghee, Sugar, Cardamom",
+    storage: "Store in a cool, dry place. Best consumed within 15 days.",
+    weights: [
+      { label: "250g", price: 799 },
+      { label: "500g", price: 1399 },
+      { label: "1kg", price: 2599 },
+    ],
+    image: "https://images.unsplash.com/photo-1621939514649-280e2ee25f60?w=600&q=80",
+    badge: "New",
+    rating: 4.5,
+    reviews: 54,
+  },
+  {
+    id: "11",
+    name: "Milk Mysore Pak",
+    slug: "milk-mysore-pak",
+    price: 699,
+    category: "Mysore Pak",
+    description: "A softer, milkier version of Mysore Pak made with condensed milk and pure ghee for an ultra-creamy experience.",
+    ingredients: "Condensed Milk, Gram flour, Pure Ghee, Sugar, Cardamom",
+    storage: "Refrigerate. Best consumed within 10 days.",
+    weights: [
+      { label: "250g", price: 699 },
+      { label: "500g", price: 1199 },
+      { label: "1kg", price: 2199 },
+    ],
+    image: "https://images.unsplash.com/photo-1548848221-0c2e497ed557?w=600&q=80",
+    rating: 4.6,
+    reviews: 88,
+  },
+  {
+    id: "12",
+    name: "Anjeer Mysore Pak",
+    slug: "anjeer-mysore-pak",
+    price: 999,
+    category: "Mysore Pak",
+    description: "Premium Afghani figs blended into Mysore Pak for a unique, chewy-meets-melt texture that is truly one of a kind.",
+    ingredients: "Afghani Figs, Gram flour, Pure Ghee, Sugar, Cardamom, Nuts",
+    storage: "Refrigerate. Best consumed within 10 days.",
+    weights: [
+      { label: "250g", price: 999 },
+      { label: "500g", price: 1799 },
+      { label: "1kg", price: 3399 },
+    ],
+    image: "https://images.unsplash.com/photo-1571115177098-24ec42ed204d?w=600&q=80",
+    badge: "Premium",
+    rating: 4.8,
+    reviews: 65,
+  },
+];
+
+export const categories = [
+  { name: "Mysore Pak", slug: "mysore-pak", image: "https://images.unsplash.com/photo-1666190020777-6210676b2699?w=600&q=80" },
+  { name: "Ghee Sweets", slug: "ghee-sweets", image: "https://images.unsplash.com/photo-1589301760014-d929f3979dbc?w=600&q=80" },
+  { name: "Namkeens", slug: "namkeens", image: "https://images.unsplash.com/photo-1601050690597-df0568f70950?w=600&q=80" },
+  { name: "Chocolates", slug: "chocolates", image: "https://images.unsplash.com/photo-1606312619070-d48b4c652a52?w=600&q=80" },
+];
+
+export const testimonials = [
+  { name: "Priya Sharma", location: "Bangalore", text: "The traditional Mysore Pak is so delicious — it tastes exactly like the ones I had in Mysuru as a child. Pure nostalgia!", rating: 5 },
+  { name: "Rajesh Kumar", location: "Mumbai", text: "Perfect sweetness and amazing taste. The packaging is premium too. Sent it as a Diwali gift and everyone loved it!", rating: 5 },
+  { name: "Ananya Rao", location: "Delhi", text: "Kaju Mysore Pak is heavenly! The cashew flavor combined with pure ghee is absolutely divine.", rating: 5 },
+  { name: "Vikram Patel", location: "Hyderabad", text: "Finally found authentic Mysore Pak online. The quality and freshness is unmatched.", rating: 4 },
+  { name: "Meera Nair", location: "Chennai", text: "The Chocolate Mysore Pak is a genius creation. My kids can't stop eating it!", rating: 5 },
+];
+
+export const founders = [
+  { name: "Sushma V Prasad", role: "Co-Founder", bio: "Passionate about preserving the culinary heritage of Mysuru, Sushma brings decades of knowledge in traditional sweet-making techniques." },
+  { name: "Shruthi Pavan Shroff", role: "Co-Founder", bio: "With a vision to take Indian sweets global, Shruthi leads the brand strategy and innovation at World of Mysore Pak." },
+  { name: "Sowmya Pavan Bargi", role: "Co-Founder", bio: "Sowmya oversees quality and operations, ensuring every piece of Mysore Pak meets the highest standards of taste and freshness." },
+];
