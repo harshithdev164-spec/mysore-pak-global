@@ -1,3 +1,5 @@
+"use client";
+
 interface FilterSidebarProps {
   selectedCategory: string;
   setSelectedCategory: (cat: string) => void;

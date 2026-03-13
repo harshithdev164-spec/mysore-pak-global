@@ -1,3 +1,5 @@
+"use client";
+
 import { Minus, Plus, X } from "lucide-react";
 import type { CartItem as CartItemType } from "@/context/CartContext";
 import { useCart } from "@/context/CartContext";

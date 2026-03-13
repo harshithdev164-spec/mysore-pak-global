@@ -1,80 +1,83 @@
-@import url('https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;0,800;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap');
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
 @layer base {
   :root {
-    --background: 30 100% 96%;
-    --foreground: 20 60% 10%;
+    /* ── Deep Forest Green + Gold Theme (from logo) ── */
+    --background: 40 30% 96%;
+    --foreground: 160 40% 10%;
 
-    --card: 30 60% 98%;
-    --card-foreground: 20 60% 10%;
+    --card: 40 20% 98%;
+    --card-foreground: 160 40% 10%;
 
-    --popover: 30 100% 96%;
-    --popover-foreground: 20 60% 10%;
+    --popover: 40 30% 96%;
+    --popover-foreground: 160 40% 10%;
 
     --primary: 40 65% 48%;
-    --primary-foreground: 30 100% 96%;
+    --primary-foreground: 160 55% 12%;
 
-    --secondary: 20 60% 10%;
-    --secondary-foreground: 30 100% 96%;
+    --secondary: 160 55% 12%;
+    --secondary-foreground: 40 30% 96%;
 
-    --muted: 30 30% 90%;
-    --muted-foreground: 20 20% 40%;
+    --muted: 40 15% 90%;
+    --muted-foreground: 160 15% 40%;
 
-    --accent: 95 30% 47%;
-    --accent-foreground: 30 100% 96%;
+    --accent: 150 35% 38%;
+    --accent-foreground: 40 30% 96%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 30 30% 85%;
-    --input: 30 30% 85%;
+    --border: 40 20% 85%;
+    --input: 40 20% 85%;
     --ring: 40 65% 48%;
 
     --radius: 0.5rem;
 
-    --sidebar-background: 20 60% 10%;
-    --sidebar-foreground: 30 100% 96%;
+    --sidebar-background: 160 55% 12%;
+    --sidebar-foreground: 40 30% 96%;
     --sidebar-primary: 40 65% 48%;
-    --sidebar-primary-foreground: 30 100% 96%;
-    --sidebar-accent: 20 40% 18%;
-    --sidebar-accent-foreground: 30 100% 96%;
-    --sidebar-border: 20 40% 18%;
+    --sidebar-primary-foreground: 40 30% 96%;
+    --sidebar-accent: 160 40% 18%;
+    --sidebar-accent-foreground: 40 30% 96%;
+    --sidebar-border: 160 40% 18%;
     --sidebar-ring: 40 65% 48%;
 
+    /* Brand Palette */
     --gold: 40 65% 48%;
     --gold-light: 40 70% 60%;
     --gold-dark: 40 60% 38%;
-    --cocoa: 20 60% 10%;
-    --cocoa-light: 20 40% 20%;
+    --forest: 160 55% 12%;
+    --forest-light: 150 35% 28%;
+    --forest-medium: 150 40% 20%;
+    --sage: 140 25% 45%;
+    --sage-light: 140 20% 60%;
+    --cream: 40 30% 96%;
+    --cream-dark: 40 25% 88%;
     --pistachio: 95 30% 47%;
     --pistachio-light: 95 30% 60%;
-    --cream: 30 100% 96%;
-    --cream-dark: 30 50% 88%;
   }
 
   .dark {
-    --background: 20 60% 6%;
-    --foreground: 30 60% 92%;
-    --card: 20 50% 10%;
-    --card-foreground: 30 60% 92%;
-    --popover: 20 50% 10%;
-    --popover-foreground: 30 60% 92%;
+    --background: 160 55% 6%;
+    --foreground: 40 30% 92%;
+    --card: 160 50% 10%;
+    --card-foreground: 40 30% 92%;
+    --popover: 160 50% 10%;
+    --popover-foreground: 40 30% 92%;
     --primary: 40 65% 48%;
-    --primary-foreground: 30 100% 96%;
-    --secondary: 30 30% 85%;
-    --secondary-foreground: 20 60% 10%;
-    --muted: 20 30% 18%;
-    --muted-foreground: 30 20% 60%;
-    --accent: 95 30% 47%;
-    --accent-foreground: 30 100% 96%;
+    --primary-foreground: 40 30% 96%;
+    --secondary: 40 20% 85%;
+    --secondary-foreground: 160 55% 10%;
+    --muted: 160 30% 18%;
+    --muted-foreground: 40 15% 60%;
+    --accent: 150 35% 38%;
+    --accent-foreground: 40 30% 96%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 20 30% 18%;
-    --input: 20 30% 18%;
+    --border: 160 30% 18%;
+    --input: 160 30% 18%;
     --ring: 40 65% 48%;
   }
 }
@@ -86,10 +89,37 @@
 
   body {
     @apply bg-background text-foreground font-body antialiased;
+    scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-heading;
+  }
+
+  /* Custom scrollbar – forest green */
+  ::-webkit-scrollbar {
+    width: 8px;
+  }
+
+  ::-webkit-scrollbar-track {
+    background: hsl(var(--cream));
+  }
+
+  ::-webkit-scrollbar-thumb {
+    background: hsl(var(--forest-light) / 0.4);
+    border-radius: 4px;
+  }
+
+  ::-webkit-scrollbar-thumb:hover {
+    background: hsl(var(--forest-light) / 0.6);
+  }
+
+  /* Selection in gold */
+  ::selection {
+    background: hsl(var(--gold) / 0.2);
+    color: hsl(var(--forest));
   }
 }
 
@@ -102,6 +132,10 @@
     @apply bg-gradient-to-r from-[hsl(var(--gold-dark))] via-[hsl(var(--gold))] to-[hsl(var(--gold-light))] bg-clip-text text-transparent;
   }
 
+  .forest-gradient {
+    background: linear-gradient(135deg, #1B3A2D 0%, #2D5A3D 50%, #1B3A2D 100%);
+  }
+
   .section-padding {
     @apply px-4 sm:px-6 lg:px-8 py-16 sm:py-20 lg:py-24;
   }
@@ -109,10 +143,157 @@
   .hover-lift {
     @apply transition-all duration-300 hover:-translate-y-2 hover:shadow-xl;
   }
+
+  /* Scrollbar hide for horizontal scrolls */
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+
+  /* Glassmorphism */
+  .glass {
+    background: rgba(255, 255, 255, 0.1);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+  }
+
+  /* Premium Button Glow */
+  .btn-glow {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .btn-glow::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(
+      90deg,
+      transparent,
+      rgba(255, 255, 255, 0.15),
+      transparent
+    );
+    animation: btn-shimmer 3s ease-in-out infinite;
+  }
+
+  /* Text gradient – forest green to gold */
+  .text-gradient-brand {
+    background: linear-gradient(135deg, #2D5A3D, #C9972D);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
 }
 
 @layer utilities {
   .text-balance {
     text-wrap: balance;
   }
+}
+
+/* ── Animations ── */
+@keyframes btn-shimmer {
+  0% { left: -100%; }
+  50% { left: 100%; }
+  100% { left: 100%; }
+}
+
+@keyframes page-enter {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@keyframes float-slow {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-15px) rotate(2deg); }
+}
+
+@keyframes float-slower {
+  0%, 100% { transform: translateY(0) rotate(0deg); }
+  50% { transform: translateY(-10px) rotate(-1deg); }
+}
+
+/* main page-enter animation removed — was animating the entire page and causing scroll jank */
+
+.animate-float-slow {
+  animation: float-slow 6s ease-in-out infinite;
+}
+
+.animate-float-slower {
+  animation: float-slower 8s ease-in-out infinite;
+}
+
+@keyframes fill-progress {
+  from { width: 0%; }
+  to   { width: 100%; }
+}
+
+@keyframes photo-scroll {
+  0%   { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+.animate-photo-scroll {
+  animation: photo-scroll 32s linear infinite;
+  will-change: transform;
+  transform: translateZ(0);
+}
+.animate-photo-scroll:hover {
+  animation-play-state: paused;
+}
+/* Isolate paint for scroll strips — prevents them from dirtying parent layers */
+.scroll-strip-wrap {
+  contain: layout style paint;
+  overflow: hidden;
+}
+
+/* GPU layer for sections with heavy backgrounds — avoids main-thread repaint on scroll */
+.section-gpu {
+  transform: translateZ(0);
+  isolation: isolate;
+}
+
+/* Defer rendering of off-screen page sections */
+.section-lazy {
+  content-visibility: auto;
+  contain-intrinsic-size: 0 600px;
+}
+
+@keyframes marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+.animate-marquee {
+  animation: marquee var(--marquee-duration, 20s) linear infinite;
+  will-change: transform;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee,
+  .animate-photo-scroll,
+  .animate-float-slow,
+  .animate-float-slower { animation: none; }
+}
+
+@keyframes grain {
+  0%, 100% { background-position: 0 0; }
+  25%  { background-position: 40px 20px; }
+  50%  { background-position: -20px 40px; }
+  75%  { background-position: 20px -20px; }
+}
+.animate-grain {
+  animation: grain 8s steps(10) infinite;
 }

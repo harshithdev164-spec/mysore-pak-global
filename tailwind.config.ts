@@ -14,8 +14,12 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ['"Playfair Display"', 'Georgia', 'serif'],
-        body: ['Inter', 'system-ui', 'sans-serif'],
+        heading: ['"Felix Titling"', '"Playfair Display"', 'Georgia', 'serif'],
+        body: ['Poppins', 'system-ui', 'sans-serif'],
+      },
+      height: {
+        '18': '4.5rem',
+        '22': '5.5rem',
       },
       colors: {
         border: "hsl(var(--border))",
@@ -56,9 +60,14 @@ export default {
           light: "hsl(var(--gold-light))",
           dark: "hsl(var(--gold-dark))",
         },
-        cocoa: {
-          DEFAULT: "hsl(var(--cocoa))",
-          light: "hsl(var(--cocoa-light))",
+        forest: {
+          DEFAULT: "hsl(var(--forest))",
+          light: "hsl(var(--forest-light))",
+          medium: "hsl(var(--forest-medium))",
+        },
+        sage: {
+          DEFAULT: "hsl(var(--sage))",
+          light: "hsl(var(--sage-light))",
         },
         pistachio: {
           DEFAULT: "hsl(var(--pistachio))",

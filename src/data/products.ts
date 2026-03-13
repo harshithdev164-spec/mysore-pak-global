@@ -250,11 +250,14 @@ export const categories = [
 ];
 
 export const testimonials = [
-  { name: "Priya Sharma", location: "Bangalore", text: "The traditional Mysore Pak is so delicious — it tastes exactly like the ones I had in Mysuru as a child. Pure nostalgia!", rating: 5 },
-  { name: "Rajesh Kumar", location: "Mumbai", text: "Perfect sweetness and amazing taste. The packaging is premium too. Sent it as a Diwali gift and everyone loved it!", rating: 5 },
-  { name: "Ananya Rao", location: "Delhi", text: "Kaju Mysore Pak is heavenly! The cashew flavor combined with pure ghee is absolutely divine.", rating: 5 },
-  { name: "Vikram Patel", location: "Hyderabad", text: "Finally found authentic Mysore Pak online. The quality and freshness is unmatched.", rating: 4 },
-  { name: "Meera Nair", location: "Chennai", text: "The Chocolate Mysore Pak is a genius creation. My kids can't stop eating it!", rating: 5 },
+  { name: "Priya Sharma",       avatarBg: "#4285F4", time: "2 weeks ago",  text: "The traditional Mysore Pak is so delicious — it tastes exactly like the ones I had in Mysuru as a child. Pure nostalgia! The ghee quality is unmatched.", rating: 5 },
+  { name: "Rajesh Kumar",       avatarBg: "#EA4335", time: "1 month ago",  text: "Perfect sweetness and amazing taste. The packaging is premium too. Sent it as a Diwali gift and everyone absolutely loved it. Will order again!", rating: 5 },
+  { name: "Ananya Rao",         avatarBg: "#34A853", time: "3 weeks ago",  text: "Kaju Mysore Pak is heavenly! The cashew flavor combined with pure ghee is absolutely divine. Highly recommend the gift boxes.", rating: 5 },
+  { name: "Vikram Patel",       avatarBg: "#FBBC05", time: "2 months ago", text: "Finally found authentic Mysore Pak online. The quality and freshness is unmatched. Ships very quickly, arrived perfectly packed.", rating: 5 },
+  { name: "Meera Nair",         avatarBg: "#4285F4", time: "1 week ago",   text: "The Chocolate Mysore Pak is a genius creation. My kids cannot stop eating it! Ordered thrice already. Best sweet shop online.", rating: 5 },
+  { name: "Suresh Venkatesh",   avatarBg: "#EA4335", time: "5 days ago",   text: "Best Mysore Pak I have tasted outside of Mysuru. Pure ghee aroma hits you the moment you open the box. Absolutely authentic.", rating: 5 },
+  { name: "Deepa Krishnamurthy",avatarBg: "#34A853", time: "3 months ago", text: "Ordered the assorted gift hamper for my parents' anniversary. Presentation was stunning and the sweets were incredibly fresh. 10/10!", rating: 5 },
+  { name: "Arun Menon",         avatarBg: "#FBBC05", time: "1 month ago",  text: "Smooth, melt-in-mouth texture with that perfect ghee aftertaste. This is exactly how Mysore Pak should taste. Superb quality!", rating: 5 },
 ];
 
 export const founders = [
