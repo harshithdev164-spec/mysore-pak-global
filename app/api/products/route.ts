@@ -1,5 +1,4 @@
-// Cache public product listings for 60 s; mutation routes (POST) are always dynamic
-export const revalidate = 60;
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { createServerClient, createAdminClient } from "@/lib/supabase";
 

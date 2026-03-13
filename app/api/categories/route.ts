@@ -1,5 +1,4 @@
-// Categories rarely change — cache for 5 minutes
-export const revalidate = 300;
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { createServerClient, createAdminClient } from "@/lib/supabase";
 

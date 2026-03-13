@@ -1,5 +1,4 @@
-// Admin stats — cache for 30 s to avoid hammering Supabase on every refresh
-export const revalidate = 30;
+export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase";
 
