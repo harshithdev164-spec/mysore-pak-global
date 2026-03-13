@@ -168,12 +168,10 @@ export default function AdminOrderDetailPage() {
             <h2 className="font-semibold text-gray-900 mb-3">Shipping Address</h2>
             <div className="text-sm text-gray-700 space-y-1">
               <div className="font-medium">{order.customer_name}</div>
-              {addr.address_line1 && <div>{addr.address_line1}</div>}
-              {addr.address_line2 && <div>{addr.address_line2}</div>}
+              {addr.address && <div>{addr.address}</div>}
               <div>
                 {[addr.city, addr.state, addr.pincode].filter(Boolean).join(", ")}
               </div>
-              {addr.country && <div>{addr.country}</div>}
             </div>
           </div>
 
