@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
-import { WOMPBg } from "@/components/TilePattern";
+import { TilePatternBg, FloralPatternBg } from "@/components/TilePattern";
 import { founders } from "@/data/products";
 
 function GoldStar({ size = 10 }: { size?: number }) {
@@ -107,7 +107,7 @@ const OurStory = () => {
         className="relative min-h-screen flex items-center justify-center overflow-hidden"
         style={{ background: "linear-gradient(160deg, #0A1A10 0%, #1B3A2D 45%, #0F2318 100%)" }}
       >
-        <WOMPBg opacity={0.5} light />
+        <TilePatternBg opacity={0.08} color="#ffffff" />
 
         {/* Giant watermark */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden" aria-hidden>
@@ -208,7 +208,7 @@ const OurStory = () => {
 
       {/* ══ THE SOUL ══ */}
       <section className="py-24 sm:py-32 bg-[#FBF7F0] relative overflow-hidden">
-        <WOMPBg opacity={0.45} />
+        <TilePatternBg opacity={0.06} />
 
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 grid lg:grid-cols-2 gap-16 items-center">
           {/* Image */}
@@ -274,7 +274,7 @@ const OurStory = () => {
         className="py-24 sm:py-32 relative overflow-hidden"
         style={{ background: "linear-gradient(160deg, #0F2318 0%, #1B3A2D 50%, #152B21 100%)" }}
       >
-        <WOMPBg opacity={0.5} light />
+        <TilePatternBg opacity={0.08} color="#ffffff" />
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #C9972D 30%, #E8B84B 50%, #C9972D 70%, transparent)" }} />
         <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #C9972D 30%, #E8B84B 50%, #C9972D 70%, transparent)" }} />
 
@@ -345,7 +345,7 @@ const OurStory = () => {
 
       {/* ══ THE CRAFT ══ */}
       <section className="py-24 sm:py-32 bg-[#FBF7F0] relative overflow-hidden">
-        <WOMPBg opacity={0.4} />
+        <TilePatternBg opacity={0.06} />
 
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 grid lg:grid-cols-2 gap-16 items-center">
           {/* Text — right on desktop */}
@@ -410,7 +410,7 @@ const OurStory = () => {
         className="py-24 sm:py-28 relative overflow-hidden"
         style={{ background: "linear-gradient(160deg, #0F2318, #1B3A2D 50%, #0F2318)" }}
       >
-        <WOMPBg opacity={0.5} light />
+        <TilePatternBg opacity={0.08} color="#ffffff" />
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #C9972D 30%, #E8B84B 50%, #C9972D 70%, transparent)" }} />
         <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #C9972D 30%, #E8B84B 50%, #C9972D 70%, transparent)" }} />
 
@@ -463,7 +463,7 @@ const OurStory = () => {
 
       {/* ══ FOUNDERS ══ */}
       <section className="py-24 sm:py-32 bg-[#FBF7F0] relative overflow-hidden">
-        <WOMPBg opacity={0.45} />
+        <TilePatternBg opacity={0.06} />
 
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
@@ -524,7 +524,7 @@ const OurStory = () => {
         className="py-28 sm:py-40 relative overflow-hidden"
         style={{ background: "linear-gradient(160deg, #0A1A10 0%, #1B3A2D 50%, #0F2318 100%)" }}
       >
-        <WOMPBg opacity={0.5} light />
+        <TilePatternBg opacity={0.08} color="#ffffff" />
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #C9972D 30%, #E8B84B 50%, #C9972D 70%, transparent)" }} />
 
         {/* Watermark */}
@@ -567,7 +567,7 @@ const OurStory = () => {
 
       {/* ══ CTA ══ */}
       <section className="py-20 sm:py-28 bg-[#FBF7F0] relative overflow-hidden">
-        <WOMPBg opacity={0.45} />
+        <TilePatternBg opacity={0.06} />
         <div className="relative max-w-3xl mx-auto px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 24 }}

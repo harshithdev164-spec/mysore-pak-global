@@ -5,7 +5,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import Link from "next/link";
 import { ArrowRight, Star, Gift, ChefHat, Flame, Truck, CheckCircle2, Package, Award, Sparkles, Heart, Instagram } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
-import { WOMPBg } from "@/components/TilePattern";
+import { TilePatternBg, FloralPatternBg } from "@/components/TilePattern";
 import { testimonials } from "@/data/products";
 import type { Product } from "@/data/products";
 
@@ -511,7 +511,7 @@ const Index = () => {
 
       {/* ── Tagline bridge ── */}
       <div className="relative bg-[#FBF7F0] py-6 overflow-hidden select-none">
-        <WOMPBg opacity={0.45} />
+        <TilePatternBg opacity={0.06} />
         {/* Left/right edge fades so it dissolves into adjacent sections */}
         <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#FBF7F0] to-transparent pointer-events-none z-10" />
         <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#FBF7F0] to-transparent pointer-events-none z-10" />
@@ -544,7 +544,7 @@ const Index = () => {
 
       {/* ══ CATEGORIES ══ */}
       <section className="pt-6 pb-8 sm:pt-8 sm:pb-10 bg-[#FBF7F0] relative overflow-hidden">
-        <WOMPBg opacity={0.45} />
+        <TilePatternBg opacity={0.06} />
         {/* Warm radial glow — same accent as products section */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 50%, #C9972D12 0%, transparent 70%)" }} />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -617,7 +617,7 @@ const Index = () => {
 
       {/* ══ FEATURED PRODUCTS ══ */}
       <section className="pt-8 pb-16 sm:pt-10 sm:pb-20 bg-[#FBF7F0] relative">
-        <WOMPBg opacity={0.45} />
+        <TilePatternBg opacity={0.06} />
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -654,7 +654,7 @@ const Index = () => {
 
       {/* ══ VIRTUAL TOUR ══ */}
       <section className="py-16 sm:py-24 bg-[#1B3A2D] relative overflow-hidden">
-        <WOMPBg opacity={0.5} light />
+        <TilePatternBg opacity={0.08} color="#ffffff" />
         {/* Corner ornaments */}
         <div className="absolute top-0 left-0 w-32 h-32 opacity-20 pointer-events-none">
           <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -760,7 +760,7 @@ const Index = () => {
 
       {/* ══ HOW IT'S MADE — PROCESS VIDEOS ══ */}
       <section className="py-20 sm:py-28 bg-[#FBF7F0] relative overflow-hidden">
-        <WOMPBg opacity={0.4} />
+        <TilePatternBg opacity={0.06} />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -908,7 +908,7 @@ const Index = () => {
 
       {/* ══ GOOGLE REVIEWS ══ */}
       <section className="py-24 sm:py-32 overflow-hidden relative" style={{ background: "linear-gradient(160deg, #0F2318 0%, #1B3A2D 40%, #152B21 100%)" }}>
-        <WOMPBg opacity={0.5} light />
+        <TilePatternBg opacity={0.08} color="#ffffff" />
 
         {/* Gold top border line */}
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #C9972D 30%, #E8B84B 50%, #C9972D 70%, transparent)" }} />
@@ -1075,7 +1075,7 @@ const Index = () => {
 
       {/* ══ FINAL CTA ══ */}
       <section className="py-20 sm:py-32 relative forest-gradient overflow-hidden">
-        <WOMPBg opacity={0.6} light />
+        <TilePatternBg opacity={0.1} color="#ffffff" />
         <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
           <motion.div {...fadeUp}>
             <img src="/logo.jpeg" alt="World of Mysore Pak" className="w-20 h-20 rounded-full mx-auto mb-8 border-2 border-[#C9972D]/40 shadow-xl" />
