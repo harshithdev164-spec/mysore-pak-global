@@ -22,6 +22,9 @@ const BodySchema = z.object({
   }),
   items: z.array(OrderItemSchema).min(1),
   notes: z.string().optional(),
+  // Shiprocket: actual shipping cost + selected courier from checkout
+  shipping_cost: z.number().min(0).optional(),
+  courier_id: z.number().int().positive().optional(),
 });
 
 export async function POST(request: Request) {
@@ -44,32 +47,44 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Validation failed", details: parsed.error.flatten() }, { status: 422 });
   }
 
-  const { customer_name, customer_email, customer_phone, shipping_address, items, notes } = parsed.data;
+  const { customer_name, customer_email, customer_phone, shipping_address, items, notes, courier_id } =
+    parsed.data;
 
   const subtotal = items.reduce((s, i) => s + i.unit_price * i.quantity, 0);
-  const shipping_cost = subtotal > 1500 ? 0 : 99;
+  // Use Shiprocket-provided rate if available; fallback to threshold logic
+  const shipping_cost =
+    parsed.data.shipping_cost !== undefined
+      ? parsed.data.shipping_cost
+      : subtotal > 1500
+      ? 0
+      : 99;
   const total = subtotal + shipping_cost;
   const order_number = `WMP-${Date.now().toString(36).toUpperCase()}`;
 
   // 1. Create the DB order first (payment_status: pending)
   const supabase = createServerClient();
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const insertPayload: Record<string, any> = {
+    order_number,
+    customer_name,
+    customer_email,
+    customer_phone,
+    subtotal,
+    shipping_cost,
+    discount: 0,
+    total,
+    payment_method: "razorpay",
+    payment_status: "pending",
+    shipping_address,
+    notes: notes ?? null,
+    status: "pending",
+  };
+  if (courier_id !== undefined) insertPayload.courier_id = courier_id;
+
   const { data: dbOrder, error: dbError } = await supabase
     .from("orders")
-    .insert({
-      order_number,
-      customer_name,
-      customer_email,
-      customer_phone,
-      subtotal,
-      shipping_cost,
-      discount: 0,
-      total,
-      payment_method: "razorpay",
-      payment_status: "pending",
-      shipping_address,
-      notes: notes ?? null,
-      status: "pending",
-    })
+    .insert(insertPayload)
     .select("id, order_number")
     .single();
 

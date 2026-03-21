@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { useAdminFetch, invalidateCache } from "@/lib/useAdminFetch";
 
 interface OrderItem {
   id: string;
@@ -31,6 +32,14 @@ interface Order {
   items: OrderItem[];
   created_at: string;
   updated_at: string;
+  // Shiprocket fields
+  shiprocket_order_id: number | null;
+  shiprocket_shipment_id: number | null;
+  awb_code: string | null;
+  courier_name: string | null;
+  tracking_url: string | null;
+  label_url: string | null;
+  invoice_url: string | null;
 }
 
 const ORDER_STATUSES = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"];
@@ -48,26 +57,23 @@ const STATUS_COLORS: Record<string, string> = {
 export default function AdminOrderDetailPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
-  const [order, setOrder] = useState<Order | null>(null);
-  const [loading, setLoading] = useState(true);
+  const { data: order, loading } = useAdminFetch<Order>(`/api/orders/${id}`);
   const [saving, setSaving] = useState(false);
   const [status, setStatus] = useState("");
   const [paymentStatus, setPaymentStatus] = useState("");
   const [saveMsg, setSaveMsg] = useState("");
 
+  // Shiprocket action states
+  const [srLoading, setSrLoading] = useState<string | null>(null); // which action is running
+  const [srMsg, setSrMsg] = useState("");
+  const [srData, setSrData] = useState<Partial<Order>>({});
+
   useEffect(() => {
-    fetch(`/api/orders/${id}`, { cache: "no-store" })
-      .then((r) => r.json())
-      .then((j) => {
-        if (j.data) {
-          setOrder(j.data);
-          setStatus(j.data.status);
-          setPaymentStatus(j.data.payment_status);
-        }
-      })
-      .catch(() => null)
-      .finally(() => setLoading(false));
-  }, [id]);
+    if (order && !status) {
+      setStatus(order.status);
+      setPaymentStatus(order.payment_status);
+    }
+  }, [order]);
 
   async function handleSave() {
     if (!order) return;
@@ -81,7 +87,9 @@ export default function AdminOrderDetailPage() {
       });
       const json = await res.json();
       if (res.ok) {
-        setOrder((prev) => prev ? { ...prev, status: json.data.status, payment_status: json.data.payment_status } : prev);
+        invalidateCache("/api/admin/orders");
+        invalidateCache(`/api/orders/${order.id}`);
+        router.refresh();
         setSaveMsg("Saved!");
       } else {
         setSaveMsg(json.error ?? "Failed to save");
@@ -89,6 +97,41 @@ export default function AdminOrderDetailPage() {
     } finally {
       setSaving(false);
       setTimeout(() => setSaveMsg(""), 3000);
+    }
+  }
+
+  async function doShiprocketAction(action: string) {
+    if (!order) return;
+    setSrLoading(action);
+    setSrMsg("");
+    try {
+      const res = await fetch(`/api/admin/shiprocket/${order.id}?action=${action}`, {
+        method: "POST",
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Action failed");
+
+      setSrMsg(action === "create" ? "Shipment created!" : action === "label" ? "Label ready!" : "Invoice ready!");
+      // Merge returned data into local state
+      if (json.data) {
+        setSrData((prev) => ({
+          ...prev,
+          shiprocket_order_id: json.data.order_id ?? prev.shiprocket_order_id,
+          shiprocket_shipment_id: json.data.shipment_id ?? prev.shiprocket_shipment_id,
+          awb_code: json.data.awb_code ?? prev.awb_code,
+          courier_name: json.data.courier_name ?? prev.courier_name,
+          tracking_url: json.data.tracking_url ?? prev.tracking_url,
+        }));
+      }
+      if (json.label_url) setSrData((prev) => ({ ...prev, label_url: json.label_url }));
+      if (json.invoice_url) setSrData((prev) => ({ ...prev, invoice_url: json.invoice_url }));
+
+      invalidateCache(`/api/orders/${order.id}`);
+    } catch (err) {
+      setSrMsg(err instanceof Error ? err.message : "Failed");
+    } finally {
+      setSrLoading(null);
+      setTimeout(() => setSrMsg(""), 5000);
     }
   }
 
@@ -101,6 +144,8 @@ export default function AdminOrderDetailPage() {
   );
 
   const addr = order.shipping_address ?? {};
+  // Merge live API data with any updates from Shiprocket actions
+  const sr = { ...order, ...srData };
 
   return (
     <div className="max-w-4xl">
@@ -144,7 +189,6 @@ export default function AdminOrderDetailPage() {
               </tbody>
             </table>
 
-            {/* Totals */}
             <div className="mt-4 pt-4 border-t border-gray-100 space-y-2 text-sm">
               <div className="flex justify-between text-gray-500">
                 <span>Subtotal</span><span>₹{order.subtotal}</span>
@@ -231,6 +275,125 @@ export default function AdminOrderDetailPage() {
                 </p>
               )}
             </div>
+          </div>
+
+          {/* Shiprocket Shipping & Tracking */}
+          <div className="bg-white rounded-xl border border-gray-200 p-6">
+            <h2 className="font-semibold text-gray-900 mb-4">Shiprocket</h2>
+
+            {sr.awb_code ? (
+              <div className="space-y-3">
+                {/* AWB */}
+                <div>
+                  <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">AWB Code</div>
+                  <div className="font-mono text-sm font-semibold text-gray-900">{sr.awb_code}</div>
+                </div>
+                {sr.courier_name && (
+                  <div>
+                    <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Courier</div>
+                    <div className="text-sm text-gray-800">{sr.courier_name}</div>
+                  </div>
+                )}
+                {sr.shiprocket_order_id && (
+                  <div>
+                    <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Shiprocket ID</div>
+                    <div className="text-sm text-gray-600">{sr.shiprocket_order_id}</div>
+                  </div>
+                )}
+
+                {/* Tracking link */}
+                {sr.tracking_url && (
+                  <a
+                    href={sr.tracking_url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-block text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
+                  >
+                    Track Shipment ↗
+                  </a>
+                )}
+
+                {/* Label / Invoice buttons */}
+                <div className="flex flex-wrap gap-2 pt-1">
+                  <button
+                    onClick={() => doShiprocketAction("label")}
+                    disabled={srLoading === "label"}
+                    className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg font-medium transition-colors disabled:opacity-50"
+                  >
+                    {srLoading === "label" ? "Loading…" : sr.label_url ? "Refresh Label" : "Get Label"}
+                  </button>
+                  {sr.label_url && (
+                    <a
+                      href={sr.label_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs bg-green-50 text-green-700 hover:bg-green-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
+                    >
+                      Print Label ↗
+                    </a>
+                  )}
+                  <button
+                    onClick={() => doShiprocketAction("invoice")}
+                    disabled={srLoading === "invoice"}
+                    className="text-xs bg-amber-50 hover:bg-amber-100 text-amber-700 px-3 py-1.5 rounded-lg font-medium transition-colors disabled:opacity-50"
+                  >
+                    {srLoading === "invoice" ? "Loading…" : sr.invoice_url ? "Refresh Invoice" : "Get Invoice"}
+                  </button>
+                  {sr.invoice_url && (
+                    <a
+                      href={sr.invoice_url}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="text-xs bg-amber-50 text-amber-700 hover:bg-amber-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
+                    >
+                      Print Invoice ↗
+                    </a>
+                  )}
+                </div>
+              </div>
+            ) : sr.shiprocket_order_id ? (
+              /* Order created but no AWB yet */
+              <div className="space-y-3">
+                <div>
+                  <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Shiprocket ID</div>
+                  <div className="text-sm text-gray-600">{sr.shiprocket_order_id}</div>
+                </div>
+                <p className="text-xs text-yellow-600 bg-yellow-50 rounded-lg px-3 py-2">
+                  Shipment created — AWB not yet assigned
+                </p>
+                <button
+                  onClick={() => doShiprocketAction("label")}
+                  disabled={srLoading === "label"}
+                  className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg font-medium transition-colors disabled:opacity-50"
+                >
+                  {srLoading === "label" ? "Loading…" : "Get Label"}
+                </button>
+              </div>
+            ) : (
+              /* No Shiprocket order yet */
+              <div className="space-y-3">
+                <p className="text-sm text-gray-400">No shipment created yet.</p>
+                {order.payment_status === "paid" ? (
+                  <button
+                    onClick={() => doShiprocketAction("create")}
+                    disabled={srLoading === "create"}
+                    className="w-full text-sm bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                  >
+                    {srLoading === "create" ? "Creating shipment…" : "Create Shipment"}
+                  </button>
+                ) : (
+                  <p className="text-xs text-gray-400">
+                    Mark payment as &ldquo;paid&rdquo; first to create a shipment.
+                  </p>
+                )}
+              </div>
+            )}
+
+            {srMsg && (
+              <p className={`text-xs mt-2 ${srMsg.includes("Failed") || srMsg.includes("failed") ? "text-red-500" : "text-green-600"}`}>
+                {srMsg}
+              </p>
+            )}
           </div>
 
           {/* Customer Info */}

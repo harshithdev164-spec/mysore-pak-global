@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import Link from "next/link";
+import { useAdminFetch } from "@/lib/useAdminFetch";
 
 interface Order {
   id: string;
@@ -34,31 +35,44 @@ const PAYMENT_COLORS: Record<string, string> = {
 
 const STATUSES = ["all", "pending", "confirmed", "processing", "shipped", "delivered", "cancelled"];
 
+function exportToCSV(orders: Order[]) {
+  const headers = ["Order #", "Customer Name", "Email", "Phone", "Total (₹)", "Status", "Payment Status", "Payment Method", "Date"];
+  const rows = orders.map((o) => [
+    o.order_number, o.customer_name, o.customer_email, o.customer_phone,
+    o.total, o.status, o.payment_status, o.payment_method ?? "",
+    new Date(o.created_at).toLocaleDateString("en-IN"),
+  ]);
+  const csv = [headers, ...rows].map((r) => r.map((c) => `"${String(c).replace(/"/g, '""')}"`).join(",")).join("\n");
+  const blob = new Blob([csv], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `orders-${new Date().toISOString().slice(0, 10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+}
+
 export default function AdminOrdersPage() {
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState("");
+  const { data: orders, loading, error } = useAdminFetch<Order[]>("/api/admin/orders");
   const [statusFilter, setStatusFilter] = useState("all");
 
-  useEffect(() => {
-    setLoading(true);
-    fetch("/api/admin/orders", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((j) => {
-        if (j.error) setError(j.error);
-        else setOrders(j.data ?? []);
-      })
-      .catch((e) => setError(String(e)))
-      .finally(() => setLoading(false));
-  }, []);
-
-  const filtered = statusFilter === "all" ? orders : orders.filter((o) => o.status === statusFilter);
+  const list = orders ?? [];
+  const filtered = statusFilter === "all" ? list : list.filter((o) => o.status === statusFilter);
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
-        <span className="text-sm text-gray-500">{orders.length} total</span>
+        <div className="flex items-center gap-3">
+          <span className="text-sm text-gray-500">{filtered.length} orders</span>
+          <button
+            onClick={() => exportToCSV(filtered)}
+            disabled={filtered.length === 0}
+            className="bg-white border border-gray-300 hover:border-gray-400 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 flex items-center gap-1.5"
+          >
+            <span>↓</span> Export CSV
+          </button>
+        </div>
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200">
@@ -69,18 +83,31 @@ export default function AdminOrdersPage() {
               key={s}
               onClick={() => setStatusFilter(s)}
               className={`px-3 py-1.5 rounded-full text-xs font-medium capitalize transition-colors ${
-                statusFilter === s
-                  ? "bg-amber-600 text-white"
-                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+                statusFilter === s ? "bg-amber-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
               {s}
+              {s !== "all" && (
+                <span className="ml-1 opacity-70">({list.filter((o) => o.status === s).length})</span>
+              )}
             </button>
           ))}
         </div>
 
         {loading ? (
-          <div className="p-8 text-center text-gray-400 text-sm">Loading orders...</div>
+          <div className="divide-y divide-gray-50">
+            {[...Array(6)].map((_, i) => (
+              <div key={i} className="px-4 py-3 flex items-center gap-4 animate-pulse">
+                <div className="h-3 bg-gray-100 rounded w-24" />
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 bg-gray-100 rounded w-1/3" />
+                  <div className="h-2 bg-gray-100 rounded w-1/4" />
+                </div>
+                <div className="h-3 bg-gray-100 rounded w-16" />
+                <div className="h-5 bg-gray-100 rounded-full w-20" />
+              </div>
+            ))}
+          </div>
         ) : error ? (
           <div className="p-8">
             <p className="text-red-600 font-medium text-sm">Error loading orders</p>
@@ -104,10 +131,7 @@ export default function AdminOrdersPage() {
                 {filtered.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
-                      <Link
-                        href={`/admin/orders/${order.id}`}
-                        className="text-amber-600 hover:underline font-medium"
-                      >
+                      <Link href={`/admin/orders/${order.id}`} className="text-amber-600 hover:underline font-medium">
                         {order.order_number}
                       </Link>
                     </td>
@@ -117,16 +141,12 @@ export default function AdminOrdersPage() {
                     </td>
                     <td className="px-4 py-3 font-semibold text-gray-900">₹{order.total}</td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[order.status] ?? "bg-gray-100 text-gray-700"}`}
-                      >
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${STATUS_COLORS[order.status] ?? "bg-gray-100 text-gray-700"}`}>
                         {order.status}
                       </span>
                     </td>
                     <td className="px-4 py-3">
-                      <span
-                        className={`px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${PAYMENT_COLORS[order.payment_status] ?? "bg-gray-100 text-gray-700"}`}
-                      >
+                      <span className={`px-2.5 py-0.5 rounded-full text-xs font-medium capitalize ${PAYMENT_COLORS[order.payment_status] ?? "bg-gray-100 text-gray-700"}`}>
                         {order.payment_status}
                       </span>
                     </td>
@@ -134,20 +154,13 @@ export default function AdminOrdersPage() {
                       {new Date(order.created_at).toLocaleDateString("en-IN")}
                     </td>
                     <td className="px-4 py-3">
-                      <Link
-                        href={`/admin/orders/${order.id}`}
-                        className="text-xs text-blue-600 hover:underline"
-                      >
-                        View →
-                      </Link>
+                      <Link href={`/admin/orders/${order.id}`} className="text-xs text-blue-600 hover:underline">View →</Link>
                     </td>
                   </tr>
                 ))}
                 {filtered.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-4 py-10 text-center text-gray-400">
-                      No orders found.
-                    </td>
+                    <td colSpan={7} className="px-4 py-10 text-center text-gray-400">No orders found.</td>
                   </tr>
                 )}
               </tbody>
