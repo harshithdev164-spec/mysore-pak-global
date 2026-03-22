@@ -123,36 +123,47 @@ const Index = () => {
       {/* ══════════════════════════════════════════
           HERO — Full-bleed banner
       ══════════════════════════════════════════ */}
-      <section className="relative h-screen min-h-[640px] overflow-hidden select-none">
-        {/* Full-bleed image with Ken Burns scale */}
+      {/* Mobile: fixed-height e-commerce banner | Desktop: full-screen hero */}
+      <section className="relative h-[70vh] sm:h-screen min-h-[320px] sm:min-h-[640px] overflow-hidden select-none">
+        {/* Image — Ken Burns on desktop only (expensive on mobile) */}
         <motion.div
           initial={{ scale: 1.04 }}
           animate={{ scale: 1 }}
           transition={{ duration: 6, ease: "linear" }}
-          className="absolute inset-x-0 bottom-0 top-[4.5rem] sm:top-[5.5rem]"
+          className="absolute inset-x-0 bottom-0 top-[4rem] sm:top-[5.5rem]"
         >
           <Image
             src="/hero 1.jpeg"
             alt="World of Mysore Pak"
             fill
             priority
-            className="object-cover"
+            className="object-cover object-center"
             sizes="100vw"
           />
         </motion.div>
-        {/* Gradient overlay */}
-        <div className="absolute inset-x-0 bottom-0 top-[4.5rem] sm:top-[5.5rem] bg-gradient-to-b from-black/30 via-transparent to-black/55" />
+
+        {/* Gradient overlay — stronger on mobile for text legibility */}
+        <div className="absolute inset-x-0 bottom-0 top-[4rem] sm:top-[5.5rem] bg-gradient-to-b from-black/40 via-black/10 to-black/70 sm:from-black/30 sm:via-transparent sm:to-black/55" />
+
+        {/* Mobile-only: brand headline overlaid in centre */}
+        <div className="sm:hidden absolute inset-x-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 px-6 text-center pointer-events-none">
+          <p className="font-body text-[10px] uppercase tracking-[0.35em] text-[#C9972D] font-semibold">Authentic · Handcrafted · Pure</p>
+          <h1 className="font-heading text-3xl font-bold text-white leading-tight drop-shadow-lg">
+            World of<br />Mysore Pak
+          </h1>
+          <p className="font-body text-xs text-white/80 mt-1">Pure Ghee Sweets from Mysuru</p>
+        </div>
 
         {/* CTA — pinned to bottom */}
         <motion.div
           initial={{ opacity: 0, y: 22 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.3 }}
-          className="absolute bottom-10 sm:bottom-14 inset-x-0 flex justify-center items-center gap-3 px-4"
+          className="absolute bottom-6 sm:bottom-14 inset-x-0 flex justify-center items-center gap-3 px-4"
         >
           <Link
             href="/shop"
-            className="btn-glow inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-full font-body text-sm font-bold tracking-wide shadow-lg shadow-black/30 hover:opacity-90 transition-opacity"
+            className="btn-glow inline-flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-body text-sm font-bold tracking-wide shadow-lg shadow-black/30 hover:opacity-90 transition-opacity"
             style={{ backgroundColor: "#1B3A2D", color: "#FBF7F0" }}
           >
             Shop Now
@@ -160,7 +171,7 @@ const Index = () => {
           </Link>
           <Link
             href="/our-story"
-            className="inline-flex items-center gap-1.5 px-6 sm:px-8 py-3 rounded-full font-body text-sm font-semibold tracking-wide border-2 border-white/40 text-white hover:border-white/70 transition-colors"
+            className="inline-flex items-center gap-1.5 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-body text-sm font-semibold tracking-wide border-2 border-white/40 text-white hover:border-white/70 transition-colors"
           >
             Our Story
           </Link>
