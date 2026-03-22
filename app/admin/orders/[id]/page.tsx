@@ -373,19 +373,13 @@ export default function AdminOrderDetailPage() {
               /* No Shiprocket order yet */
               <div className="space-y-3">
                 <p className="text-sm text-gray-400">No shipment created yet.</p>
-                {order.payment_status === "paid" ? (
-                  <button
-                    onClick={() => doShiprocketAction("create")}
-                    disabled={srLoading === "create"}
-                    className="w-full text-sm bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
-                  >
-                    {srLoading === "create" ? "Creating shipment…" : "Create Shipment"}
-                  </button>
-                ) : (
-                  <p className="text-xs text-gray-400">
-                    Mark payment as &ldquo;paid&rdquo; first to create a shipment.
-                  </p>
-                )}
+                <button
+                  onClick={() => doShiprocketAction("create")}
+                  disabled={srLoading === "create"}
+                  className="w-full text-sm bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                >
+                  {srLoading === "create" ? "Creating shipment…" : "Create Shipment"}
+                </button>
               </div>
             )}
 
