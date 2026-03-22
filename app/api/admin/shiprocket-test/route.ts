@@ -1,7 +1,8 @@
 export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
+import { deleteCached } from "@/lib/redis";
 
-// GET /api/admin/shiprocket-test — diagnose Shiprocket auth
+// GET /api/admin/shiprocket-test — diagnose Shiprocket auth + clear backoff cache
 export async function GET() {
   const email = process.env.SHIPROCKET_EMAIL;
   const password = process.env.SHIPROCKET_PASSWORD;
@@ -11,6 +12,9 @@ export async function GET() {
   if (!email || !password) {
     return NextResponse.json({ error: "SHIPROCKET_EMAIL or SHIPROCKET_PASSWORD not set" });
   }
+
+  // Clear any cached backoff + stale token so this test always tries fresh
+  await deleteCached("shiprocket:auth_backoff", "shiprocket:token");
 
   try {
     const res = await fetch("https://apiv2.shiprocket.in/v1/external/auth/login", {

@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { z } from "zod";
+import { createShiprocketOrder, parseWeightKg } from "@/lib/shiprocket";
 
 const OrderItemSchema = z.object({
   product_id: z.string().uuid().optional(),
@@ -25,9 +26,11 @@ const CreateOrderSchema = z.object({
   items: z.array(OrderItemSchema).min(1),
   payment_method: z.string().optional().default("razorpay"),
   notes: z.string().optional(),
+  shipping_cost: z.number().min(0).optional(),
+  courier_id: z.number().int().positive().optional(),
 });
 
-// POST /api/orders — create a new order
+// POST /api/orders — create a new order (also triggers Shiprocket for COD)
 export async function POST(request: Request) {
   const supabase = createServerClient();
 
@@ -46,35 +49,46 @@ export async function POST(request: Request) {
     );
   }
 
-  const { customer_name, customer_email, customer_phone, shipping_address, items, payment_method, notes } =
+  const { customer_name, customer_email, customer_phone, shipping_address, items, payment_method, notes, courier_id } =
     parsed.data;
 
   // Calculate totals
   const subtotal = items.reduce((sum, i) => sum + i.unit_price * i.quantity, 0);
-  const shipping_cost = subtotal > 1500 ? 0 : 99;
+  const shipping_cost =
+    parsed.data.shipping_cost !== undefined
+      ? parsed.data.shipping_cost
+      : subtotal > 1500
+      ? 0
+      : 99;
   const total = subtotal + shipping_cost;
 
   // Generate human-readable order number
   const order_number = `WMP-${Date.now().toString(36).toUpperCase()}`;
 
-  // Insert order
+  const isCod = payment_method === "cod";
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const insertPayload: Record<string, any> = {
+    order_number,
+    customer_name,
+    customer_email,
+    customer_phone,
+    subtotal,
+    shipping_cost,
+    discount: 0,
+    total,
+    payment_method: payment_method ?? "razorpay",
+    // COD orders are confirmed immediately; Razorpay orders stay pending until verify
+    payment_status: isCod ? "pending" : "pending",
+    status: isCod ? "confirmed" : "pending",
+    shipping_address,
+    notes: notes ?? null,
+  };
+  if (courier_id !== undefined) insertPayload.courier_id = courier_id;
+
   const { data: order, error: orderError } = await supabase
     .from("orders")
-    .insert({
-      order_number,
-      customer_name,
-      customer_email,
-      customer_phone,
-      subtotal,
-      shipping_cost,
-      discount: 0,
-      total,
-      payment_method: payment_method ?? "razorpay",
-      payment_status: "pending",
-      shipping_address,
-      notes: notes ?? null,
-      status: "pending",
-    })
+    .insert(insertPayload)
     .select("id, order_number, status, total, created_at")
     .single();
 
@@ -98,6 +112,55 @@ export async function POST(request: Request) {
 
   if (itemsError) {
     return NextResponse.json({ error: itemsError.message }, { status: 500 });
+  }
+
+  // Auto-create Shiprocket order for COD (best-effort — never blocks the response)
+  if (isCod && process.env.SHIPROCKET_EMAIL) {
+    try {
+      const totalWeight = items.reduce(
+        (sum, item) => sum + parseWeightKg(item.weight_label) * item.quantity,
+        0
+      );
+      const orderDate = new Date(order.created_at)
+        .toISOString()
+        .replace("T", " ")
+        .slice(0, 16);
+
+      const srResult = await createShiprocketOrder({
+        order_number: order.order_number,
+        order_date: orderDate,
+        customer_name,
+        customer_email,
+        customer_phone,
+        address: shipping_address.address,
+        city: shipping_address.city,
+        state: shipping_address.state,
+        pincode: shipping_address.pincode,
+        items: items.map((item) => ({
+          name: item.product_name,
+          sku: item.product_name.toLowerCase().replace(/\s+/g, "-"),
+          units: item.quantity,
+          selling_price: item.unit_price,
+        })),
+        subtotal,
+        shipping_charges: shipping_cost,
+        weight_kg: Math.max(totalWeight, 0.1),
+      });
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const srUpdate: Record<string, any> = {
+        shiprocket_order_id: srResult.order_id,
+        shiprocket_shipment_id: srResult.shipment_id,
+      };
+      if (srResult.awb_code) srUpdate.awb_code = srResult.awb_code;
+      if (srResult.courier_name) srUpdate.courier_name = srResult.courier_name;
+      if (srResult.tracking_url) srUpdate.tracking_url = srResult.tracking_url;
+      if (srResult.label_url) srUpdate.label_url = srResult.label_url;
+
+      await supabase.from("orders").update(srUpdate).eq("id", order.id);
+    } catch (err) {
+      console.error("[Shiprocket] COD order creation failed:", err);
+    }
   }
 
   return NextResponse.json({ data: order }, { status: 201 });

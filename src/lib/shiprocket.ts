@@ -7,11 +7,17 @@ import { getCached, setCached } from "./redis";
 
 const BASE = "https://apiv2.shiprocket.in/v1/external";
 const TOKEN_CACHE_KEY = "shiprocket:token";
-const TOKEN_TTL_S = 230 * 60 * 60; // 230 hours (buffer before 240hr expiry)
+const AUTH_BACKOFF_KEY = "shiprocket:auth_backoff"; // prevents hammering on bad creds
+const TOKEN_TTL_S = 230 * 60 * 60; // 230 hours
+const AUTH_BACKOFF_TTL_S = 10 * 60; // 10 min cooldown after auth failure
 
 // ── Auth ────────────────────────────────────────────────────────────────────
 
 async function fetchFreshToken(): Promise<string> {
+  // Check backoff — don't retry if we recently had a non-401 auth failure
+  const backoff = await getCached<string>(AUTH_BACKOFF_KEY);
+  if (backoff) throw new Error(`Shiprocket auth in cooldown: ${backoff}`);
+
   const res = await fetch(`${BASE}/auth/login`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -20,10 +26,14 @@ async function fetchFreshToken(): Promise<string> {
       password: process.env.SHIPROCKET_PASSWORD,
     }),
   });
+
   if (!res.ok) {
     const body = await res.text().catch(() => "");
+    // Cache the failure to prevent repeated hammering (account block)
+    await setCached(AUTH_BACKOFF_KEY, `${res.status}: ${body}`, AUTH_BACKOFF_TTL_S);
     throw new Error(`Shiprocket auth failed (${res.status}): ${body}`);
   }
+
   const data = await res.json();
   if (!data.token) throw new Error("Shiprocket: no token in login response");
   return data.token as string;
@@ -53,7 +63,7 @@ async function srFetch(path: string, options: RequestInit = {}): Promise<Respons
   let token = await getToken();
   let res = await doReq(token);
 
-  // Refresh and retry once on 401
+  // Refresh and retry once on 401 (expired token)
   if (res.status === 401) {
     token = await fetchFreshToken();
     await setCached(TOKEN_CACHE_KEY, token, TOKEN_TTL_S);
