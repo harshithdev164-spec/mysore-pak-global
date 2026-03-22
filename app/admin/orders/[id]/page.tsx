@@ -131,7 +131,6 @@ export default function AdminOrderDetailPage() {
       setSrMsg(err instanceof Error ? err.message : "Failed");
     } finally {
       setSrLoading(null);
-      setTimeout(() => setSrMsg(""), 5000);
     }
   }
 
