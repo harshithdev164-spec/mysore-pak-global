@@ -83,17 +83,18 @@ function InstaCard({ post }: { post: { src: string; likes: string; caption: stri
 /* ══════════════════════════════════════════
    MOTION HELPERS
    ══════════════════════════════════════════ */
+// Opacity-only animations — GPU composited, no layout recalculation
 const fadeUp = {
-  initial: { opacity: 0, y: 40 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-80px" },
-  transition: { duration: 0.7 },
+  initial: { opacity: 0 },
+  whileInView: { opacity: 1 },
+  viewport: { once: true, margin: "-60px" },
+  transition: { duration: 0.45 },
 };
 
 const stagger = {
-  initial: { opacity: 0, y: 30 },
-  whileInView: { opacity: 1, y: 0 },
-  viewport: { once: true, margin: "-50px" },
+  initial: { opacity: 0 },
+  whileInView: { opacity: 1 },
+  viewport: { once: true, margin: "-40px" },
 };
 
 /* ══════════════════════════════════════════
@@ -101,6 +102,11 @@ const stagger = {
    ══════════════════════════════════════════ */
 const Index = () => {
   const [featured, setFeatured] = useState<Product[]>([]);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    setIsMobile(window.innerWidth < 640);
+  }, []);
 
   useEffect(() => {
     // Try featured products first; fall back to newest 6 if none are starred
@@ -127,9 +133,9 @@ const Index = () => {
       <section className="relative h-[70vh] sm:h-screen min-h-[320px] sm:min-h-[640px] overflow-hidden select-none">
         {/* Image — Ken Burns on desktop only (expensive on mobile) */}
         <motion.div
-          initial={{ scale: 1.04 }}
+          initial={{ scale: isMobile ? 1 : 1.04 }}
           animate={{ scale: 1 }}
-          transition={{ duration: 6, ease: "linear" }}
+          transition={isMobile ? { duration: 0 } : { duration: 6, ease: "linear" }}
           className="absolute inset-x-0 bottom-0 top-[4rem] sm:top-[5.5rem]"
         >
           <Image
@@ -156,7 +162,7 @@ const Index = () => {
 
         {/* CTA — pinned to bottom */}
         <motion.div
-          initial={{ opacity: 0, y: 22 }}
+          initial={{ opacity: 0 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.55, delay: 0.3 }}
           className="absolute bottom-6 sm:bottom-14 inset-x-0 flex justify-center items-center gap-3 px-4"
@@ -216,8 +222,8 @@ const Index = () => {
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 50%, #C9972D12 0%, transparent 70%)" }} />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 24 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.65 }}
             className="text-center mb-4"
@@ -246,7 +252,7 @@ const Index = () => {
             ].map((cat) => (
               <motion.div
                 key={cat.slug}
-                variants={{ hidden: { opacity: 0, y: 36 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
+                variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.4 } } }}
               >
                 <Link href={`/shop?category=${cat.slug}`} className="group flex flex-col items-center gap-3">
                   <motion.div
@@ -288,8 +294,8 @@ const Index = () => {
       <section className="pt-8 pb-16 sm:pt-10 sm:pb-20 bg-[#FBF7F0] relative overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7 }}
             className="text-center mb-12"
@@ -325,8 +331,8 @@ const Index = () => {
         <div className="relative max-w-5xl mx-auto px-3 sm:px-6 lg:px-8">
           {/* Heading */}
           <motion.div
-            initial={{ opacity: 0, y: 28 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7 }}
             className="text-center mb-6 sm:mb-10"
@@ -387,8 +393,8 @@ const Index = () => {
       <section className="py-20 sm:py-28 bg-[#FBF7F0] relative overflow-hidden section-lazy">
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7 }}
             className="text-center mb-14"
@@ -417,7 +423,7 @@ const Index = () => {
             ].map((item, i) => (
               <motion.div
                 key={i}
-                variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
+                variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.4 } } }}
                 className="flex flex-col items-center text-center gap-4"
               >
                 {/* Circular video */}
@@ -483,8 +489,8 @@ const Index = () => {
       <section className="py-20 sm:py-28 bg-[#FBF7F0] relative section-lazy">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7 }}
             className="flex flex-col sm:flex-row items-start sm:items-end justify-between mb-10 gap-4"
@@ -509,8 +515,8 @@ const Index = () => {
             ].map((col, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 30 }}
-                whileInView={{ opacity: 1, y: 0 }}
+                initial={{ opacity: 0 }}
+                whileInView={{ opacity: 1 }}
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.6, delay: (i % 2) * 0.1 }}
               >
@@ -542,8 +548,8 @@ const Index = () => {
         {/* Header */}
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-14 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7 }}
           >
@@ -661,8 +667,8 @@ const Index = () => {
       <section className="py-20 sm:py-28 bg-[#FBF7F0] overflow-hidden relative section-lazy">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            whileInView={{ opacity: 1, y: 0 }}
+            initial={{ opacity: 0 }}
+            whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7 }}
           >
