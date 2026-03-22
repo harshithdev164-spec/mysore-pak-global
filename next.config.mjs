@@ -1,13 +1,59 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  compress: true,
+  poweredByHeader: false,
+  productionBrowserSourceMaps: false,
+
   images: {
+    formats: ["image/avif", "image/webp"],
+    minimumCacheTTL: 60 * 60 * 24 * 365, // 1 year
     remotePatterns: [
       { protocol: "https", hostname: "images.unsplash.com" },
       { protocol: "https", hostname: "*.supabase.co" },
     ],
   },
-  // Needed for Three.js (uses Node.js globals in some packages)
-  transpilePackages: ["three"],
+
+  async headers() {
+    return [
+      {
+        source: "/(.*)",
+        headers: [
+          { key: "X-Content-Type-Options", value: "nosniff" },
+          { key: "X-Frame-Options", value: "SAMEORIGIN" },
+          { key: "X-XSS-Protection", value: "1; mode=block" },
+          { key: "Referrer-Policy", value: "strict-origin-when-cross-origin" },
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=63072000; includeSubDomains; preload",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=(), payment=(self)",
+          },
+        ],
+      },
+      {
+        // Cache all public static assets for 1 year
+        source: "/(:path*)(png|jpg|jpeg|webp|avif|svg|ico|woff2|woff)",
+        headers: [
+          { key: "Cache-Control", value: "public, max-age=31536000, immutable" },
+        ],
+      },
+      {
+        // Short CDN cache for product/category API responses
+        source: "/api/products(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, s-maxage=30, stale-while-revalidate=300" },
+        ],
+      },
+      {
+        source: "/api/categories(.*)",
+        headers: [
+          { key: "Cache-Control", value: "public, s-maxage=60, stale-while-revalidate=600" },
+        ],
+      },
+    ];
+  },
 };
 
 export default nextConfig;

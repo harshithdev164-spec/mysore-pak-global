@@ -1,11 +1,11 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight, Star, Gift, ChefHat, Flame, Truck, CheckCircle2, Package, Award, Sparkles, Heart, Instagram } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
-import { TilePatternBg, FloralPatternBg } from "@/components/TilePattern";
 import { testimonials } from "@/data/products";
 import type { Product } from "@/data/products";
 
@@ -32,324 +32,19 @@ function mapApiProduct(p: any): Product {
   };
 }
 
-/* ══════════════════════════════════════════
-   SLIDE DATA
-   ══════════════════════════════════════════ */
-type SlideConfig = {
-  bg: string;
-  textColor: string;
-  accentColor: string;
-  eyebrow: string;
-  line1: string;
-  line2: string;
-  product: string;
-  cta: string;
-  ctaHref: string;
-  ctaBg: string;
-  ctaTextColor: string;
-  badge1: { text: string; rotate: number };
-  badge2: { text: string; rotate: number };
-  fullBanner?: boolean;
-};
-
-const SLIDES: SlideConfig[] = [
-  {
-    bg: "#F5B800",
-    textColor: "#1B3A2D",
-    accentColor: "#7A3200",
-    eyebrow: "Our Signature",
-    line1: "Crafted in",
-    line2: "Pure Ghee.",
-    product: "/hero%201.png",
-    cta: "Shop Now",
-    ctaHref: "/shop",
-    ctaBg: "#1B3A2D",
-    ctaTextColor: "#FBF7F0",
-    badge1: { text: "100%\nPure Ghee", rotate: 14 },
-    badge2: { text: "Since\nGenerations", rotate: -10 },
-    fullBanner: true,
-  },
-  {
-    bg: "#1B3A2D",
-    textColor: "#FBF7F0",
-    accentColor: "#C9972D",
-    eyebrow: "The Classic",
-    line1: "The Art of",
-    line2: "Mysore Pak.",
-    product: "/hero%202.png",
-    cta: "Explore Flavors",
-    ctaHref: "/shop",
-    ctaBg: "#C9972D",
-    ctaTextColor: "#1B3A2D",
-    badge1: { text: "Traditional\nRecipe", rotate: 10 },
-    badge2: { text: "Freshly\nMade", rotate: -12 },
-    fullBanner: true,
-  },
-];
 
 
 const INSTAGRAM_POSTS = [
-  { src: "/hero-mysore-pak.png",   likes: "2.4k", caption: "The golden beauty of freshly made Mysore Pak ✨ Pure ghee, pure love." },
-  { src: "/hero-preparation.png",  likes: "1.8k", caption: "Watch the magic happen 🍳 Our masters at work in the kitchen." },
-  { src: "/hero-stack.png",        likes: "3.1k", caption: "The perfect stack. The perfect bite. 🤍 #MysorePak #WorldOfMysorePak" },
-  { src: "/hero-gift-boxes.png",   likes: "4.2k", caption: "Festival season is gift season 🎁 Premium hampers, now available." },
-  { src: "/hero-closeup.png",      likes: "2.9k", caption: "Up close with perfection 📸 Every piece tells a story of craft." },
-  { src: "/hero-giftbox.png",      likes: "1.6k", caption: "Wrapped with love, delivered with care 💛 Order yours today." },
-  { src: "/brbrb.png",             likes: "3.5k", caption: "From Mysuru, to your home 🏠 Authentic taste, everywhere." },
+  { src: "/Mysore Pak.webp",   likes: "2.4k", caption: "The golden beauty of freshly made Mysore Pak ✨ Pure ghee, pure love." },
+  { src: "/Ghee Sweets.webp",  likes: "1.8k", caption: "Melt-in-mouth ghee sweets made fresh every day 🍯" },
+  { src: "/Gift Boxes.webp",   likes: "4.2k", caption: "Festival season is gift season 🎁 Premium hampers, now available." },
+  { src: "/Namkeen.webp",      likes: "3.1k", caption: "Crunchy, spicy, irresistible — our Namkeen range 🤍 #WorldOfMysorePak" },
+  { src: "/Choclates.webp",    likes: "2.9k", caption: "Where tradition meets indulgence 📸 Our chocolate collection." },
+  { src: "/Specials.webp",     likes: "1.6k", caption: "Limited specials — crafted for the season 💛 Order yours today." },
+  { src: "/story 5.webp",      likes: "3.5k", caption: "From Mysuru, to your home 🏠 Authentic taste, everywhere." },
 ];
 
 
-/* ══════════════════════════════════════════
-   STATIC SLIDE (previous slide, no animation)
-   ══════════════════════════════════════════ */
-function StaticSlide({ slide }: { slide: SlideConfig }) {
-  if (slide.fullBanner) {
-    return (
-      <div className="absolute inset-0">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={slide.product}
-          alt=""
-          fetchPriority="high"
-          className="absolute inset-x-0 bottom-0 top-[4.5rem] sm:top-[5.5rem] w-full object-cover"
-          style={{ height: "calc(100% - 4.5rem)" }}
-        />
-        <div className="absolute inset-x-0 bottom-0 top-[4.5rem] sm:top-[5.5rem] bg-gradient-to-b from-black/30 via-transparent to-black/50" />
-      </div>
-    );
-  }
-
-  return (
-    <div className="absolute inset-0 flex flex-col pt-[4.5rem] sm:pt-[5.5rem]">
-      {/* Headline */}
-      <div className="text-center pt-3 sm:pt-5 px-5 flex-none">
-        <p
-          className="text-[10px] uppercase tracking-[0.4em] font-bold mb-2"
-          style={{ color: slide.textColor, opacity: 0.55 }}
-        >
-          {slide.eyebrow}
-        </p>
-        <h1 className="font-body font-black uppercase leading-[0.86]" aria-hidden>
-          <span
-            className="block text-[clamp(2.6rem,5vw,6rem)] tracking-tighter"
-            style={{ color: slide.textColor }}
-          >
-            {slide.line1}
-          </span>
-          <span
-            className="block text-[clamp(3.8rem,7.5vw,8.5rem)] tracking-tighter"
-            style={{ color: slide.accentColor }}
-          >
-            {slide.line2}
-          </span>
-        </h1>
-      </div>
-
-      {/* Product — fetchPriority=high marks this as the LCP element */}
-      <div className="flex-1 min-h-0 flex items-center justify-center px-4 relative">
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          src={slide.product}
-          alt=""
-          fetchPriority="high"
-          className="w-auto object-contain"
-          style={{
-            maxHeight: "min(46vh, 400px)",
-            filter: "drop-shadow(0 24px 40px rgba(0,0,0,0.32))",
-          }}
-        />
-      </div>
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════
-   ANIMATED SLIDE (current slide, with animations)
-   ══════════════════════════════════════════ */
-function AnimatedSlide({ slide }: { slide: SlideConfig }) {
-  if (slide.fullBanner) {
-    return (
-      <div className="absolute inset-0">
-        {/* Full-bleed banner — starts below navbar */}
-        <motion.img
-          initial={{ scale: 1.04 }}
-          animate={{ scale: 1 }}
-          transition={{ duration: 6, ease: "linear" }}
-          src={slide.product}
-          alt={`${slide.line1} ${slide.line2}`}
-          className="absolute inset-x-0 bottom-0 top-[4.5rem] sm:top-[5.5rem] w-full object-cover"
-          style={{ height: "calc(100% - 4.5rem)" }}
-        />
-        <div className="absolute inset-x-0 bottom-0 top-[4.5rem] sm:top-[5.5rem] bg-gradient-to-b from-black/30 via-transparent to-black/55" />
-
-        {/* CTA only — pinned to bottom */}
-        <motion.div
-          initial={{ opacity: 0, y: 22 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.3 }}
-          className="absolute bottom-10 sm:bottom-14 inset-x-0 flex justify-center items-center gap-3 px-4"
-        >
-          <Link
-            href={slide.ctaHref}
-            className="btn-glow inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-full font-body text-sm font-bold tracking-wide shadow-lg shadow-black/30 hover:opacity-90 transition-opacity"
-            style={{ backgroundColor: slide.ctaBg, color: slide.ctaTextColor }}
-          >
-            {slide.cta}
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-          {slide.ctaHref !== "/our-story" && (
-            <Link
-              href="/our-story"
-              className="inline-flex items-center gap-1.5 px-6 sm:px-8 py-3 rounded-full font-body text-sm font-semibold tracking-wide border-2 border-white/40 text-white hover:border-white/70 transition-colors"
-            >
-              Our Story
-            </Link>
-          )}
-        </motion.div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="absolute inset-0 flex flex-col pt-[4.5rem] sm:pt-[5.5rem]">
-      {/* Top: headline */}
-      <div className="text-center pt-3 sm:pt-5 px-5 flex-none">
-        {/* Eyebrow */}
-        <div className="overflow-hidden mb-2">
-          <motion.p
-            initial={{ y: "110%", opacity: 0 }}
-            animate={{ y: "0%", opacity: 0.55 }}
-            transition={{ duration: 0.65, delay: 0.1, ease: [0.22, 1, 0.36, 1] }}
-            className="text-[10px] uppercase tracking-[0.4em] font-bold"
-            style={{ color: slide.textColor }}
-          >
-            {slide.eyebrow}
-          </motion.p>
-        </div>
-
-        {/* Line 1 */}
-        <h1 className="font-body font-black uppercase leading-[0.86]">
-          <div className="overflow-hidden">
-            <motion.span
-              initial={{ y: "115%" }}
-              animate={{ y: "0%" }}
-              transition={{ duration: 0.88, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="block text-[clamp(2.6rem,5vw,6rem)] tracking-tighter"
-              style={{ color: slide.textColor }}
-            >
-              {slide.line1}
-            </motion.span>
-          </div>
-
-          {/* Line 2 — larger, accent color */}
-          <div className="overflow-hidden">
-            <motion.span
-              initial={{ y: "115%" }}
-              animate={{ y: "0%" }}
-              transition={{ duration: 0.88, delay: 0.34, ease: [0.22, 1, 0.36, 1] }}
-              className="block text-[clamp(3.8rem,7.5vw,8.5rem)] tracking-tighter"
-              style={{ color: slide.accentColor }}
-            >
-              {slide.line2}
-            </motion.span>
-          </div>
-        </h1>
-      </div>
-
-      {/* Middle: Product + floating badge stickers */}
-      <div className="flex-1 min-h-0 relative flex items-center justify-center px-4">
-        <motion.img
-          initial={{ scale: 0.78, opacity: 0, y: 16 }}
-          animate={{ scale: 1, opacity: 1, y: 0 }}
-          transition={{ duration: 0.95, delay: 0.22, ease: [0.22, 1, 0.36, 1] }}
-          src={slide.product}
-          alt={`${slide.line1} ${slide.line2}`}
-          className="w-auto object-contain relative z-10"
-          style={{
-            maxHeight: "min(46vh, 400px)",
-            filter: "drop-shadow(0 24px 40px rgba(0,0,0,0.32))",
-          }}
-        />
-
-        {/* Badge sticker 1 — top right */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.3, rotate: 0 }}
-          animate={{ opacity: 1, scale: 1, rotate: slide.badge1.rotate }}
-          transition={{ duration: 0.55, delay: 0.68, type: "spring", stiffness: 260, damping: 17 }}
-          className="absolute top-2 right-3 sm:top-6 sm:right-10 lg:right-28 z-20 pointer-events-none"
-        >
-          <div
-            className="w-[62px] h-[62px] sm:w-[76px] sm:h-[76px] rounded-full flex flex-col items-center justify-center shadow-xl"
-            style={{
-              backgroundColor: "rgba(255,255,255,0.93)",
-              border: `2.5px solid ${slide.accentColor}50`,
-            }}
-          >
-            <span
-              className="text-[7px] sm:text-[8.5px] font-black uppercase text-center leading-tight whitespace-pre-line px-2"
-              style={{ color: slide.textColor }}
-            >
-              {slide.badge1.text}
-            </span>
-          </div>
-        </motion.div>
-
-        {/* Badge sticker 2 — bottom left */}
-        <motion.div
-          initial={{ opacity: 0, scale: 0.3, rotate: 0 }}
-          animate={{ opacity: 1, scale: 1, rotate: slide.badge2.rotate }}
-          transition={{ duration: 0.55, delay: 0.82, type: "spring", stiffness: 260, damping: 17 }}
-          className="absolute bottom-2 left-3 sm:bottom-6 sm:left-10 lg:left-28 z-20 pointer-events-none"
-        >
-          <div
-            className="w-[62px] h-[62px] sm:w-[76px] sm:h-[76px] rounded-full flex flex-col items-center justify-center shadow-xl"
-            style={{
-              backgroundColor: "rgba(255,255,255,0.93)",
-              border: `2.5px solid ${slide.accentColor}50`,
-            }}
-          >
-            <span
-              className="text-[7px] sm:text-[8.5px] font-black uppercase text-center leading-tight whitespace-pre-line px-2"
-              style={{ color: slide.textColor }}
-            >
-              {slide.badge2.text}
-            </span>
-          </div>
-        </motion.div>
-      </div>
-
-      {/* Bottom: CTA buttons */}
-      <motion.div
-        initial={{ opacity: 0, y: 22 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.55, delay: 0.48 }}
-        className="flex-none pb-6 sm:pb-8 flex justify-center items-center gap-3 px-4"
-      >
-        <Link
-          href={slide.ctaHref}
-          className="btn-glow inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-full font-body text-sm font-bold tracking-wide shadow-lg shadow-black/20 hover:opacity-90 transition-opacity"
-          style={{ backgroundColor: slide.ctaBg, color: slide.ctaTextColor }}
-        >
-          {slide.cta}
-          <ArrowRight className="w-3.5 h-3.5" />
-        </Link>
-        {slide.ctaHref !== "/our-story" && (
-          <Link
-            href="/our-story"
-            className="inline-flex items-center gap-1.5 px-6 sm:px-8 py-3 rounded-full font-body text-sm font-semibold tracking-wide border-2 hover:opacity-75 transition-opacity"
-            style={{
-              borderColor: slide.ctaBg + "70",
-              color: slide.textColor,
-              opacity: 0.85,
-            }}
-          >
-            Our Story
-          </Link>
-        )}
-      </motion.div>
-    </div>
-  );
-}
 
 /* ══════════════════════════════════════════
    INSTAGRAM POST CARD
@@ -386,7 +81,7 @@ function InstaCard({ post }: { post: { src: string; likes: string; caption: stri
 }
 
 /* ══════════════════════════════════════════
-   MOTION HELPERS FOR BELOW-HERO SECTIONS
+   MOTION HELPERS
    ══════════════════════════════════════════ */
 const fadeUp = {
   initial: { opacity: 0, y: 40 },
@@ -408,110 +103,72 @@ const Index = () => {
   const [featured, setFeatured] = useState<Product[]>([]);
 
   useEffect(() => {
-    fetch("/api/products?limit=6")
+    // Try featured products first; fall back to newest 6 if none are starred
+    fetch("/api/products?featured=true&limit=6")
       .then((r) => r.json())
-      .then((j) => { if (j.data) setFeatured(j.data.map(mapApiProduct)); })
+      .then((j) => {
+        if (j.data && j.data.length > 0) {
+          setFeatured(j.data.map(mapApiProduct));
+        } else {
+          return fetch("/api/products?limit=6")
+            .then((r) => r.json())
+            .then((j2) => { if (j2.data) setFeatured(j2.data.map(mapApiProduct)); });
+        }
+      })
       .catch(console.error);
   }, []);
-
-  const [current, setCurrent]     = useState(0);
-  const [prevSlide, setPrevSlide] = useState(0);
-  const hasTransitioned           = useRef(false);
-
-  const goTo = useCallback(
-    (idx: number) => {
-      if (idx === current) return;
-      hasTransitioned.current = true;
-      setPrevSlide(current);
-      setCurrent(idx);
-    },
-    [current]
-  );
-
-  /* Auto-advance every 5 s */
-  useEffect(() => {
-    const id = setInterval(() => goTo((current + 1) % SLIDES.length), 5000);
-    return () => clearInterval(id);
-  }, [current, goTo]);
 
   return (
     <div className="overflow-hidden">
       {/* ══════════════════════════════════════════
-          HERO — Brars-style: solid bg + big headline
-                 + centered product + floating badges
+          HERO — Full-bleed banner
       ══════════════════════════════════════════ */}
       <section className="relative h-screen min-h-[640px] overflow-hidden select-none">
-
-        {/* ── Layer 1: Previous slide (static base, fully visible) ── */}
-        <div
-          className="absolute inset-0"
-          style={{ backgroundColor: SLIDES[prevSlide].bg }}
+        {/* Full-bleed image with Ken Burns scale */}
+        <motion.div
+          initial={{ scale: 1.04 }}
+          animate={{ scale: 1 }}
+          transition={{ duration: 6, ease: "linear" }}
+          className="absolute inset-x-0 bottom-0 top-[4.5rem] sm:top-[5.5rem]"
         >
-          <StaticSlide slide={SLIDES[prevSlide]} />
-        </div>
+          <Image
+            src="/hero 1.jpeg"
+            alt="World of Mysore Pak"
+            fill
+            priority
+            className="object-cover"
+            sizes="100vw"
+          />
+        </motion.div>
+        {/* Gradient overlay */}
+        <div className="absolute inset-x-0 bottom-0 top-[4.5rem] sm:top-[5.5rem] bg-gradient-to-b from-black/30 via-transparent to-black/55" />
 
-        {/* ── Layer 2: Current slide — full content inside circle reveal ── */}
-        <AnimatePresence mode="sync">
-          <motion.div
-            key={current}
-            className="absolute inset-0"
-            style={{ backgroundColor: SLIDES[current].bg }}
-            initial={{
-              clipPath: hasTransitioned.current
-                ? "circle(0% at 50% 50%)"
-                : "circle(150% at 50% 50%)",
-            }}
-            animate={{ clipPath: "circle(150% at 50% 50%)" }}
-            exit={{ clipPath: "circle(150% at 50% 50%)", transition: { duration: 0 } }}
-            transition={{ duration: 1.3, ease: [0.76, 0, 0.24, 1] }}
+        {/* CTA — pinned to bottom */}
+        <motion.div
+          initial={{ opacity: 0, y: 22 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.55, delay: 0.3 }}
+          className="absolute bottom-10 sm:bottom-14 inset-x-0 flex justify-center items-center gap-3 px-4"
+        >
+          <Link
+            href="/shop"
+            className="btn-glow inline-flex items-center gap-2 px-6 sm:px-8 py-3 rounded-full font-body text-sm font-bold tracking-wide shadow-lg shadow-black/30 hover:opacity-90 transition-opacity"
+            style={{ backgroundColor: "#1B3A2D", color: "#FBF7F0" }}
           >
-            <AnimatedSlide slide={SLIDES[current]} />
-          </motion.div>
-        </AnimatePresence>
-
-        {/* ── Layer 3: Dot navigation (always above, never clipped) ── */}
-        <div className="absolute bottom-0 left-0 right-0 z-50 pb-3 flex flex-col items-center gap-2 pointer-events-none">
-          {/* Slide counter */}
-          <span className="font-body text-[10px] tracking-widest tabular-nums" style={{ color: SLIDES[current].textColor, opacity: 0.45 }}>
-            0{current + 1} / 0{SLIDES.length}
-          </span>
-
-          {/* Dots */}
-          <div className="flex items-center gap-2 pointer-events-auto">
-            {SLIDES.map((_, i) => (
-              <button
-                key={i}
-                onClick={() => goTo(i)}
-                aria-label={`Go to slide ${i + 1}`}
-                className="relative overflow-hidden rounded-full transition-all duration-300"
-                style={{
-                  width: i === current ? "2.75rem" : "0.6rem",
-                  height: "0.6rem",
-                  backgroundColor:
-                    i === current
-                      ? SLIDES[current].textColor + "30"
-                      : SLIDES[current].textColor + "40",
-                }}
-              >
-                {i === current && (
-                  <div
-                    key={`prog-${current}`}
-                    className="absolute inset-y-0 left-0 rounded-full"
-                    style={{
-                      backgroundColor: SLIDES[current].ctaBg,
-                      animation: "fill-progress 5s linear forwards",
-                    }}
-                  />
-                )}
-              </button>
-            ))}
-          </div>
-        </div>
+            Shop Now
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+          <Link
+            href="/our-story"
+            className="inline-flex items-center gap-1.5 px-6 sm:px-8 py-3 rounded-full font-body text-sm font-semibold tracking-wide border-2 border-white/40 text-white hover:border-white/70 transition-colors"
+          >
+            Our Story
+          </Link>
+        </motion.div>
       </section>
 
       {/* ── Tagline bridge ── */}
       <div className="relative bg-[#FBF7F0] py-6 overflow-hidden select-none">
-        <TilePatternBg opacity={0.06} />
         {/* Left/right edge fades so it dissolves into adjacent sections */}
         <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#FBF7F0] to-transparent pointer-events-none z-10" />
         <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#FBF7F0] to-transparent pointer-events-none z-10" />
@@ -544,7 +201,6 @@ const Index = () => {
 
       {/* ══ CATEGORIES ══ */}
       <section className="pt-6 pb-8 sm:pt-8 sm:pb-10 bg-[#FBF7F0] relative overflow-hidden">
-        <TilePatternBg opacity={0.06} />
         {/* Warm radial glow — same accent as products section */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 50%, #C9972D12 0%, transparent 70%)" }} />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -561,46 +217,48 @@ const Index = () => {
             </h2>
           </motion.div>
 
-          <div className="flex flex-wrap items-start justify-center gap-8 sm:gap-12 lg:gap-16">
+          {/* Single whileInView on the container — staggerChildren handles the cascade */}
+          <motion.div
+            className="grid grid-cols-3 sm:grid-cols-6 gap-x-4 gap-y-8 sm:gap-x-12 lg:gap-x-16 justify-items-center"
+            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07 } } }}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-40px" }}
+          >
             {[
-              { name: "Mysore Pak",  slug: "mysore-pak",  img: "/hero-mysore-pak.png",   accent: "#C9972D" },
-              { name: "Ghee Sweets", slug: "ghee-sweets", img: "/hero-preparation.png",  accent: "#1B3A2D" },
-              { name: "Gift Boxes",  slug: "gift-boxes",  img: "/hero-gift-boxes.png",   accent: "#C4512A" },
-              { name: "Namkeens",    slug: "namkeens",    img: "/hero-giftbox.png",       accent: "#1B3A2D" },
-              { name: "Chocolates",  slug: "chocolates",  img: "/hero-closeup.png",       accent: "#C9972D" },
-              { name: "Specials",    slug: "specials",    img: "/hero-stack.png",         accent: "#C4512A" },
-            ].map((cat, i) => (
+              { name: "Mysore Pak",  slug: "mysore-pak",  img: "/Mysore Pak.webp",   accent: "#C9972D" },
+              { name: "Ghee Sweets", slug: "ghee-sweets", img: "/Ghee Sweets.webp",  accent: "#1B3A2D" },
+              { name: "Gift Boxes",  slug: "gift-boxes",  img: "/Gift Boxes.webp",   accent: "#C4512A" },
+              { name: "Namkeens",    slug: "namkeens",    img: "/Namkeen.webp",       accent: "#1B3A2D" },
+              { name: "Chocolates",  slug: "chocolates",  img: "/Choclates.webp",     accent: "#C9972D" },
+              { name: "Specials",    slug: "specials",    img: "/Specials.webp",      accent: "#C4512A" },
+            ].map((cat) => (
               <motion.div
                 key={cat.slug}
-                initial={{ opacity: 0, y: 36 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-40px" }}
-                transition={{ duration: 0.55, delay: i * 0.07 }}
+                variants={{ hidden: { opacity: 0, y: 36 }, show: { opacity: 1, y: 0, transition: { duration: 0.5 } } }}
               >
                 <Link href={`/shop?category=${cat.slug}`} className="group flex flex-col items-center gap-3">
                   <motion.div
                     whileHover={{ scale: 1.07, y: -4 }}
                     whileTap={{ scale: 0.96 }}
                     transition={{ type: "spring", stiffness: 320, damping: 20 }}
-                    className="relative w-[6.5rem] h-[6.5rem] sm:w-32 sm:h-32 rounded-full overflow-hidden shadow-lg group-hover:shadow-2xl transition-shadow duration-400"
+                    className="relative w-20 h-20 sm:w-32 sm:h-32 rounded-full overflow-hidden shadow-lg group-hover:shadow-2xl transition-shadow duration-300"
                     style={{ boxShadow: `0 0 0 3px ${cat.accent}28` }}
                   >
-                    {/* eslint-disable-next-line @next/next/no-img-element */}
-                    <img
+                    <Image
                       src={cat.img}
                       alt={cat.name}
-                      loading="lazy"
-                      className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-110"
+                      fill
+                      sizes="(max-width: 640px) 80px, 128px"
+                      className="object-cover transition-transform duration-300 group-hover:scale-110"
                     />
-                    {/* Hover tint ring */}
                     <div
                       className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                       style={{ background: `${cat.accent}22` }}
                     />
                   </motion.div>
-                  {/* Name pill */}
                   <div className="flex flex-col items-center gap-0.5">
-                    <span className="font-body text-xs sm:text-sm font-bold text-[#1B3A2D] tracking-wide group-hover:text-[#C9972D] transition-colors duration-300 text-center">
+                    <span className="font-body text-[11px] sm:text-sm font-bold text-[#1B3A2D] tracking-wide group-hover:text-[#C9972D] transition-colors duration-300 text-center leading-tight">
                       {cat.name}
                     </span>
                     <span
@@ -611,13 +269,12 @@ const Index = () => {
                 </Link>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ══ FEATURED PRODUCTS ══ */}
-      <section className="pt-8 pb-16 sm:pt-10 sm:pb-20 bg-[#FBF7F0] relative">
-        <TilePatternBg opacity={0.06} />
+      <section className="pt-8 pb-16 sm:pt-10 sm:pb-20 bg-[#FBF7F0] relative overflow-hidden">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -653,91 +310,48 @@ const Index = () => {
 
 
       {/* ══ VIRTUAL TOUR ══ */}
-      <section className="py-16 sm:py-24 bg-[#1B3A2D] relative overflow-hidden">
-        <TilePatternBg opacity={0.08} color="#ffffff" />
-        {/* Corner ornaments */}
-        <div className="absolute top-0 left-0 w-32 h-32 opacity-20 pointer-events-none">
-          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 0 Q50 12 38 38 Q12 50 0 0Z" fill="#C9972D" />
-            <path d="M0 0 Q12 50 38 38 Q50 12 0 0Z" fill="#C9972D" opacity="0.6" />
-            <circle cx="55" cy="55" r="6" fill="#C9972D" opacity="0.3" />
-          </svg>
-        </div>
-        <div className="absolute top-0 right-0 w-32 h-32 opacity-20 pointer-events-none scale-x-[-1]">
-          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 0 Q50 12 38 38 Q12 50 0 0Z" fill="#C9972D" />
-            <path d="M0 0 Q12 50 38 38 Q50 12 0 0Z" fill="#C9972D" opacity="0.6" />
-          </svg>
-        </div>
-        <div className="absolute bottom-0 left-0 w-32 h-32 opacity-20 pointer-events-none scale-y-[-1]">
-          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 0 Q50 12 38 38 Q12 50 0 0Z" fill="#FBF7F0" />
-          </svg>
-        </div>
-        <div className="absolute bottom-0 right-0 w-32 h-32 opacity-20 pointer-events-none scale-[-1]">
-          <svg viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
-            <path d="M0 0 Q50 12 38 38 Q12 50 0 0Z" fill="#FBF7F0" />
-          </svg>
-        </div>
-
-        <div className="relative max-w-5xl mx-auto px-4 sm:px-6 lg:px-8">
+      <section className="py-10 sm:py-20 bg-[#1B3A2D] relative overflow-hidden section-lazy section-gpu">
+        <div className="relative max-w-5xl mx-auto px-3 sm:px-6 lg:px-8">
           {/* Heading */}
           <motion.div
             initial={{ opacity: 0, y: 28 }}
             whileInView={{ opacity: 1, y: 0 }}
             viewport={{ once: true, margin: "-80px" }}
             transition={{ duration: 0.7 }}
-            className="text-center mb-10"
+            className="text-center mb-6 sm:mb-10"
           >
-            <span className="font-body text-xs uppercase tracking-[0.3em] text-[#C9972D] mb-3 block font-semibold">Immersive Experience</span>
-            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-[#FBF7F0] mb-4">
+            <span className="font-body text-[10px] sm:text-xs uppercase tracking-[0.3em] text-[#C9972D] mb-2 block font-semibold">Immersive Experience</span>
+            <h2 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-bold text-[#FBF7F0] mb-2 sm:mb-4">
               Step Inside Our <span className="text-[#C9972D]">Sweet Shop</span>
             </h2>
-            <p className="font-body text-[#FBF7F0]/55 text-sm sm:text-base max-w-md mx-auto leading-relaxed">
-              Take a virtual walk through our kitchen — see where every piece of Mysore Pak is born.
+            <p className="font-body text-[#FBF7F0]/50 text-xs sm:text-base max-w-sm sm:max-w-md mx-auto leading-relaxed">
+              Take a virtual walk through our store — explore every corner of World of Mysore Pak.
             </p>
           </motion.div>
 
-          {/* Tour embed frame */}
+          {/* Tour embed frame — tall on mobile, 16:9 on desktop */}
           <motion.div
             initial={{ opacity: 0, scale: 0.97 }}
             whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-60px" }}
+            viewport={{ once: true, margin: "-40px" }}
             transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-            className="relative rounded-2xl overflow-hidden border border-[#C9972D]/25 shadow-2xl shadow-black/40"
-            style={{ aspectRatio: "16/9" }}
+            className="relative rounded-xl sm:rounded-2xl overflow-hidden border border-[#C9972D]/25 shadow-2xl shadow-black/40"
           >
-            {/* ── INSERT VIRTUAL TOUR EMBED HERE ── */}
-            {/* Replace this placeholder div with your <iframe> or tour component */}
-            <div className="absolute inset-0 bg-[#0E2218] flex flex-col items-center justify-center gap-5">
-              {/* Camera / 360° icon */}
-              <div className="w-20 h-20 rounded-full border-2 border-[#C9972D]/40 flex items-center justify-center bg-[#C9972D]/10">
-                <svg viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg" className="w-9 h-9">
-                  <circle cx="24" cy="24" r="10" stroke="#C9972D" strokeWidth="2" />
-                  <circle cx="24" cy="24" r="4" fill="#C9972D" opacity="0.7" />
-                  <path d="M24 6 C14 6 6 14 6 24 C6 34 14 42 24 42 C34 42 42 34 42 24 C42 14 34 6 24 6Z" stroke="#C9972D" strokeWidth="1.5" strokeDasharray="3 3" opacity="0.4" />
-                  <path d="M6 24 Q14 20 24 24 Q34 28 42 24" stroke="#C9972D" strokeWidth="1.5" opacity="0.35" />
-                  <path d="M8 18 Q16 22 24 18 Q32 14 40 18" stroke="#C9972D" strokeWidth="1" opacity="0.25" />
-                  <path d="M8 30 Q16 26 24 30 Q32 34 40 30" stroke="#C9972D" strokeWidth="1" opacity="0.25" />
-                </svg>
-              </div>
-              <div className="text-center">
-                <p className="font-body text-[#C9972D] text-sm font-bold uppercase tracking-[0.2em] mb-1">360° Virtual Tour</p>
-                <p className="font-body text-[#FBF7F0]/35 text-xs tracking-wide">Tour embed coming soon</p>
-              </div>
+            {/* Mobile: fixed tall height. Desktop: 16:9 */}
+            <div className="h-[70vh] sm:h-auto sm:aspect-video">
+              <iframe
+                src="/World of Mysore Pak_HTML_Package/index.html"
+                className="w-full h-full border-0"
+                allow="fullscreen; gyroscope; accelerometer"
+                loading="lazy"
+                title="360° Virtual Tour — World of Mysore Pak"
+              />
             </div>
-            {/* Decorative gold border glow */}
-            <div className="absolute inset-0 rounded-2xl pointer-events-none" style={{ boxShadow: "inset 0 0 0 1px rgba(201,151,45,0.2)" }} />
+            <div className="absolute inset-0 rounded-xl sm:rounded-2xl pointer-events-none" style={{ boxShadow: "inset 0 0 0 1px rgba(201,151,45,0.15)" }} />
           </motion.div>
 
-          {/* Bottom caption row */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.6, delay: 0.2 }}
-            className="flex flex-col sm:flex-row items-center justify-between gap-4 mt-6 px-1"
-          >
+          {/* Caption row — hidden on mobile to reduce clutter */}
+          <div className="hidden sm:flex items-center justify-between gap-4 mt-5 px-1">
             <div className="flex items-center gap-2 text-[#FBF7F0]/40">
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
                 <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.2" />
@@ -754,13 +368,12 @@ const Index = () => {
               </svg>
               <span className="font-body text-xs">HD Quality</span>
             </div>
-          </motion.div>
+          </div>
         </div>
       </section>
 
       {/* ══ HOW IT'S MADE — PROCESS VIDEOS ══ */}
-      <section className="py-20 sm:py-28 bg-[#FBF7F0] relative overflow-hidden">
-        <TilePatternBg opacity={0.06} />
+      <section className="py-20 sm:py-28 bg-[#FBF7F0] relative overflow-hidden section-lazy">
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -775,7 +388,13 @@ const Index = () => {
             </h2>
           </motion.div>
 
-          <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-14 relative">
+          <motion.div
+            className="grid grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-14 relative"
+            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.12 } } }}
+            initial="hidden"
+            whileInView="show"
+            viewport={{ once: true, margin: "-50px" }}
+          >
             {/* Connector line — runs through video circle centres */}
             <div className="hidden lg:block absolute top-[6.5rem] left-[14%] right-[14%] h-px bg-gradient-to-r from-transparent via-[#C9972D]/40 to-transparent pointer-events-none" />
 
@@ -787,10 +406,7 @@ const Index = () => {
             ].map((item, i) => (
               <motion.div
                 key={i}
-                initial={{ opacity: 0, y: 40 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true, margin: "-50px" }}
-                transition={{ duration: 0.6, delay: i * 0.12 }}
+                variants={{ hidden: { opacity: 0, y: 40 }, show: { opacity: 1, y: 0, transition: { duration: 0.6 } } }}
                 className="flex flex-col items-center text-center gap-4"
               >
                 {/* Circular video */}
@@ -848,12 +464,12 @@ const Index = () => {
                 </div>
               </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
       </section>
 
       {/* ══ COLLECTIONS ══ */}
-      <section className="py-20 sm:py-28 bg-[#FBF7F0] relative">
+      <section className="py-20 sm:py-28 bg-[#FBF7F0] relative section-lazy">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -875,10 +491,10 @@ const Index = () => {
 
           <div className="grid sm:grid-cols-2 gap-4 sm:gap-5">
             {[
-              { img: "/hero-mysore-pak.png",  no: "01", name: "Classic Mysore Pak",    sub: "The original, perfected"     },
-              { img: "/hero-gift-boxes.png",  no: "02", name: "Premium Gift Hampers",  sub: "For every celebration"       },
-              { img: "/hero-preparation.png", no: "03", name: "Artisan Specials",      sub: "Limited seasonal drops"      },
-              { img: "/hero-closeup.png",     no: "04", name: "Flavored Collection",   sub: "Bold new combinations"       },
+              { img: "/Mysore Pak.webp",  name: "Classic Mysore Pak",    sub: "The original, perfected"     },
+              { img: "/Gift Boxes.webp",  name: "Premium Gift Hampers",  sub: "For every celebration"       },
+              { img: "/Specials.webp",    name: "Artisan Specials",      sub: "Limited seasonal drops"      },
+              { img: "/Choclates.webp",   name: "Flavored Collection",   sub: "Bold new combinations"       },
             ].map((col, i) => (
               <motion.div
                 key={i}
@@ -888,9 +504,8 @@ const Index = () => {
                 transition={{ duration: 0.6, delay: (i % 2) * 0.1 }}
               >
                 <Link href="/shop" className="group block relative overflow-hidden rounded-2xl aspect-video">
-                  <img src={col.img} alt={col.name} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" loading="lazy" />
+                  <Image src={col.img} alt={col.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1B3A2D]/85 via-[#1B3A2D]/20 to-transparent" />
-                  <span className="absolute top-5 left-5 font-heading text-6xl font-black text-white/15 group-hover:text-white/25 transition-colors duration-500 leading-none">{col.no}</span>
                   <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
                     <h3 className="font-heading text-xl sm:text-2xl font-bold text-[#FBF7F0] mb-1">{col.name}</h3>
                     <p className="font-body text-xs text-[#C9972D] uppercase tracking-wider mb-3">{col.sub}</p>
@@ -907,9 +522,7 @@ const Index = () => {
       </section>
 
       {/* ══ GOOGLE REVIEWS ══ */}
-      <section className="py-24 sm:py-32 overflow-hidden relative" style={{ background: "linear-gradient(160deg, #0F2318 0%, #1B3A2D 40%, #152B21 100%)" }}>
-        <TilePatternBg opacity={0.08} color="#ffffff" />
-
+      <section className="py-24 sm:py-32 overflow-hidden relative section-lazy section-gpu" style={{ background: "linear-gradient(160deg, #0F2318 0%, #1B3A2D 40%, #152B21 100%)" }}>
         {/* Gold top border line */}
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #C9972D 30%, #E8B84B 50%, #C9972D 70%, transparent)" }} />
         {/* Gold bottom border line */}
@@ -1034,7 +647,7 @@ const Index = () => {
       </section>
 
       {/* ══ INSTAGRAM — EVERY PIXEL TELLS A STORY ══ */}
-      <section className="py-20 sm:py-28 bg-[#FBF7F0] overflow-hidden relative">
+      <section className="py-20 sm:py-28 bg-[#FBF7F0] overflow-hidden relative section-lazy">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 text-center">
           <motion.div
             initial={{ opacity: 0, y: 30 }}
@@ -1073,27 +686,6 @@ const Index = () => {
         </div>
       </section>
 
-      {/* ══ FINAL CTA ══ */}
-      <section className="py-20 sm:py-32 relative forest-gradient overflow-hidden">
-        <TilePatternBg opacity={0.1} color="#ffffff" />
-        <div className="relative max-w-4xl mx-auto px-4 sm:px-6 lg:px-8 text-center">
-          <motion.div {...fadeUp}>
-            <img src="/logo.jpeg" alt="World of Mysore Pak" className="w-20 h-20 rounded-full mx-auto mb-8 border-2 border-[#C9972D]/40 shadow-xl" />
-            <h2 className="font-heading text-3xl sm:text-4xl lg:text-6xl font-bold text-[#FBF7F0] mb-8 leading-tight">
-              Ready to Taste <span className="text-[#C9972D]">Tradition?</span>
-            </h2>
-            <p className="font-body text-[#FBF7F0]/60 text-base sm:text-lg max-w-lg mx-auto mb-12 leading-relaxed">
-              Order now and experience the authentic taste of Mysuru&apos;s finest Mysore Pak, delivered fresh to your doorstep.
-            </p>
-            <Link
-              href="/shop"
-              className="inline-flex items-center gap-3 bg-[#C9972D] text-[#1B3A2D] px-10 py-5 rounded-full font-body text-base font-bold tracking-wide hover:bg-[#DAA520] transition-all duration-300 shadow-xl shadow-black/20"
-            >
-              Order Now <ArrowRight className="w-5 h-5" />
-            </Link>
-          </motion.div>
-        </div>
-      </section>
     </div>
   );
 };
