@@ -182,8 +182,8 @@ export async function GET(request: Request) {
     .select(
       `
       id, order_number, status, subtotal, shipping_cost, total,
-      payment_status, created_at,
-      items:order_items(id, product_name, weight_label, quantity, unit_price, total_price)
+      payment_status, payment_method, created_at,
+      order_items(id, product_name, weight_label, quantity, unit_price, total_price)
     `
     )
     .eq("customer_email", email)

@@ -54,6 +54,7 @@ const Checkout = () => {
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "cod">("razorpay");
+  const [orderComplete, setOrderComplete] = useState(false);
 
   const [form, setForm] = useState({
     name: "", phone: "", email: "",
@@ -73,8 +74,8 @@ const Checkout = () => {
   }, []);
 
   useEffect(() => {
-    if (mounted && items.length === 0) router.push("/shop");
-  }, [mounted, items.length, router]);
+    if (mounted && items.length === 0 && !orderComplete) router.push("/shop");
+  }, [mounted, items.length, router, orderComplete]);
 
   useEffect(() => {
     if (user) {
@@ -153,6 +154,7 @@ const Checkout = () => {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error ?? "Failed to place order");
+      setOrderComplete(true);
       clearCart();
       localStorage.removeItem("delivery_pincode");
       router.push(`/order-confirmation?order=${data.data.order_number}`);
@@ -229,6 +231,7 @@ const Checkout = () => {
             });
             const verifyData = await verifyRes.json();
             if (!verifyRes.ok) throw new Error(verifyData.error ?? "Payment verification failed");
+            setOrderComplete(true);
             clearCart();
             localStorage.removeItem("delivery_pincode");
             router.push(`/order-confirmation?order=${verifyData.order_number}`);
