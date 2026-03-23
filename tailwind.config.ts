@@ -14,8 +14,8 @@ export default {
     },
     extend: {
       fontFamily: {
-        heading: ['"Felix Titling"', '"Playfair Display"', 'Georgia', 'serif'],
-        body: ['Poppins', 'system-ui', 'sans-serif'],
+        heading: ['"Felix Titling"', 'var(--font-playfair)', 'Georgia', 'serif'],
+        body: ['var(--font-poppins)', 'system-ui', 'sans-serif'],
       },
       height: {
         '18': '4.5rem',
