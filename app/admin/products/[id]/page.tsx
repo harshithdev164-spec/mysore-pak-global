@@ -67,7 +67,7 @@ export default function EditProductPage() {
 
   useEffect(() => {
     Promise.all([
-      fetch(`/api/products/${id}`, { cache: "no-store" }).then((r) => r.json()),
+      fetch(`/api/products/${id}?admin=true`, { cache: "no-store" }).then((r) => r.json()),
       fetch("/api/categories", { cache: "no-store" }).then((r) => r.json()),
     ]).then(([productJson, catJson]) => {
       const p: ProductData = productJson.data;
@@ -187,7 +187,7 @@ export default function EditProductPage() {
       invalidateCache(`/api/products/${id}`);
       setUploadSuccess(false);
       // Re-fetch product so form reflects latest saved state
-      const fresh = await fetch(`/api/products/${id}`, { cache: "no-store" }).then((r) => r.json());
+      const fresh = await fetch(`/api/products/${id}?admin=true`, { cache: "no-store" }).then((r) => r.json());
       if (fresh.data?.weights) setWeights(fresh.data.weights);
       setSuccess("Saved!");
       setTimeout(() => setSuccess(""), 3000);
