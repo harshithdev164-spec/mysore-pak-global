@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
 import Link from "next/link";
+import { invalidateCache } from "@/lib/useAdminFetch";
 
 interface Category {
   id: string;
@@ -44,6 +45,8 @@ export default function EditProductPage() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [uploading, setUploading] = useState(false);
+  const [uploadError, setUploadError] = useState("");
+  const [uploadSuccess, setUploadSuccess] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [form, setForm] = useState({
@@ -91,14 +94,32 @@ export default function EditProductPage() {
   async function handleImageUpload(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
+    setUploadError("");
+    setUploadSuccess(false);
+    if (file.size > 4 * 1024 * 1024) {
+      setUploadError("File too large — max 4 MB. Please compress the image and try again.");
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
+    const allowed = ["image/jpeg", "image/png", "image/webp", "image/gif"];
+    if (!allowed.includes(file.type)) {
+      setUploadError(`Unsupported format "${file.type}". Use JPEG, PNG, or WebP.`);
+      if (fileInputRef.current) fileInputRef.current.value = "";
+      return;
+    }
     setUploading(true);
     try {
       const fd = new FormData();
       fd.append("file", file);
       const res = await fetch("/api/upload", { method: "POST", body: fd });
-      const json = await res.json();
-      if (!res.ok) { setError(json.error ?? "Upload failed"); return; }
-      setForm((f) => ({ ...f, image: json.url }));
+      let json: { error?: string; url?: string } = {};
+      try { json = await res.json(); } catch { /* non-JSON response (e.g. 413) */ }
+      if (!res.ok) {
+        setUploadError(json.error ?? `Upload failed (HTTP ${res.status})`);
+        return;
+      }
+      setForm((f) => ({ ...f, image: json.url ?? "" }));
+      setUploadSuccess(true);
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = "";
@@ -162,7 +183,13 @@ export default function EditProductPage() {
         setError(json.error ?? "Failed to update product");
         return;
       }
-      setSuccess("Product updated successfully!");
+      invalidateCache("/api/products?admin=true&slim=true&limit=500");
+      invalidateCache(`/api/products/${id}`);
+      setUploadSuccess(false);
+      // Re-fetch product so form reflects latest saved state
+      const fresh = await fetch(`/api/products/${id}`, { cache: "no-store" }).then((r) => r.json());
+      if (fresh.data?.weights) setWeights(fresh.data.weights);
+      setSuccess("Saved!");
       setTimeout(() => setSuccess(""), 3000);
     } finally {
       setSaving(false);
@@ -297,20 +324,26 @@ export default function EditProductPage() {
                 <input
                   type="url"
                   value={form.image}
-                  onChange={(e) => setForm((f) => ({ ...f, image: e.target.value }))}
+                  onChange={(e) => { setForm((f) => ({ ...f, image: e.target.value })); setUploadSuccess(false); setUploadError(""); }}
                   className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-amber-400"
                   placeholder="https://... or upload →"
                 />
                 <button
                   type="button"
-                  onClick={() => fileInputRef.current?.click()}
+                  onClick={() => { setUploadError(""); setUploadSuccess(false); fileInputRef.current?.click(); }}
                   disabled={uploading}
                   className="shrink-0 text-xs border border-gray-200 rounded-lg px-3 py-2 text-gray-600 hover:bg-gray-50 transition-colors disabled:opacity-50"
                 >
-                  {uploading ? "Uploading..." : "Upload"}
+                  {uploading ? "Uploading…" : "Upload"}
                 </button>
-                <input ref={fileInputRef} type="file" accept="image/*" className="hidden" onChange={handleImageUpload} />
+                <input ref={fileInputRef} type="file" accept="image/jpeg,image/png,image/webp,image/gif" className="hidden" onChange={handleImageUpload} />
               </div>
+              {uploadError && (
+                <p className="mt-1.5 text-xs text-red-600 font-medium">⚠ {uploadError}</p>
+              )}
+              {uploadSuccess && (
+                <p className="mt-1.5 text-xs text-green-600 font-medium">✓ Image uploaded — click Save to apply</p>
+              )}
               {form.image && (
                 // eslint-disable-next-line @next/next/no-img-element
                 <img src={form.image} alt="preview" className="mt-2 h-20 w-20 object-cover rounded-lg border border-gray-200" />
