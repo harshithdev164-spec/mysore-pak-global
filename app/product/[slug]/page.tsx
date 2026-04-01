@@ -51,7 +51,7 @@ export default async function ProductDetailPage({ params }: PageProps) {
     ingredients: p.ingredients ?? "",
     storage: p.storage ?? "",
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    weights: ((p.weights ?? []) as any[]).map((w) => ({ label: w.label, price: w.price })),
+    weights: ((p.weights ?? []) as any[]).map((w) => ({ id: w.id, label: w.label, price: w.price, stock_quantity: w.stock_quantity ?? 100 })),
     image: p.image ?? "",
     badge: p.badge ?? undefined,
     rating: p.rating ?? 0,

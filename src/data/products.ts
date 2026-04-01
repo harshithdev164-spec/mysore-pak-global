@@ -8,7 +8,7 @@ export interface Product {
   description: string;
   ingredients: string;
   storage: string;
-  weights: { label: string; price: number }[];
+  weights: { id: string; label: string; price: number; stock_quantity: number }[];
   image: string;
   badge?: string;
   rating: number;

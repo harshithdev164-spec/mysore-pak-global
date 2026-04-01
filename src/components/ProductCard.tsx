@@ -95,9 +95,15 @@ function WeightSheet({
               items.find(
                 (i) => i.product.id === product.id && i.weight === w.label
               )?.quantity ?? 0;
+            const stock = w.stock_quantity ?? 0;
+            const isOutOfStock = stock <= 0;
 
             const handleAdd = (e: React.MouseEvent) => {
               e.stopPropagation();
+              if (isOutOfStock) {
+                toast.error(`${w.label} is out of stock`);
+                return;
+              }
               addItem(product, w.label, w.price);
               toast.success(`${product.name} added to cart`, {
                 description: w.label,
@@ -116,6 +122,8 @@ function WeightSheet({
                 className={`flex items-center justify-between px-4 py-3.5 rounded-2xl border transition-all duration-200 ${
                   qty > 0
                     ? "border-[#C9972D]/50 bg-[#FFFBF2]"
+                    : isOutOfStock
+                    ? "border-red-200 bg-red-50 opacity-50"
                     : "border-[#1B3A2D]/10 bg-white"
                 }`}
               >
@@ -123,9 +131,16 @@ function WeightSheet({
                   <p className="font-body text-sm font-semibold text-[#1B3A2D]">
                     {w.label}
                   </p>
-                  <p className="font-body text-xs font-bold text-[#C9972D]">
-                    ₹{w.price}
-                  </p>
+                  <div className="flex items-center gap-2 mt-1">
+                    <p className="font-body text-xs font-bold text-[#C9972D]">
+                      ₹{w.price}
+                    </p>
+                    {isOutOfStock ? (
+                      <p className="font-body text-xs font-bold text-red-600">Out of Stock</p>
+                    ) : (
+                      <p className="font-body text-xs text-green-700">{stock} available</p>
+                    )}
+                  </div>
                 </div>
 
                 <div className="flex items-center gap-2">
@@ -150,7 +165,10 @@ function WeightSheet({
                       <motion.button
                         whileTap={{ scale: 0.88 }}
                         onClick={handleAdd}
-                        className="w-8 h-8 rounded-full bg-[#1B3A2D] flex items-center justify-center shadow-sm hover:bg-[#2D5A3D] transition-colors"
+                        disabled={isOutOfStock}
+                        className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors ${
+                          isOutOfStock ? "bg-gray-300 cursor-not-allowed" : "bg-[#1B3A2D] hover:bg-[#2D5A3D]"
+                        }`}
                         aria-label="Add one"
                       >
                         <Plus className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />
@@ -160,7 +178,10 @@ function WeightSheet({
                     <motion.button
                       whileTap={{ scale: 0.88 }}
                       onClick={handleAdd}
-                      className="w-8 h-8 rounded-full bg-[#1B3A2D] flex items-center justify-center shadow-sm hover:bg-[#2D5A3D] transition-colors"
+                      disabled={isOutOfStock}
+                      className={`w-8 h-8 rounded-full flex items-center justify-center shadow-sm transition-colors ${
+                        isOutOfStock ? "bg-gray-300 cursor-not-allowed" : "bg-[#1B3A2D] hover:bg-[#2D5A3D]"
+                      }`}
                       aria-label="Add to cart"
                     >
                       <Plus className="w-3.5 h-3.5 text-white" strokeWidth={2.5} />

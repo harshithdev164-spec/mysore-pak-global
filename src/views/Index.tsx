@@ -21,9 +21,11 @@ function mapApiProduct(p: any): Product {
     description: p.description ?? "",
     ingredients: p.ingredients ?? "",
     storage: p.storage ?? "",
-    weights: (p.weights ?? []).map((w: { label: string; price: number }) => ({
+    weights: (p.weights ?? []).map((w: { id: string; label: string; price: number; stock_quantity: number }) => ({
+      id: w.id,
       label: w.label,
       price: w.price,
+      stock_quantity: w.stock_quantity ?? 100,
     })),
     image: p.image ?? "",
     badge: p.badge ?? undefined,

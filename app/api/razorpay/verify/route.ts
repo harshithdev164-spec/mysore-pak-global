@@ -41,6 +41,41 @@ export async function POST(request: Request) {
 
   const supabase = createAdminClient();
 
+  // Fetch order items to decrement stock
+  const { data: orderData } = await supabase
+    .from("orders")
+    .select(`
+      id, order_number,
+      items:order_items(id, product_weight_id, quantity)
+    `)
+    .eq("id", db_order_id)
+    .single();
+
+  if (orderData?.items && Array.isArray(orderData.items)) {
+    // Decrement stock for each item
+    for (const item of orderData.items) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const weightId = (item as any).product_weight_id;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const qty = (item as any).quantity ?? 1;
+      if (weightId) {
+        // Decrement stock safely
+        const { data: weight } = await supabase
+          .from("product_weights")
+          .select("stock_quantity")
+          .eq("id", weightId)
+          .single();
+        if (weight) {
+          const newStock = Math.max(0, (weight.stock_quantity ?? 0) - qty);
+          await supabase
+            .from("product_weights")
+            .update({ stock_quantity: newStock })
+            .eq("id", weightId);
+        }
+      }
+    }
+  }
+
   // Mark order as paid + confirmed in DB
   const { data, error } = await supabase
     .from("orders")
