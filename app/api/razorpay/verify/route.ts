@@ -2,7 +2,7 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase";
 import crypto from "crypto";
-import { createShiprocketOrder, parseWeightKg } from "@/lib/shiprocket";
+import { createShiprocketOrder, parseWeightKg, generateAWB, generateLabel } from "@/lib/shiprocket";
 
 export async function POST(request: Request) {
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -109,7 +109,7 @@ export async function POST(request: Request) {
           weight_kg: Math.max(totalWeight, 0.1),
         });
 
-        // Store Shiprocket details back in the order (graceful — columns may not exist yet)
+        // Store Shiprocket details back in the order
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const srUpdate: Record<string, any> = {
           shiprocket_order_id: srResult.order_id,
@@ -119,6 +119,25 @@ export async function POST(request: Request) {
         if (srResult.courier_name) srUpdate.courier_name = srResult.courier_name;
         if (srResult.tracking_url) srUpdate.tracking_url = srResult.tracking_url;
         if (srResult.label_url) srUpdate.label_url = srResult.label_url;
+
+        // Auto-generate AWB and label for automatic shipment
+        try {
+          const courierId = fullOrder.courier_id;
+          if (srResult.shipment_id && courierId) {
+            // Step 1: Assign courier (AWB generation)
+            const awbResult = await generateAWB(srResult.shipment_id, courierId);
+            if (awbResult?.awb_code) {
+              srUpdate.awb_code = awbResult.awb_code;
+            }
+
+            // Step 2: Auto-generate shipping label (this makes the shipment "ready to ship")
+            await generateLabel(srResult.shipment_id);
+            console.log(`[Shiprocket] Auto-generated label for shipment ${srResult.shipment_id}`);
+          }
+        } catch (labelErr) {
+          // Log but don't block — label can be generated manually if needed
+          console.warn("[Shiprocket] Auto-label generation failed (manual generation still available):", labelErr);
+        }
 
         await supabase.from("orders").update(srUpdate).eq("id", db_order_id);
       }
