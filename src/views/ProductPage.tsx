@@ -36,9 +36,11 @@ const ProductPage = () => {
             description: p.description ?? "",
             ingredients: p.ingredients ?? "",
             storage: p.storage ?? "",
-            weights: (p.weights ?? []).map((w: { label: string; price: number }) => ({
+            weights: (p.weights ?? []).map((w: any) => ({
+              id: w.id ?? "",
               label: w.label,
               price: w.price,
+              stock_quantity: w.stock_quantity ?? 100,
             })),
             image: p.image ?? "",
             badge: p.badge ?? undefined,
