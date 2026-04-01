@@ -431,6 +431,28 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
         </div>
       </section>
 
+      {/* ══ CLASSIC MYSORE PAK SHOWCASE ══ */}
+      <section className="py-20 sm:py-28 bg-[#FBF7F0] relative section-lazy">
+        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
+          <motion.div
+            initial={{ opacity: 0, scale: 0.95 }}
+            whileInView={{ opacity: 1, scale: 1 }}
+            viewport={{ once: true, margin: "-80px" }}
+            transition={{ duration: 0.7 }}
+            className="rounded-2xl overflow-hidden shadow-2xl aspect-video"
+          >
+            <Image
+              src="/mysoree paak.png"
+              alt="Classic Mysore Pak"
+              fill
+              sizes="(max-width: 768px) 100vw, 90vw"
+              className="object-cover"
+              priority
+            />
+          </motion.div>
+        </div>
+      </section>
+
       {/* ══ COLLECTIONS ══ */}
       <section className="py-20 sm:py-28 bg-[#FBF7F0] relative section-lazy">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -454,7 +476,7 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
 
           <div className="grid sm:grid-cols-2 gap-4 sm:gap-5">
             {[
-              { img: "/Mysore Pak.webp",  name: "Classic Mysore Pak",    sub: "The original, perfected"     },
+              { img: "/mysoree paak.png",  name: "Classic Mysore Pak",    sub: "The original, perfected"     },
               { img: "/Gift Boxes.webp",  name: "Premium Gift Hampers",  sub: "For every celebration"       },
               { img: "/specials.webp",    name: "Artisan Specials",      sub: "Limited seasonal drops"      },
               { img: "/chocolates.webp",   name: "Flavored Collection",   sub: "Bold new combinations"       },
