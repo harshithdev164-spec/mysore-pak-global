@@ -183,7 +183,7 @@ const Hero3D = () => {
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           >
             <div
-              className="w-56 h-56 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-3xl overflow-hidden border-3 border-[#C9972D]/30 relative"
+              className="w-80 h-80 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-3xl overflow-hidden border-3 border-[#C9972D]/30 relative"
               style={{
                 boxShadow: "0 30px 60px rgba(27, 58, 45, 0.3), 0 0 80px rgba(201, 151, 45, 0.15)",
               }}
@@ -205,7 +205,7 @@ const Hero3D = () => {
 
       {/* ── Secondary Image - Top Right (Gift Box) ── */}
       <motion.div
-        className="absolute right-2 sm:right-4 top-4 sm:top-8 z-10"
+        className="absolute right-2 sm:right-4 top-4 sm:top-8 z-10 hidden sm:block"
         style={{ x: layer2X, y: layer2Y }}
       >
         <FloatingImage
@@ -220,7 +220,7 @@ const Hero3D = () => {
 
       {/* ── Tertiary Image - Bottom Left (Close-up) ── */}
       <motion.div
-        className="absolute left-0 sm:left-4 bottom-8 sm:bottom-12 z-15"
+        className="absolute left-0 sm:left-4 bottom-8 sm:bottom-12 z-15 hidden sm:block"
         style={{ x: layer2X, y: layer2Y }}
       >
         <FloatingImage
@@ -235,7 +235,7 @@ const Hero3D = () => {
 
       {/* ── Small accent image - Top Left (Preparation) ── */}
       <motion.div
-        className="absolute left-8 sm:left-16 top-0 sm:top-4 z-5"
+        className="absolute left-8 sm:left-16 top-0 sm:top-4 z-5 hidden sm:block"
         style={{ x: layer3X, y: layer3Y }}
       >
         <FloatingImage
