@@ -137,7 +137,7 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
         <div className="absolute inset-x-0 bottom-0 top-[4rem] sm:top-[5.5rem]">
           {/* Mobile image — hidden on sm+ */}
           <Image
-            src="/hero mobile.png"
+            src="/mobile heroo.webp"
             alt="World of Mysore Pak"
             fill
             priority
@@ -146,7 +146,7 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
           />
           {/* Desktop image — hidden below sm */}
           <Image
-            src="/hero pc.png"
+            src="/pc heroo.webp"
             alt="World of Mysore Pak"
             fill
             priority
@@ -216,7 +216,7 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
             viewport={{ once: true, margin: "-40px" }}
           >
             {[
-              { name: "Mysore Pak",  slug: "mysore-pak",  img: "/Mysore Pak.webp",   accent: "#C9972D" },
+              { name: "Mysore Pak",  slug: "mysore-pak",  img: "/mysoree paak.png",   accent: "#C9972D" },
               { name: "Gift Boxes",  slug: "gift-boxes",  img: "/Gift Boxes.webp",   accent: "#C4512A" },
               { name: "Ghee Sweets", slug: "ghee-sweets", img: "/Ghee sweets.webp",  accent: "#1B3A2D" },
               { name: "Namkeens",    slug: "namkeens",    img: "/Namkeen.webp",       accent: "#1B3A2D" },
@@ -430,28 +430,6 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
               </div>
             ))}
           </div>
-        </div>
-      </section>
-
-      {/* ══ CLASSIC MYSORE PAK SHOWCASE ══ */}
-      <section className="py-20 sm:py-28 bg-[#FBF7F0] relative section-lazy">
-        <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7 }}
-            className="rounded-2xl overflow-hidden shadow-2xl aspect-video"
-          >
-            <Image
-              src="/mysoree paak.png"
-              alt="Classic Mysore Pak"
-              fill
-              sizes="(max-width: 768px) 100vw, 90vw"
-              className="object-cover"
-              priority
-            />
-          </motion.div>
         </div>
       </section>
 

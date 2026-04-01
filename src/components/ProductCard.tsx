@@ -131,16 +131,12 @@ function WeightSheet({
                   <p className="font-body text-sm font-semibold text-[#1B3A2D]">
                     {w.label}
                   </p>
-                  <div className="flex items-center gap-2 mt-1">
-                    <p className="font-body text-xs font-bold text-[#C9972D]">
-                      ₹{w.price}
-                    </p>
-                    {isOutOfStock ? (
-                      <p className="font-body text-xs font-bold text-red-600">Out of Stock</p>
-                    ) : (
-                      <p className="font-body text-xs text-green-700">{stock} available</p>
-                    )}
-                  </div>
+                  <p className="font-body text-xs font-bold text-[#C9972D]">
+                    ₹{w.price}
+                  </p>
+                  {isOutOfStock && (
+                    <p className="font-body text-xs font-bold text-red-600">Out of Stock</p>
+                  )}
                 </div>
 
                 <div className="flex items-center gap-2">

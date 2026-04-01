@@ -35,7 +35,7 @@ function mapApiProduct(p: any): Product {
 
 // ── Hardcoded sidebar categories — same images as homepage, independent of DB ──
 const SIDEBAR_CATEGORIES = [
-  { slug: "mysore-pak",  name: "Mysore Pak",  image: "/Mysore Pak.webp" },
+  { slug: "mysore-pak",  name: "Mysore Pak",  image: "/mysoree paak.png" },
   { slug: "ghee-sweets", name: "Ghee Sweets", image: "/Ghee sweets.webp" },
   { slug: "gift-boxes",  name: "Gift Boxes",  image: "/Gift Boxes.webp" },
   { slug: "namkeens",    name: "Namkeens",    image: "/Namkeen.webp" },

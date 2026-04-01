@@ -58,13 +58,23 @@ export async function GET(request: Request) {
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
 
-  if (!isAdmin && data) {
+  // Ensure all weights have stock_quantity (default to 100 if missing)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const normalizedData = data?.map((product: any) => ({
+    ...product,
+    weights: (product.weights || []).map((w: any) => ({
+      ...w,
+      stock_quantity: w.stock_quantity ?? 100,
+    })),
+  }));
+
+  if (!isAdmin && normalizedData) {
     const version = await getProductsVersion();
     const cacheKey = `products:v${version}:${searchParams.toString()}`;
-    await setCached(cacheKey, data, TTL.PRODUCTS_LIST);
+    await setCached(cacheKey, normalizedData, TTL.PRODUCTS_LIST);
   }
 
-  return NextResponse.json({ data }, {
+  return NextResponse.json({ data: normalizedData }, {
     headers: isAdmin ? {} : { "Cache-Control": "public, s-maxage=300, stale-while-revalidate=60", "X-Cache": "MISS" },
   });
 }

@@ -19,7 +19,7 @@ export default async function Home() {
     .from("products")
     .select(
       "id, name, slug, base_price, original_price, image, badge, rating, review_count, " +
-      "category:categories(id, name, slug), weights:product_weights(label, price)"
+      "category:categories(id, name, slug), weights:product_weights(id, label, price, stock_quantity)"
     )
     .eq("is_active", true)
     .in("slug", FEATURED_SLUGS);

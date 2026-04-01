@@ -12,7 +12,7 @@ export default async function ShopPage() {
   const [{ data: products }, { data: categories }] = await Promise.all([
     supabase
       .from("products")
-      .select("id, name, slug, base_price, original_price, image, badge, rating, review_count, category:categories(id, name, slug), weights:product_weights(label, price)")
+      .select("id, name, slug, base_price, original_price, image, badge, rating, review_count, category:categories(id, name, slug), weights:product_weights(id, label, price, stock_quantity)")
       .eq("is_active", true)
       .order("created_at", { ascending: false }),
     supabase

@@ -53,7 +53,14 @@ export async function GET(
     )
     .slice(0, 10);
 
-  const result = { ...data, reviews: sortedReviews };
+  // Ensure all weights have stock_quantity (default to 100 if missing)
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const normalizedWeights = ((data as any).weights ?? []).map((w: any) => ({
+    ...w,
+    stock_quantity: w.stock_quantity ?? 100,
+  }));
+
+  const result = { ...data, reviews: sortedReviews, weights: normalizedWeights };
 
   // Cache by both slug and UUID so either lookup hits cache
   await setCached(`product:${data.slug}`, result, TTL.PRODUCT_DETAIL);
