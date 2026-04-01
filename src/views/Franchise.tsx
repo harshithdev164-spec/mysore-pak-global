@@ -398,8 +398,8 @@ export default function Franchise() {
               </motion.button>
 
               <div className="flex flex-col sm:flex-row gap-4 mt-2 text-center sm:text-left">
-                <a href="tel:+919876543210" className="flex items-center justify-center gap-2 font-body text-xs text-[#FBF7F0]/40 hover:text-[#FBF7F0]/70 transition-colors">
-                  <Phone className="w-3.5 h-3.5" /> +91 98765 43210
+                <a href="tel:+916364895255" className="flex items-center justify-center gap-2 font-body text-xs text-[#FBF7F0]/40 hover:text-[#FBF7F0]/70 transition-colors">
+                  <Phone className="w-3.5 h-3.5" /> +91 63648 95255 / 63648 95254
                 </a>
                 <a href="mailto:franchise@worldofmysorepak.com" className="flex items-center justify-center gap-2 font-body text-xs text-[#FBF7F0]/40 hover:text-[#FBF7F0]/70 transition-colors">
                   <Mail className="w-3.5 h-3.5" /> franchise@worldofmysorepak.com

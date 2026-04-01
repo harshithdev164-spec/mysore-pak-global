@@ -126,16 +126,16 @@ const Footer = () => (
                 <div className="w-7 h-7 rounded-lg bg-[#C9972D]/10 flex items-center justify-center flex-shrink-0">
                   <Mail className="w-3.5 h-3.5 text-[#C9972D]" />
                 </div>
-                <a href="mailto:contact@worldofmysore.com" className="text-[#FBF7F0]/45 text-sm font-body hover:text-[#FBF7F0] transition-colors">
-                  contact@worldofmysore.com
+                <a href="mailto:support@worldofmysorepak.com" className="text-[#FBF7F0]/45 text-sm font-body hover:text-[#FBF7F0] transition-colors">
+                  support@worldofmysorepak.com
                 </a>
               </li>
               <li className="flex items-center gap-3">
                 <div className="w-7 h-7 rounded-lg bg-[#C9972D]/10 flex items-center justify-center flex-shrink-0">
                   <Phone className="w-3.5 h-3.5 text-[#C9972D]" />
                 </div>
-                <a href="tel:+919876543210" className="text-[#FBF7F0]/45 text-sm font-body hover:text-[#FBF7F0] transition-colors">
-                  +91 98765 43210
+                <a href="tel:+916364895255" className="text-[#FBF7F0]/45 text-sm font-body hover:text-[#FBF7F0] transition-colors">
+                  +91 63648 95255 / 63648 95254
                 </a>
               </li>
             </ul>

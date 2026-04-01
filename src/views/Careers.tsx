@@ -238,7 +238,7 @@ export default function Careers() {
                     </div>
                   </div>
                   <motion.a
-                    href={`mailto:contact@worldofmysore.com?subject=Application for ${encodeURIComponent(job.role)}`}
+                    href={`mailto:support@worldofmysorepak.com?subject=Application for ${encodeURIComponent(job.role)}`}
                     whileHover={{ scale: 1.04 }}
                     whileTap={{ scale: 0.97 }}
                     className="self-start sm:self-center flex-shrink-0 inline-flex items-center gap-1.5 bg-[#1B3A2D] text-[#FBF7F0] font-body text-xs font-bold px-5 py-2.5 rounded-full group-hover:bg-[#C9972D] group-hover:text-[#1B3A2D] transition-colors duration-300"
@@ -264,7 +264,7 @@ export default function Careers() {
               We love meeting passionate people. Send us your story and we&apos;ll keep you in mind for future openings.
             </p>
             <motion.a
-              href="mailto:contact@worldofmysore.com?subject=Open Application"
+              href="mailto:support@worldofmysorepak.com?subject=Open Application"
               whileHover={{ scale: 1.03 }}
               whileTap={{ scale: 0.97 }}
               className="inline-flex items-center gap-2 bg-[#C9972D] text-[#1B3A2D] font-body font-bold text-sm px-7 py-3.5 rounded-full hover:bg-[#b8862a] transition-colors"
