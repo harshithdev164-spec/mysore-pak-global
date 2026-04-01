@@ -4,6 +4,20 @@ import { useRef, useEffect, useState, useCallback } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
 import Image from "next/image";
 
+// Hook to detect if screen is mobile
+const useIsMobile = () => {
+  const [isMobile, setIsMobile] = useState(true);
+
+  useEffect(() => {
+    const checkMobile = () => setIsMobile(window.innerWidth < 768);
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
+  return isMobile;
+};
+
 /* ─── Floating Image with 3D Perspective ─── */
 interface FloatingImageProps {
   src: string;
@@ -96,6 +110,7 @@ const Hero3D = () => {
   const containerRef = useRef<HTMLDivElement>(null);
   const mouseX = useMotionValue(0);
   const mouseY = useMotionValue(0);
+  const isMobile = useIsMobile();
 
   // Smooth spring physics for mouse tracking
   const springConfig = { damping: 25, stiffness: 150 };
@@ -174,8 +189,8 @@ const Hero3D = () => {
               }}
             >
               <Image
-                src="/hero-stack.png"
-                alt="Mysore Pak Stack"
+                src={isMobile ? "/hero mobile.png" : "/hero pc.png"}
+                alt="Mysore Pak Hero"
                 fill
                 className="object-cover"
                 sizes="(max-width: 640px) 14rem, (max-width: 1024px) 18rem, 20rem"
