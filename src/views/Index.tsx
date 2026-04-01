@@ -39,7 +39,6 @@ const INSTAGRAM_POSTS = [
   { src: "/A royal crunch of tradition in every bite — our Avarekal Mixture is your perfect festive snack .jpg",   caption: "A royal crunch of tradition in every bite — our Avarekal Mixture is your perfect festive snack." },
   { src: "/Golden, soft, and irresistibly rich, our Motichur Laddoos are crafted to turn every moment into.jpg",   caption: "Golden, soft, and irresistibly rich, our Motichur Laddoos are crafted to turn every moment into magic." },
   { src: "/One for you, one for me Because happiness is sweeter when shared.[Premium Indian sweets, Tradit.jpg",   caption: "One for you, one for me. Because happiness is sweeter when shared. Premium Indian sweets, tradition." },
-  { src: "/Slow%20moments%2C%20classic%20flavours%2C%20and%20a%20recipe%20that%20time%20can%27t%20change.Experience%20the%20richness%20of%20.jpg", caption: "Slow moments, classic flavours, and a recipe that time can't change. Experience the richness of tradition." },
 ];
 
 

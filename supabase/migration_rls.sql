@@ -3,6 +3,11 @@
 -- Adds missing UPDATE/DELETE policies needed by admin panel
 -- ============================================================
 
+-- Allow service-role (admin) to read all orders
+CREATE POLICY "Service role can select orders"
+  ON orders FOR SELECT
+  USING (true);
+
 -- Allow service-role (admin) to update order status & payment
 CREATE POLICY "Service role can update orders"
   ON orders FOR UPDATE
