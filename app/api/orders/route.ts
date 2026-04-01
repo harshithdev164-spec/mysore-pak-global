@@ -96,17 +96,49 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: orderError?.message ?? "Failed to create order" }, { status: 500 });
   }
 
-  // Insert order items
-  const orderItems = items.map((item) => ({
-    order_id: order.id,
-    product_id: item.product_id ?? null,
-    product_weight_id: item.product_weight_id ?? null,
-    product_name: item.product_name,
-    weight_label: item.weight_label,
-    quantity: item.quantity,
-    unit_price: item.unit_price,
-    total_price: item.unit_price * item.quantity,
-  }));
+  // Lookup product IDs and weight IDs for items without them (for stock tracking)
+  const itemsNeedingLookup = items.filter((i) => !i.product_id || !i.product_weight_id);
+
+  let weightIdMap: Record<string, Record<string, string>> = {};
+  if (itemsNeedingLookup.length > 0) {
+    const productLookup = await supabase
+      .from("products")
+      .select("id, name, weights:product_weights(id, label)")
+      .in("name", itemsNeedingLookup.map((i) => i.product_name));
+
+    const { data: productsWithWeights } = productLookup;
+    if (productsWithWeights && Array.isArray(productsWithWeights)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      productsWithWeights.forEach((product: any) => {
+        weightIdMap[product.name] = {};
+        (product.weights ?? []).forEach((w: { id: string; label: string }) => {
+          weightIdMap[product.name][w.label] = w.id;
+        });
+      });
+    }
+  }
+
+  // Insert order items with proper IDs for stock decrement
+  const orderItems = items.map((item) => {
+    const productId = item.product_id ?? null;
+    let productWeightId = item.product_weight_id ?? null;
+
+    // Lookup weight ID if not provided
+    if (!productWeightId && weightIdMap[item.product_name]?.[item.weight_label]) {
+      productWeightId = weightIdMap[item.product_name][item.weight_label];
+    }
+
+    return {
+      order_id: order.id,
+      product_id: productId,
+      product_weight_id: productWeightId,
+      product_name: item.product_name,
+      weight_label: item.weight_label,
+      quantity: item.quantity,
+      unit_price: item.unit_price,
+      total_price: item.unit_price * item.quantity,
+    };
+  });
 
   const { error: itemsError } = await supabase.from("order_items").insert(orderItems);
 

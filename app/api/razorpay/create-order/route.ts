@@ -92,17 +92,48 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: dbError?.message ?? "Failed to create order" }, { status: 500 });
   }
 
-  // Insert order items
-  await supabase.from("order_items").insert(
-    items.map((item) => ({
+  // Lookup product IDs and weight IDs for stock tracking
+  const productLookup = await supabase
+    .from("products")
+    .select("id, name, weights:product_weights(id, label)")
+    .in("name", items.map((i) => i.product_name));
+
+  const { data: productsWithWeights } = productLookup;
+
+  // Build order items with proper IDs for stock decrement
+  const orderItemsToInsert = items.map((item) => {
+    let productId: string | null = null;
+    let productWeightId: string | null = null;
+
+    if (productsWithWeights && Array.isArray(productsWithWeights)) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const product = productsWithWeights.find((p: any) => p.name === item.product_name);
+      if (product) {
+        productId = product.id;
+        // Find the matching weight variant
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const weight = (product.weights as any[])?.find(
+          (w) => w.label === item.weight_label
+        );
+        if (weight) {
+          productWeightId = weight.id;
+        }
+      }
+    }
+
+    return {
       order_id: dbOrder.id,
+      product_id: productId,
+      product_weight_id: productWeightId,
       product_name: item.product_name,
       weight_label: item.weight_label,
       quantity: item.quantity,
       unit_price: item.unit_price,
       total_price: item.unit_price * item.quantity,
-    }))
-  );
+    };
+  });
+
+  await supabase.from("order_items").insert(orderItemsToInsert);
 
   // 2. Create Razorpay order
   const credentials = Buffer.from(`${keyId}:${keySecret}`).toString("base64");

@@ -58,11 +58,11 @@
 
 ---
 
-## ❌ Step 2: Run RLS Migration in Supabase
+## ❌ Step 2: Setup Stock Management in Supabase
 
-**Problem**: Even with the service role key, RLS policies must allow admin SELECT.
+**Problem**: Stock updates require proper RLS policies and column setup.
 
-### ✅ Fix: Apply RLS Policies
+### ✅ Fix: Apply Stock Management Migration
 
 1. **Go to Supabase Dashboard**
    - URL: https://app.supabase.com
@@ -72,13 +72,39 @@
 2. **Copy & paste this SQL** and execute:
 
    ```sql
-   -- Allow service-role (admin) to read all orders
+   -- Ensure stock_quantity column exists
+   ALTER TABLE product_weights
+   ADD COLUMN IF NOT EXISTS stock_quantity INTEGER DEFAULT 100;
+
+   -- Ensure all weights have stock values
+   UPDATE product_weights
+   SET stock_quantity = COALESCE(stock_quantity, 100)
+   WHERE stock_quantity IS NULL;
+
+   -- Allow service-role to read all orders
    CREATE POLICY IF NOT EXISTS "Service role can select orders"
      ON orders FOR SELECT
      USING (true);
+
+   -- Allow service-role to update product weights (stock)
+   CREATE POLICY IF NOT EXISTS "Service role can update stock"
+     ON product_weights FOR UPDATE
+     USING (true)
+     WITH CHECK (true);
+
+   -- Allow service-role to update order items
+   CREATE POLICY IF NOT EXISTS "Service role can update order items"
+     ON order_items FOR UPDATE
+     USING (true)
+     WITH CHECK (true);
+
+   -- Verify data
+   SELECT COUNT(*) as total_weights,
+          COUNT(CASE WHEN stock_quantity IS NULL THEN 1 END) as null_stock
+   FROM product_weights;
    ```
 
-3. **Done!** Admin panel will now show all orders.
+3. **Done!** Stock management and admin panel fully functional.
 
 ---
 
