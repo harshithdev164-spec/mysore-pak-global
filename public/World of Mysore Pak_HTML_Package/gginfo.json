@@ -1,0 +1,22 @@
+{
+	"version": 1,
+	"type": "panorama",
+	"external": {
+		"js": [
+			"https://www.turiya.co/360/source/pano2vr7/script/script.min.js"
+		],
+		"css": [
+			"https://www.turiya.co/360/source/pano2vr7/style/style.min.css",
+			"utility.css"
+		]
+	},
+	"skin": {
+		"js": "skin.js"
+	},
+	"vrskin": {},
+	"player": {
+		"js": "pano2vr_player.js"
+	},
+	"creationdate": "2025-10-15T05:19:14.816Z",
+	"configuration": "pano.xml"
+}

@@ -5,10 +5,11 @@ import { usePathname } from "next/navigation";
 import { ReactNode } from "react";
 
 const navItems = [
-  { href: "/admin", label: "Dashboard", icon: "▦" },
-  { href: "/admin/orders", label: "Orders", icon: "◫" },
-  { href: "/admin/products", label: "Products", icon: "◈" },
-  { href: "/admin/categories", label: "Categories", icon: "◉" },
+  { href: "/admin", label: "Dashboard", icon: "▦", exact: true },
+  { href: "/admin/orders", label: "Orders", icon: "◫", exact: false },
+  { href: "/admin/products", label: "Products", icon: "◈", exact: false, exclude: "/admin/products/bulk-upload" },
+  { href: "/admin/products/bulk-upload", label: "Bulk Upload", icon: "⇪", exact: true },
+  { href: "/admin/categories", label: "Categories", icon: "◉", exact: false },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
@@ -19,16 +20,14 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
       {/* Sidebar */}
       <aside className="w-56 bg-white border-r border-gray-200 flex-shrink-0 flex flex-col">
         <div className="px-5 py-5 border-b border-gray-200">
-          <div className="text-base font-bold text-amber-700 tracking-tight">WMP Admin</div>
-          <div className="text-xs text-gray-400 mt-0.5">Mysore Pak Global</div>
+          <div className="text-base font-bold text-amber-700 tracking-tight">WOMP Admin</div>
         </div>
 
         <nav className="flex-1 p-3 space-y-0.5">
           {navItems.map((item) => {
-            const isActive =
-              item.href === "/admin"
-                ? pathname === "/admin"
-                : pathname.startsWith(item.href);
+            const isActive = item.exact
+                ? pathname === item.href
+                : pathname.startsWith(item.href) && (!item.exclude || !pathname.startsWith(item.exclude));
             return (
               <Link
                 key={item.href}

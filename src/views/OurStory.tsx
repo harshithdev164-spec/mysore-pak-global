@@ -3,8 +3,8 @@
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import Link from "next/link";
+import Image from "next/image";
 import { ArrowRight } from "lucide-react";
-import { TilePatternBg, FloralPatternBg } from "@/components/TilePattern";
 import { founders } from "@/data/products";
 
 function GoldStar({ size = 10 }: { size?: number }) {
@@ -31,28 +31,34 @@ function GoldDivider() {
 
 const TIMELINE = [
   {
-    year: "1980s",
     era: "The Beginning",
-    text: "A dream took root in the lanes of Mysuru — to preserve and share the authentic taste of Mysore Pak with the world. Three women, united by heritage and a love for sweets, began their quiet revolution.",
+    text: "In the year 1935, on the command of His Highness Maharaja Nalwadi Krishnaraja Wodeyar, the royal chef Kakasura Madappa was asked to prepare a sweet delicacy for a royal feast.",
+    image: "/story image 1.jpeg",
     accent: "#C9972D",
   },
   {
-    year: "2005",
     era: "The Recipe",
-    text: "After years of research alongside master sweet-makers and rigorous testing, the signature World of Mysore Pak formula was born — using only single-origin ghee and heritage besan.",
+    text: "Enthralled by the Maharaja's request, Kakasura Madappa began preparing a sweet using ingredients found in the royal kitchen. The ones he chose were besan, sugar and ghee.",
+    image: "/story image 2.jpeg",
     accent: "#E8B84B",
   },
   {
-    year: "2018",
-    era: "The Launch",
-    text: "World of Mysore Pak opened its doors in Mysuru. An immersive sweet experience store that felt more like a heritage gallery than a sweet shop — and the world took notice.",
+    era: "The King of Sweets",
+    text: "Little did he know, that day in the royal kitchen, this simple trio of besan, sugar and ghee would create a timeless treasure — an extraordinary sweet that would go on to become the pride of Mysore and earn its title as \u201cThe King of Sweets\u201d.",
+    image: "/story image 3.jpeg",
     accent: "#C9972D",
   },
   {
-    year: "Today",
-    era: "Going Global",
-    text: "With innovation in flavors and premium gifting, the brand now reaches sweet lovers across India and the globe, carrying the warmth of Mysuru wherever it goes.",
+    era: "To the World",
+    text: "The Maharaja tasted it and knew instantly that this creation was too special to be confined to the palace walls. \u201cLet all of Mysuru experience this wonder,\u201d he declared. Thus, Mysorepak made its way to the world.",
+    image: "/story image 4.jpeg",
     accent: "#E8B84B",
+  },
+  {
+    era: "Today",
+    text: "From the royal kitchens of Mysuru Palace, Mysore Pak began its journey to the world. What started as a sweet for the Maharaja soon became a beloved delicacy for everyone. Today, World of Mysore Pak proudly carries forward this royal legacy, sharing the timeless taste of Mysuru with sweet lovers everywhere.",
+    image: "/story 5.webp",
+    accent: "#C9972D",
   },
 ];
 
@@ -76,7 +82,7 @@ const PILLARS = [
       </svg>
     ),
     title: "Uncompromised Purity",
-    text: "100% pure ghee, zero shortcuts. Our ingredients are sourced from trusted Karnataka dairies — the same ones used for generations.",
+    text: "100% pure ghee, zero shortcuts. Our ingredients are meticulously selected for their premium quality, ensuring the same royal richness that has defined our heritage for over a century.",
   },
   {
     icon: (
@@ -86,7 +92,7 @@ const PILLARS = [
       </svg>
     ),
     title: "Made with Love",
-    text: "Every batch is handcrafted by artisans who have spent decades perfecting their craft. This isn't just production — it's devotion.",
+    text: "Every batch is traditionally crafted by artisans who have spent decades perfecting their craft. This isn't just production — it's devotion.",
   },
 ];
 
@@ -107,7 +113,6 @@ const OurStory = () => {
         className="relative min-h-screen flex items-center justify-center overflow-hidden"
         style={{ background: "linear-gradient(160deg, #0A1A10 0%, #1B3A2D 45%, #0F2318 100%)" }}
       >
-        <TilePatternBg opacity={0.08} color="#ffffff" />
 
         {/* Giant watermark */}
         <div className="absolute inset-0 flex items-center justify-center pointer-events-none select-none overflow-hidden" aria-hidden>
@@ -150,20 +155,22 @@ const OurStory = () => {
               initial={{ y: "105%" }}
               animate={{ y: "0%" }}
               transition={{ duration: 1, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
-              className="font-heading font-black leading-[0.88] tracking-tight text-[#FBF7F0]"
-              style={{ fontSize: "clamp(3.5rem, 10vw, 9rem)" }}
+              className="font-heading font-black leading-[0.9] tracking-tight text-[#FBF7F0]"
+              style={{ fontSize: "clamp(2rem, 9vw, 9rem)" }}
             >
               A Sweet
             </motion.h1>
           </div>
-          <div className="overflow-hidden mb-8">
+          <div className="mb-8" style={{ overflow: "hidden", paddingBottom: "0.25em" }}>
             <motion.h1
               initial={{ y: "105%" }}
               animate={{ y: "0%" }}
               transition={{ duration: 1, delay: 0.35, ease: [0.22, 1, 0.36, 1] }}
-              className="font-heading font-black leading-[0.88] tracking-tight"
+              className="font-heading font-black tracking-tight"
               style={{
-                fontSize: "clamp(3.5rem, 10vw, 9rem)",
+                fontSize: "clamp(2rem, 9vw, 9rem)",
+                lineHeight: 1,
+                paddingBottom: "0.2em",
                 background: "linear-gradient(90deg, #C9972D, #E8B84B 50%, #C9972D)",
                 WebkitBackgroundClip: "text",
                 WebkitTextFillColor: "transparent",
@@ -195,21 +202,10 @@ const OurStory = () => {
           </motion.div>
         </motion.div>
 
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 1.3, duration: 0.8 }}
-          className="absolute bottom-10 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
-        >
-          <span className="font-body text-[10px] uppercase tracking-[0.3em] text-[#FBF7F0]/25">Scroll</span>
-          <div className="w-px h-10 bg-gradient-to-b from-[#C9972D]/50 to-transparent" />
-        </motion.div>
       </section>
 
       {/* ══ THE SOUL ══ */}
       <section className="py-24 sm:py-32 bg-[#FBF7F0] relative overflow-hidden">
-        <TilePatternBg opacity={0.06} />
-
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 grid lg:grid-cols-2 gap-16 items-center">
           {/* Image */}
           <motion.div
@@ -220,12 +216,15 @@ const OurStory = () => {
             className="relative"
           >
             <div className="absolute -top-5 -left-5 right-5 bottom-5 rounded-3xl border border-[#C9972D]/20" style={{ background: "rgba(201,151,45,0.03)" }} />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/hero-mysore-pak.png"
-              alt="Mysore Pak — The Soul of Mysuru"
-              className="relative w-full h-80 sm:h-[480px] object-cover rounded-3xl shadow-2xl"
-            />
+            <div className="relative w-full h-80 sm:h-[480px] rounded-3xl overflow-hidden shadow-2xl">
+              <Image
+                src="/story 5.webp"
+                alt="Mysore Pak — The Soul of Mysuru"
+                fill
+                sizes="(max-width: 1024px) 100vw, 50vw"
+                className="object-cover"
+              />
+            </div>
             {/* Floating badge */}
             <div
               className="absolute -bottom-6 -right-6 w-28 h-28 rounded-full flex flex-col items-center justify-center shadow-xl border border-[#C9972D]/20"
@@ -247,9 +246,9 @@ const OurStory = () => {
             <div>
               <span className="font-body text-xs uppercase tracking-[0.3em] text-[#C9972D] font-semibold">The Soul</span>
               <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1B3A2D] mt-2 leading-tight">
-                Born from the<br />
+                What was born in the royal kitchen<br />
                 <span style={{ background: "linear-gradient(90deg, #C9972D, #E8B84B)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>
-                  Kitchens of Royalty
+                  is being made in ours
                 </span>
               </h2>
             </div>
@@ -262,7 +261,7 @@ const OurStory = () => {
             </p>
             <div className="border-l-2 border-[#C9972D] pl-5 py-1 mt-2">
               <p className="font-heading text-lg sm:text-xl font-bold text-[#1B3A2D] italic leading-snug">
-                &ldquo;A sweet that carries the weight of history in every bite.&rdquo;
+                &ldquo;This is not the Mysore Pak as you know it, this is the Mysore Pak as it should be.&rdquo;
               </p>
             </div>
           </motion.div>
@@ -274,11 +273,11 @@ const OurStory = () => {
         className="py-24 sm:py-32 relative overflow-hidden"
         style={{ background: "linear-gradient(160deg, #0F2318 0%, #1B3A2D 50%, #152B21 100%)" }}
       >
-        <TilePatternBg opacity={0.08} color="#ffffff" />
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #C9972D 30%, #E8B84B 50%, #C9972D 70%, transparent)" }} />
         <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #C9972D 30%, #E8B84B 50%, #C9972D 70%, transparent)" }} />
 
-        <div className="relative max-w-5xl mx-auto px-6 lg:px-8">
+        <div className="relative max-w-6xl mx-auto px-6 lg:px-8">
+          {/* Header */}
           <motion.div
             initial={{ opacity: 0, y: 24 }}
             whileInView={{ opacity: 1, y: 0 }}
@@ -295,58 +294,135 @@ const OurStory = () => {
             </h2>
           </motion.div>
 
-          <div className="relative">
-            {/* Center vertical line */}
-            <div
-              className="absolute left-1/2 top-0 bottom-0 w-px -translate-x-1/2 hidden sm:block"
-              style={{ background: "linear-gradient(180deg, transparent, #C9972D 8%, #C9972D 92%, transparent)" }}
-            />
+          {/* Timeline entries */}
+          <div className="flex flex-col">
+            {TIMELINE.map((item, i) => {
+              const isEven = i % 2 === 0;
+              const isLast = i === TIMELINE.length - 1;
+              const isToday = item.era === "Today";
 
-            <div className="flex flex-col gap-16">
-              {TIMELINE.map((item, i) => (
+              const ImageBlock = ({ slideX }: { slideX: number }) => (
                 <motion.div
-                  key={i}
-                  initial={{ opacity: 0, y: 40 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-50px" }}
-                  transition={{ duration: 0.7, delay: i * 0.1 }}
-                  className={`relative flex flex-col sm:flex-row items-start sm:items-center gap-6 sm:gap-0 ${i % 2 === 0 ? "sm:flex-row" : "sm:flex-row-reverse"}`}
+                  initial={{ opacity: 0, x: slideX }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-60px" }}
+                  transition={{ duration: 0.85, ease: [0.22, 1, 0.36, 1] }}
+                  className="relative w-56 lg:w-64"
                 >
-                  {/* Card */}
-                  <div className={`sm:w-[45%] ${i % 2 === 0 ? "sm:pr-12 sm:text-right" : "sm:pl-12"} pl-12 sm:pl-0`}>
-                    <span className="font-heading font-black leading-none block mb-1" style={{ fontSize: "clamp(2.5rem,6vw,4.5rem)", color: item.accent, opacity: 0.18 }}>
-                      {item.year}
-                    </span>
-                    <h3 className="font-heading text-lg sm:text-xl font-bold text-[#FBF7F0] mb-3">{item.era}</h3>
-                    <p className="font-body text-sm text-[#FBF7F0]/60 leading-relaxed">{item.text}</p>
+                  <div className={`absolute -top-4 ${isEven ? "-left-4" : "-right-4"} w-full h-full rounded-2xl border border-[#C9972D]/20`} />
+                  <div className={`relative aspect-[3/4] rounded-2xl overflow-hidden shadow-2xl ${isToday ? "ring-1 ring-[#C9972D]/40" : ""}`}>
+                    <Image src={item.image} alt={item.era} fill sizes="(max-width: 1024px) 50vw, 25vw" className="object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-[#0F2318]/55 via-[#0F2318]/10 to-transparent" />
+                    <div className="absolute bottom-4 left-4">
+                      <span className="font-body text-[10px] uppercase tracking-[0.2em] font-semibold px-3 py-1 rounded-full" style={{ background: "rgba(201,151,45,0.2)", color: "#C9972D", border: "1px solid rgba(201,151,45,0.3)" }}>
+                        {item.era}
+                      </span>
+                    </div>
+                  </div>
+                </motion.div>
+              );
+
+              const TextBlock = ({ slideX }: { slideX: number }) => (
+                <motion.div
+                  initial={{ opacity: 0, x: slideX }}
+                  whileInView={{ opacity: 1, x: 0 }}
+                  viewport={{ once: true, margin: "-40px" }}
+                  transition={{ duration: 0.7, delay: 0.12 }}
+                  className="relative"
+                >
+                  <span
+                    className="absolute -top-6 -left-2 font-heading font-black leading-none select-none pointer-events-none"
+                    style={{ fontSize: "clamp(4rem, 9vw, 7rem)", color: item.accent, opacity: 0.07 }}
+                  >
+                    {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <span className="font-body text-[10px] uppercase tracking-[0.35em] font-semibold block mb-2 relative z-10" style={{ color: item.accent }}>
+                    Chapter {String(i + 1).padStart(2, "0")}
+                  </span>
+                  <h3 className={`font-heading font-bold text-[#FBF7F0] mb-4 leading-tight relative z-10 ${isToday ? "text-3xl sm:text-4xl" : "text-2xl sm:text-3xl"}`}>
+                    {item.era}
+                  </h3>
+                  <div className="flex items-center gap-2 mb-5">
+                    <div className="h-px w-10" style={{ background: `linear-gradient(90deg, ${item.accent}, transparent)` }} />
+                    <div className="w-1.5 h-1.5 rounded-full flex-shrink-0" style={{ background: item.accent }} />
+                  </div>
+                  <p className="font-body text-sm sm:text-base text-[#FBF7F0]/60 leading-relaxed max-w-sm">
+                    {item.text}
+                  </p>
+                </motion.div>
+              );
+
+              return (
+                <div key={i} className="flex">
+
+                  {/* ── Left col: image (even) | text (odd) ── */}
+                  <div className="hidden md:flex md:w-5/12 items-center justify-end pr-10 py-10 md:py-14">
+                    {isEven
+                      ? <ImageBlock slideX={-40} />
+                      : <TextBlock slideX={-30} />
+                    }
                   </div>
 
-                  {/* Node */}
-                  <div className="absolute left-0 sm:left-1/2 sm:-translate-x-1/2 top-1 sm:top-auto">
+                  {/* ── Spine ── */}
+                  <div className="flex flex-col items-center w-10 md:w-2/12 flex-shrink-0">
+                    <div className="w-px" style={{ flex: "0 0 32px", background: i === 0 ? "transparent" : `linear-gradient(180deg, ${TIMELINE[i-1].accent}, ${item.accent})` }} />
                     <div
-                      className="w-10 h-10 rounded-full flex items-center justify-center border-2"
+                      className="flex-shrink-0 rounded-full flex items-center justify-center border-2 z-10"
                       style={{
+                        width: isToday ? 52 : 44,
+                        height: isToday ? 52 : 44,
                         borderColor: item.accent,
                         background: "linear-gradient(135deg, #0F2318, #1B3A2D)",
-                        boxShadow: `0 0 22px ${item.accent}35`,
+                        boxShadow: `0 0 ${isToday ? 36 : 24}px ${item.accent}${isToday ? "60" : "40"}`,
                       }}
                     >
-                      <GoldStar size={10} />
+                      <GoldStar size={isToday ? 13 : 11} />
+                    </div>
+                    {!isLast && (
+                      <div className="w-px flex-1 min-h-[60px]" style={{ background: `linear-gradient(180deg, ${item.accent}, ${TIMELINE[i+1].accent}50)` }} />
+                    )}
+                    {isLast && <div className="w-px flex-1" style={{ background: "transparent" }} />}
+                  </div>
+
+                  {/* ── Right col: text (even) | image (odd) ── */}
+                  <div className="flex-1 md:w-5/12 flex flex-col justify-center pl-6 md:pl-10 py-10 md:py-14">
+                    {/* Mobile: image always on top */}
+                    <motion.div
+                      initial={{ opacity: 0, y: 20 }}
+                      whileInView={{ opacity: 1, y: 0 }}
+                      viewport={{ once: true }}
+                      transition={{ duration: 0.7 }}
+                      className="md:hidden mb-6 w-full max-w-[200px]"
+                    >
+                      <div className="relative aspect-[3/4] rounded-xl overflow-hidden shadow-xl border border-[#C9972D]/20">
+                        <Image src={item.image} alt={item.era} fill sizes="50vw" className="object-cover" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-[#0F2318]/50 to-transparent" />
+                      </div>
+                    </motion.div>
+
+                    {/* Desktop */}
+                    <div className="hidden md:block">
+                      {isEven
+                        ? <TextBlock slideX={30} />
+                        : <ImageBlock slideX={40} />
+                      }
+                    </div>
+
+                    {/* Mobile text */}
+                    <div className="md:hidden">
+                      <TextBlock slideX={0} />
                     </div>
                   </div>
 
-                  <div className="hidden sm:block sm:w-[45%]" />
-                </motion.div>
-              ))}
-            </div>
+                </div>
+              );
+            })}
           </div>
         </div>
       </section>
 
       {/* ══ THE CRAFT ══ */}
       <section className="py-24 sm:py-32 bg-[#FBF7F0] relative overflow-hidden">
-        <TilePatternBg opacity={0.06} />
-
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8 grid lg:grid-cols-2 gap-16 items-center">
           {/* Text — right on desktop */}
           <motion.div
@@ -359,16 +435,16 @@ const OurStory = () => {
             <div>
               <span className="font-body text-xs uppercase tracking-[0.3em] text-[#C9972D] font-semibold">The Craft</span>
               <h2 className="font-heading text-3xl sm:text-4xl font-bold text-[#1B3A2D] mt-2 leading-tight">
-                Handcrafted,<br />
-                <span className="text-[#C9972D]">Every Single Time.</span>
+                Mastery in Every Stir,<br />
+                <span className="text-[#C9972D]">Precision in Every Piece.</span>
               </h2>
             </div>
             <GoldDivider />
             <p className="font-body text-[#1B3A2D]/70 leading-relaxed text-base">
-              No machines. No shortcuts. Our sweet-makers slow-cook each batch in heavy-bottomed vessels, stirring by hand until the mixture hits that elusive, golden melt-in-mouth consistency.
+              Heritage meets precision. We&apos;ve evolved from manual batches to state-of-the-art machinery, ensuring that our royal recipe hits that elusive, golden melt-in-mouth consistency with surgical accuracy.
             </p>
             <p className="font-body text-[#1B3A2D]/55 leading-relaxed text-sm">
-              The process takes patience — sometimes hours for a single batch. But that patience is what makes the difference between ordinary and extraordinary.
+              Technology now honors the legacy. By combining modern engineering with traditional secrets, we achieve perfection in every single piece — making the extraordinary taste of Mysore a consistent reality for the world.
             </p>
             <div className="grid grid-cols-3 gap-3 mt-2">
               {[{ num: "100%", label: "Pure Ghee" }, { num: "3", label: "Ingredients" }, { num: "∞", label: "Generations" }].map((s, i) => (
@@ -389,17 +465,14 @@ const OurStory = () => {
             className="relative lg:order-1"
           >
             <div className="absolute -top-5 -right-5 left-5 bottom-5 rounded-3xl border border-[#C9972D]/20" />
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              src="/hero-preparation.png"
-              alt="Our craftsmen at work"
-              className="relative w-full h-80 sm:h-[480px] object-cover rounded-3xl shadow-2xl"
-            />
+            <div className="relative w-full h-80 sm:h-[480px] rounded-3xl overflow-hidden shadow-2xl">
+              <Image src="/ABP_5011-HDR.webp" alt="Our masters of precision" fill sizes="(max-width: 1024px) 100vw, 50vw" className="object-cover" />
+            </div>
             <div
               className="absolute top-5 left-5 px-4 py-2 rounded-full"
               style={{ background: "rgba(27,58,45,0.9)", border: "1px solid rgba(201,151,45,0.3)" }}
             >
-              <span className="font-body text-xs font-semibold text-[#C9972D] uppercase tracking-wider">Handcrafted Daily</span>
+              <span className="font-body text-xs font-semibold text-[#C9972D] uppercase tracking-wider">Perfectly Consistent</span>
             </div>
           </motion.div>
         </div>
@@ -410,7 +483,6 @@ const OurStory = () => {
         className="py-24 sm:py-28 relative overflow-hidden"
         style={{ background: "linear-gradient(160deg, #0F2318, #1B3A2D 50%, #0F2318)" }}
       >
-        <TilePatternBg opacity={0.08} color="#ffffff" />
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #C9972D 30%, #E8B84B 50%, #C9972D 70%, transparent)" }} />
         <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #C9972D 30%, #E8B84B 50%, #C9972D 70%, transparent)" }} />
 
@@ -463,8 +535,6 @@ const OurStory = () => {
 
       {/* ══ FOUNDERS ══ */}
       <section className="py-24 sm:py-32 bg-[#FBF7F0] relative overflow-hidden">
-        <TilePatternBg opacity={0.06} />
-
         <div className="relative max-w-7xl mx-auto px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -524,7 +594,6 @@ const OurStory = () => {
         className="py-28 sm:py-40 relative overflow-hidden"
         style={{ background: "linear-gradient(160deg, #0A1A10 0%, #1B3A2D 50%, #0F2318 100%)" }}
       >
-        <TilePatternBg opacity={0.08} color="#ffffff" />
         <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #C9972D 30%, #E8B84B 50%, #C9972D 70%, transparent)" }} />
 
         {/* Watermark */}
@@ -567,7 +636,6 @@ const OurStory = () => {
 
       {/* ══ CTA ══ */}
       <section className="py-20 sm:py-28 bg-[#FBF7F0] relative overflow-hidden">
-        <TilePatternBg opacity={0.06} />
         <div className="relative max-w-3xl mx-auto px-6 text-center">
           <motion.div
             initial={{ opacity: 0, y: 24 }}
@@ -575,8 +643,7 @@ const OurStory = () => {
             viewport={{ once: true }}
             transition={{ duration: 0.7 }}
           >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src="/logo.jpeg" alt="World of Mysore Pak" className="w-16 h-16 rounded-full mx-auto mb-8 border-2 border-[#C9972D]/30 shadow-lg" />
+            <Image src="/logo.svg" alt="World of Mysore Pak" width={55} height={64} className="rounded-full mx-auto mb-8 border-2 border-[#C9972D]/30 shadow-lg object-contain" />
             <h2 className="font-heading text-3xl sm:text-4xl font-bold text-[#1B3A2D] mb-5">
               Ready to Taste <span className="text-[#C9972D]">History?</span>
             </h2>

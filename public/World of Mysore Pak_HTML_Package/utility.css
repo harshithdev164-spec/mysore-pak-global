@@ -1,0 +1,7 @@
+.info_title.customTitlePos > div {
+    font-size: 21px !important;
+}
+
+.customPos {
+    top: calc(50% - 242px) !important;
+}

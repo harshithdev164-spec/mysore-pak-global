@@ -1,6 +1,7 @@
 export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { createServerClient, createAdminClient } from "@/lib/supabase";
+import { deleteCached } from "@/lib/redis";
 
 // GET /api/categories/:id
 export async function GET(
@@ -43,6 +44,7 @@ export async function PUT(
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  await deleteCached("categories:list");
   return NextResponse.json({ data });
 }
 
@@ -57,5 +59,6 @@ export async function DELETE(
   if (error) {
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
+  await deleteCached("categories:list");
   return NextResponse.json({ success: true });
 }

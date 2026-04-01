@@ -12,11 +12,23 @@ export default function VideoPopup() {
   const [open, setOpen] = useState(false);
   const [muted, setMuted] = useState(true);
   const [isFullscreen, setIsFullscreen] = useState(false);
+  const [nearFooter, setNearFooter] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), SHOW_DELAY_MS);
     return () => clearTimeout(t);
+  }, []);
+
+  useEffect(() => {
+    function onScroll() {
+      const scrollBottom = window.scrollY + window.innerHeight;
+      const threshold = document.body.scrollHeight - 320;
+      const isNear = scrollBottom >= threshold;
+      setNearFooter((prev) => (prev === isNear ? prev : isNear));
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
   useEffect(() => {
@@ -67,7 +79,12 @@ export default function VideoPopup() {
   if (!visible) return null;
 
   return (
-    <div className="fixed bottom-6 left-4 md:left-auto md:right-6 right-auto z-50 flex flex-col items-start md:items-end gap-3">
+    <motion.div
+      data-videopopup
+      animate={{ opacity: nearFooter ? 0 : 1, y: nearFooter ? 16 : 0, pointerEvents: nearFooter ? "none" : "auto" }}
+      transition={{ duration: 0.35, ease: "easeInOut" }}
+      className="fixed bottom-6 left-4 md:left-auto md:right-6 right-auto z-50 flex flex-col items-start md:items-end gap-3"
+    >
 
       {/* ── Expanded player ── */}
       <AnimatePresence>
@@ -182,6 +199,6 @@ export default function VideoPopup() {
           <Play className="w-3.5 h-3.5 text-[#C9972D] group-hover:scale-110 transition-transform" />
         </button>
       )}
-    </div>
+    </motion.div>
   );
 }

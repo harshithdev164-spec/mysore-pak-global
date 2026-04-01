@@ -1,0 +1,620 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<tour apprev="20938" hassounds="0" start="node27" appversion="7.1.4">
+  <panorama hideabout="1" id="node27">
+    <input leveltilesize="472" width="2250" levelingpitch="0" height="2250" levelingroll="0" overlap="1" leveltileurl="tiles/node27/cf_%c/l_%l/c_%x/tile_%y.webp" levelbias="0.400" levelbiashidpi="1.000">
+      <level height="2250" preload="0" width="2250" predecode="0"/>
+      <level height="1125" preload="0" width="1125" predecode="0"/>
+      <level height="562" preload="0" width="562" predecode="0"/>
+      <level height="281" preload="1" width="281" predecode="1"/>
+      <preview color="0x808080" strip="1"/>
+    </input>
+    <view pannorth="0" fovmode="0">
+      <start tilt="-90" fov="75" pan="117.797" projection="4"/>
+      <flyin tilt="-90" fov="170" pan="0" projection="9"/>
+      <min tilt="-90" fov="75" pan="0"/>
+      <max fovstereographic="330" tilt="90" fov="75" fovfisheye="360" pan="360" scaletofit="1"/>
+    </view>
+    <userdata title="Aerial View" copyright="" datetime="11-09-25 9:46" source="" info="" latitude="12.293777" nodeid="node27" author="" altitude="844.01" longitude="76.682499" description="" comment="" tags="9K|AerialView" heading="0" customnodeid="AerialView">
+      <custompropertyvalue value="false" variablename="varDayNight"/>
+      <custompropertyvalue value="" variablename="varNodeID"/>
+      <custompropertyvalue value="" variablename="varMode"/>
+    </userdata>
+    <hotspots wordwrap="1" height="0" smoothmovement="1" width="180">
+      <label bordercolor="0x000000" borderalpha="1" backgroundalpha="1" width="180" border="1" background="1" enabled="0" textcolor="0x000000" borderradius="1" wordwrap="1" height="0" textalpha="1" backgroundcolor="0xffffff"/>
+      <polystyle bordercolor="0x0000ff" mode="1" borderalpha="1" backgroundalpha="0.25098" backgroundcolor="0x0000ff" handcursor="1"/>
+      <hotspot title="World of Mysore Pak&lt;br>Flagship Outlet" tilt="-89.58" url="{node9}" distance="1.99956" target="1.9/0.0/75.0" pan="24.98" id="Point01" description="" skinid="ht_node">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Sri Chamundeshwari Temple" description="" tilt="-0.89" url="" target="" skinid="ht_flag" pan="-207.99" id="Point03">
+        <custompropertyvalue value="Sri Chamundeshwari Temple" variablename="FlagTitle"/>
+        <custompropertyvalue value="13 min drive" variablename="FlagDescription"/>
+        <custompropertyvalue value="Temple" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Thavare Katte Junction" description="" tilt="-26.82" url="" target="" skinid="ht_flag" pan="-154.01" id="Point04">
+        <custompropertyvalue value="Thavare Katte Junction" variablename="FlagTitle"/>
+        <custompropertyvalue value="1 min drive" variablename="FlagDescription"/>
+        <custompropertyvalue value="Highway" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Lalitha Mahal Palace Hotel" description="" tilt="-13.5" url="" target="" skinid="ht_flag" pan="-64.75" id="Point09">
+        <custompropertyvalue value="Lalitha Mahal Palace Hotel" variablename="FlagTitle"/>
+        <custompropertyvalue value="5 min drive" variablename="FlagDescription"/>
+        <custompropertyvalue value="Hotel" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Funway Mysore" description="" tilt="-65.4" url="" target="" skinid="ht_flag" pan="-13.14" id="Point02">
+        <custompropertyvalue value="Funway Mysore" variablename="FlagTitle"/>
+        <custompropertyvalue value="2 min drive" variablename="FlagDescription"/>
+        <custompropertyvalue value="DashingCar" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="SDMIMD" description="" tilt="-42.09" url="" target="" skinid="ht_flag" pan="-201.96" id="Point12">
+        <custompropertyvalue value="SDMIMD" variablename="FlagTitle"/>
+        <custompropertyvalue value="2 min drive" variablename="FlagDescription"/>
+        <custompropertyvalue value="Education" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Shuka Vana" description="" tilt="-0.84" url="" target="" skinid="ht_flag" pan="-250.53" id="Point17">
+        <custompropertyvalue value="Shuka Vana" variablename="FlagTitle"/>
+        <custompropertyvalue value="12 min drive" variablename="FlagDescription"/>
+        <custompropertyvalue value="FatacyPark" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Jagan Mohan Palace" description="" tilt="-0.94" url="" target="" skinid="ht_flag" pan="-272.46" id="Point13">
+        <custompropertyvalue value="Jagan Mohan Palace" variablename="FlagTitle"/>
+        <custompropertyvalue value="11 min drive" variablename="FlagDescription"/>
+        <custompropertyvalue value="Palace" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Rail Museum" description="" tilt="-0.22" url="" target="" skinid="ht_flag" pan="-298.29" id="Point15">
+        <custompropertyvalue value="Rail Museum" variablename="FlagTitle"/>
+        <custompropertyvalue value="15 min drive" variablename="FlagDescription"/>
+        <custompropertyvalue value="Museum" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="GRS Fantasy Park" description="" tilt="-0.78" url="" target="" skinid="ht_flag" pan="-323.76" id="Point20">
+        <custompropertyvalue value="GRS Fantasy Park" variablename="FlagTitle"/>
+        <custompropertyvalue value="21 min drive" variablename="FlagDescription"/>
+        <custompropertyvalue value="FatacyPark" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="St Philomenas Cathedral" description="" tilt="-4.12" url="" target="" skinid="ht_flag" pan="-344.33" id="Point16">
+        <custompropertyvalue value="St Philomenas Cathedral" variablename="FlagTitle"/>
+        <custompropertyvalue value="10 min drive" variablename="FlagDescription"/>
+        <custompropertyvalue value="Church" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Ranganathittu Bird Sanctuary" description="" tilt="-2.85" url="" target="" skinid="ht_flag" pan="-6.76999" id="Point18">
+        <custompropertyvalue value="Ranganathittu Bird Sanctuary" variablename="FlagTitle"/>
+        <custompropertyvalue value="28 min drive" variablename="FlagDescription"/>
+        <custompropertyvalue value="Bird" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Lokaranjan Aqua World" description="" tilt="-11.12" url="" target="" skinid="ht_flag" pan="-302.82" id="Point19">
+        <custompropertyvalue value="Lokaranjan Aqua World" variablename="FlagTitle"/>
+        <custompropertyvalue value="6 min drive" variablename="FlagDescription"/>
+        <custompropertyvalue value="Aquarium" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="World Of Mysore Pak" description="" tilt="-11.16" url="https://maps.app.goo.gl/gkZ3cMFMQnLrvY2a7" target="_blank" skinid="ht_url_logo" pan="-330.73" id="Point21">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Ivaana Nature Resort" description="" tilt="-12.97" url="" target="" skinid="ht_flag" pan="-105.7" id="Point14">
+        <custompropertyvalue value="Ivaana Nature Resort" variablename="FlagTitle"/>
+        <custompropertyvalue value="4 min drive" variablename="FlagDescription"/>
+        <custompropertyvalue value="Resort" variablename="FlagType"/>
+      </hotspot>
+    </hotspots>
+    <media/>
+    <transition blendtime="1" blendcolor="0x000000" softedge="0" zoomout="0" zoomoutpause="1" enabled="1" zoomafteroutfov="40" zoomin="7" zoomspeed="2" zoomfov="75" zoomafterinfov="140" type="mesh" delay="none"/>
+    <animation clipsrandom="0" useinautorotation="0" syncanimationwithvideo="0" animsequence="Animation01"/>
+    <control simulatemass="1" lockedwheel="1" contextvr="0" lockedkeyboardzoom="0" zoomcentercursor="1" dblclickfullscreen="0" invertwheel="0" invertcontrol="1" rubberband="0" speedwheel="1" contextfullscreen="0" lockedkeyboard="0" contextprojections="0" sensitivity="8" lockedmouse="0" hideabout="1">
+      <menulink text="Created By TURIYA" url="https://turiya.co/"/>
+    </control>
+  </panorama>
+  <panorama hideabout="1" id="node9">
+    <input leveltilesize="472" width="2250" levelingpitch="0" height="2250" levelingroll="0" overlap="1" leveltileurl="tiles/node9/cf_%c/l_%l/c_%x/tile_%y.webp" levelbias="0.400" levelbiashidpi="1.000">
+      <level height="2250" preload="0" width="2250" predecode="0"/>
+      <level height="1125" preload="0" width="1125" predecode="0"/>
+      <level height="562" preload="0" width="562" predecode="0"/>
+      <level height="281" preload="1" width="281" predecode="1"/>
+      <preview color="0x808080" strip="1"/>
+    </input>
+    <view pannorth="0" fovmode="0">
+      <start tilt="0" fov="75" pan="1.9" projection="4"/>
+      <flyin tilt="-90" fov="170" pan="0" projection="9"/>
+      <min tilt="-90" fov="75" pan="0"/>
+      <max fovstereographic="330" tilt="90" fov="75" fovfisheye="360" pan="360" scaletofit="1"/>
+    </view>
+    <userdata title="Parking Area" copyright="" datetime="11-09-25 9:39" source="DSC06913 Panorama.jpg" info="" latitude="12.293794" nodeid="node9" author="" altitude="777.63" longitude="76.682505" description="" comment="" tags="9K|Day|Entrance|Transition|triTransition" heading="0" customnodeid="ParkingArea_01">
+      <custompropertyvalue value="true" variablename="varDayNight"/>
+      <custompropertyvalue value="node1" variablename="varNodeID"/>
+      <custompropertyvalue value="Day" variablename="varMode"/>
+    </userdata>
+    <hotspots wordwrap="1" height="0" smoothmovement="1" width="180">
+      <label bordercolor="0x000000" borderalpha="1" backgroundalpha="1" width="180" border="1" background="1" enabled="0" textcolor="0x000000" borderradius="1" wordwrap="1" height="0" textalpha="1" backgroundcolor="0xffffff"/>
+      <polystyle bordercolor="0x0000ff" mode="1" borderalpha="1" backgroundalpha="0.25098" backgroundcolor="0x0000ff" handcursor="1"/>
+      <hotspot title="Entrance" description="" tilt="6.2" url="{node18}" target="67.6/0.0/75.0" skinid="ht_node" pan="-340.54" id="Point01">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Aerial View" tilt="41.63" url="{node27}" distance="1.99956" target="117.8/-90.0/75.0" pan="-357.65" id="Point02" description="" skinid="ht_drone">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Guide Book" description="" tilt="-4.24" url="" target="" skinid="ht_popup_pdf" pan="-246.75" id="Point03">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+    </hotspots>
+    <media/>
+    <transition blendtime="1" blendcolor="0x000000" softedge="0" zoomout="0" zoomoutpause="1" enabled="1" zoomafteroutfov="40" zoomin="7" zoomspeed="2" zoomfov="75" zoomafterinfov="140" type="mesh" delay="none"/>
+    <animation clipsrandom="0" useinautorotation="0" syncanimationwithvideo="0" animsequence="Animation01"/>
+    <control simulatemass="1" lockedwheel="1" contextvr="0" lockedkeyboardzoom="0" zoomcentercursor="1" dblclickfullscreen="0" invertwheel="0" invertcontrol="1" rubberband="0" speedwheel="1" contextfullscreen="0" lockedkeyboard="0" contextprojections="0" sensitivity="8" lockedmouse="0" hideabout="1">
+      <menulink text="Created By TURIYA" url="https://turiya.co/"/>
+    </control>
+  </panorama>
+  <panorama hideabout="1" id="node1">
+    <input leveltilesize="472" width="2250" levelingpitch="0" height="2250" levelingroll="0" overlap="1" leveltileurl="tiles/node1/cf_%c/l_%l/c_%x/tile_%y.webp" levelbias="0.400" levelbiashidpi="1.000">
+      <level height="2250" preload="0" width="2250" predecode="0"/>
+      <level height="1125" preload="0" width="1125" predecode="0"/>
+      <level height="562" preload="0" width="562" predecode="0"/>
+      <level height="281" preload="1" width="281" predecode="1"/>
+      <preview color="0x808080" strip="1"/>
+    </input>
+    <view pannorth="0" fovmode="0">
+      <start tilt="0" fov="75" pan="1.9" projection="4"/>
+      <flyin tilt="-90" fov="170" pan="0" projection="9"/>
+      <min tilt="-90" fov="75" pan="0"/>
+      <max fovstereographic="330" tilt="90" fov="75" fovfisheye="360" pan="360" scaletofit="1"/>
+    </view>
+    <userdata title="Parking Area" copyright="" datetime="11-09-25 8:26" source="DSC06679 Panorama.jpg" info="" latitude="12.293808" nodeid="node1" author="" altitude="792.10" longitude="76.682518" description="" comment="" tags="9K|Entrance|Night|Transition|triTransition" heading="0" customnodeid="ParkingArea_02">
+      <custompropertyvalue value="true" variablename="varDayNight"/>
+      <custompropertyvalue value="node9" variablename="varNodeID"/>
+      <custompropertyvalue value="Night" variablename="varMode"/>
+    </userdata>
+    <hotspots wordwrap="1" height="0" smoothmovement="1" width="180">
+      <label bordercolor="0x000000" borderalpha="1" backgroundalpha="1" width="180" border="1" background="1" enabled="0" textcolor="0x000000" borderradius="1" wordwrap="1" height="0" textalpha="1" backgroundcolor="0xffffff"/>
+      <polystyle bordercolor="0x0000ff" mode="1" borderalpha="1" backgroundalpha="0.25098" backgroundcolor="0x0000ff" handcursor="1"/>
+      <hotspot title="Entrance" description="" tilt="6.2" url="{node18}" target="67.6/0.0/75.0" skinid="ht_node" pan="-340.45" id="Point01">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Aerial View" tilt="39.81" url="{node27}" distance="4.01787" target="117.8/-90.0/75.0" pan="-357.73" id="Point02" description="" skinid="ht_drone">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Guide Book" description="" tilt="-3.88" url="" target="" skinid="ht_popup_pdf" pan="-246.73" id="Point03">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+    </hotspots>
+    <media/>
+    <transition blendtime="1" blendcolor="0x000000" softedge="0" zoomout="0" zoomoutpause="1" enabled="1" zoomafteroutfov="40" zoomin="7" zoomspeed="2" zoomfov="75" zoomafterinfov="140" type="mesh" delay="none"/>
+    <animation clipsrandom="0" useinautorotation="0" syncanimationwithvideo="0" animsequence="Animation01"/>
+    <control simulatemass="1" lockedwheel="1" contextvr="0" lockedkeyboardzoom="0" zoomcentercursor="1" dblclickfullscreen="0" invertwheel="0" invertcontrol="1" rubberband="0" speedwheel="1" contextfullscreen="0" lockedkeyboard="0" contextprojections="0" sensitivity="8" lockedmouse="0" hideabout="1">
+      <menulink text="Created By TURIYA" url="https://turiya.co/"/>
+    </control>
+  </panorama>
+  <panorama hideabout="1" id="node18">
+    <input leveltilesize="472" width="2250" levelingpitch="0" height="2250" levelingroll="0" overlap="1" leveltileurl="tiles/node18/cf_%c/l_%l/c_%x/tile_%y.webp" levelbias="0.400" levelbiashidpi="1.000">
+      <level height="2250" preload="0" width="2250" predecode="0"/>
+      <level height="1125" preload="0" width="1125" predecode="0"/>
+      <level height="562" preload="0" width="562" predecode="0"/>
+      <level height="281" preload="1" width="281" predecode="1"/>
+      <preview color="0x808080" strip="1"/>
+    </input>
+    <view pannorth="0" fovmode="0">
+      <start tilt="0" fov="75" pan="67.58" projection="4"/>
+      <flyin tilt="-90" fov="170" pan="0" projection="9"/>
+      <min tilt="-90" fov="75" pan="0"/>
+      <max fovstereographic="330" tilt="90" fov="75" fovfisheye="360" pan="360" scaletofit="1"/>
+    </view>
+    <userdata title="Packed Products" copyright="" datetime="11-09-25 7:29" source="DSC06733 Panorama Close.jpg" info="" latitude="" nodeid="node18" author="" longitude="" description="" comment="" tags="9K|TheExperienceStore" heading="0" customnodeid="PackedProducts">
+      <custompropertyvalue value="false" variablename="varDayNight"/>
+      <custompropertyvalue value="" variablename="varNodeID"/>
+      <custompropertyvalue value="" variablename="varMode"/>
+    </userdata>
+    <hotspots wordwrap="1" height="0" smoothmovement="1" width="180">
+      <label bordercolor="0x000000" borderalpha="1" backgroundalpha="1" width="180" border="1" background="1" enabled="0" textcolor="0x000000" borderradius="1" wordwrap="1" height="0" textalpha="1" backgroundcolor="0xffffff"/>
+      <polystyle bordercolor="0x0000ff" mode="1" borderalpha="1" backgroundalpha="0.25098" backgroundcolor="0x0000ff" handcursor="1"/>
+      <hotspot title="Mysore Pak Counter" description="" tilt="0" url="{node20}" target="-79.4/0.0/75.0" skinid="ht_node" pan="-21.91" id="Point01">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Premium Gifting" description="" tilt="0" url="{node23}" target="105.3/0/75.0" skinid="ht_node" pan="-292.02" id="Point03">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Parking Area" description="" tilt="0" url="{node9}" target="1.9/-0/75.0" skinid="ht_node" pan="-109.99" id="Point02">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Namkeen" description="&lt;h2 style=&quot;margin:0px;&quot;>Namkeen&lt;/h2>&#xa;&lt;div>Crispy, spicy, and packed with flavor — our traditional Namkeen collection brings you the best of Karnataka’s savory heritage. From crunchy chakkuli and kodubale to masala peanuts, fried green peas, ribbon muruku and beyond, every bite is handcrafted with authentic ingredients and generations of taste. Perfect for snack time, gifting, or a flavourful break — discover something new in every pack.&lt;/div>" tilt="0" url="https://www.worldofmysorepak.com/collections/buy-authentic-traditional-namkeen-savory-snacks-online" target="" skinid="ht_url" pan="-226.95" id="Point05">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Mysore Pak" description="&lt;h2 style=&quot;margin:0px;&quot;>Mysore Pak&lt;/h2>&#xa;&lt;div>Indulge in the melt-in-your-mouth richness of our ghee-infused sweets, where traditional recipes meet premium ingredients. Each Mysore Pak is handcrafted with 100% pure ghee and the finest gram flour, delivering a soft, buttery texture and a royal South Indian flavor. From classic to nut-enhanced varieties, every piece is a celebration of heritage and sweetness — perfect for festivals, gifting, or treating yourself.&lt;/div>" tilt="0.15" url="https://www.worldofmysorepak.com/collections/buy-fresh-ghee-mysore-pak-soft-rich-sweets-online" target="" skinid="ht_url" pan="-264.74" id="Point06">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Billing Counter" description="" tilt="-7.6" url="" target="" skinid="ht_tag" pan="-324.49" id="Point04">
+        <custompropertyvalue value="Billing Counter" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+    </hotspots>
+    <media/>
+    <transition blendtime="1" blendcolor="0x000000" softedge="0" zoomout="0" zoomoutpause="1" enabled="1" zoomafteroutfov="40" zoomin="7" zoomspeed="2" zoomfov="75" zoomafterinfov="140" type="mesh" delay="none"/>
+    <animation clipsrandom="0" useinautorotation="0" syncanimationwithvideo="0" animsequence="Animation01"/>
+    <control simulatemass="1" lockedwheel="1" contextvr="0" lockedkeyboardzoom="0" zoomcentercursor="1" dblclickfullscreen="0" invertwheel="0" invertcontrol="1" rubberband="0" speedwheel="1" contextfullscreen="0" lockedkeyboard="0" contextprojections="0" sensitivity="8" lockedmouse="0" hideabout="1">
+      <menulink text="Created By TURIYA" url="https://turiya.co/"/>
+    </control>
+  </panorama>
+  <panorama hideabout="1" id="node23">
+    <input leveltilesize="472" width="2250" levelingpitch="0" height="2250" levelingroll="0" overlap="1" leveltileurl="tiles/node23/cf_%c/l_%l/c_%x/tile_%y.webp" levelbias="0.400" levelbiashidpi="1.000">
+      <level height="2250" preload="0" width="2250" predecode="0"/>
+      <level height="1125" preload="0" width="1125" predecode="0"/>
+      <level height="562" preload="0" width="562" predecode="0"/>
+      <level height="281" preload="1" width="281" predecode="1"/>
+      <preview color="0x808080" strip="1"/>
+    </input>
+    <view pannorth="0" fovmode="0">
+      <start tilt="0" fov="75" pan="106.44" projection="4"/>
+      <flyin tilt="-90" fov="170" pan="0" projection="9"/>
+      <min tilt="-90" fov="75" pan="0"/>
+      <max fovstereographic="330" tilt="90" fov="75" fovfisheye="360" pan="360" scaletofit="1"/>
+    </view>
+    <userdata title="Premium Gifting" copyright="" datetime="11-09-25 7:41" source="DSC06841 Panorama.jpg" info="" latitude="" nodeid="node23" author="" longitude="" description="" comment="" tags="9K|TheExperienceStore" heading="0" customnodeid="PremiumGifting">
+      <custompropertyvalue value="false" variablename="varDayNight"/>
+      <custompropertyvalue value="" variablename="varNodeID"/>
+      <custompropertyvalue value="" variablename="varMode"/>
+    </userdata>
+    <hotspots wordwrap="1" height="0" smoothmovement="1" width="180">
+      <label bordercolor="0x000000" borderalpha="1" backgroundalpha="1" width="180" border="1" background="1" enabled="0" textcolor="0x000000" borderradius="1" wordwrap="1" height="0" textalpha="1" backgroundcolor="0xffffff"/>
+      <polystyle bordercolor="0x0000ff" mode="1" borderalpha="1" backgroundalpha="0.25098" backgroundcolor="0x0000ff" handcursor="1"/>
+      <hotspot title="Sweets &amp; Namkeens" description="" tilt="0" url="{node22}" target="-100.8/0.0/75.0" skinid="ht_node" pan="-344.31" id="Point01">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Packed Products" description="" tilt="0" url="{node18}" target="-109.5/-0/75.0" skinid="ht_node" pan="-76.14" id="Point02">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Mysore Pak Counter" description="" tilt="0" url="{node20}" target="-79.6/-0/75.0" skinid="ht_node" pan="-33.34" id="Point03">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Kitchen Area" description="" tilt="0" url="{node24}" target="-170.0/0.0/75.0" skinid="ht_node" pan="-311.44" id="Point04">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Chocolates" description="&lt;h2 style=&quot;margin:0px;&quot;>Chocolates&lt;/h2>&lt;div>Dive into decadence with our artisanal chocolate sweets—a perfect fusion of Indian tradition and rich cocoa indulgence. From silky milk chocolate to bold dark and nut-infused creations, each piece is handcrafted to elevate your sweet experience. Whether for gifting, festive treats, or a personal delight, our chocolate collection is the sweet symphony your taste buds deserve.&lt;/div>" tilt="1.15" url="https://www.worldofmysorepak.com/collections/buy-exclusive-chocolate-sweets-delivery-online" target="_blank" skinid="ht_url" pan="-196.82" id="Point05">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Gift Boxes" description="&lt;h2 style=&quot;margin:0px;&quot;>Gift Boxes&lt;/h2>&#xa;&lt;div>Celebrate every moment with our curated Gift Boxes — thoughtfully assembled with a selection of our finest sweets, chocolates, namkeens, and dry fruits. Whether it’s festivals, corporate gifting, or special occasions, each box is a blend of heritage and indulgence, beautifully presented and ready to delight. Give the gift of taste, tradition, and love.&lt;/div>" tilt="0" url="https://www.worldofmysorepak.com/collections/gift-boxes" target="_blank" skinid="ht_url" pan="-251.18" id="Point06">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Mysore Pak" description="&lt;h2 style=&quot;margin:0px;&quot;>Mysore Pak&lt;/h2>&#xa;&lt;div>Indulge in the melt-in-your-mouth richness of our ghee-infused sweets, where traditional recipes meet premium ingredients. Each Mysore Pak is handcrafted with 100% pure ghee and the finest gram flour, delivering a soft, buttery texture and a royal South Indian flavor. From classic to nut-enhanced varieties, every piece is a celebration of heritage and sweetness — perfect for festivals, gifting, or treating yourself.&lt;/div>" tilt="0.17" url="https://www.worldofmysorepak.com/collections/gift-boxes" target="_blank" skinid="ht_url" pan="-109.87" id="Point07">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+    </hotspots>
+    <media/>
+    <transition blendtime="1" blendcolor="0x000000" softedge="0" zoomout="0" zoomoutpause="1" enabled="1" zoomafteroutfov="40" zoomin="7" zoomspeed="2" zoomfov="75" zoomafterinfov="140" type="mesh" delay="none"/>
+    <animation clipsrandom="0" useinautorotation="0" syncanimationwithvideo="0" animsequence="Animation01"/>
+    <control simulatemass="1" lockedwheel="1" contextvr="0" lockedkeyboardzoom="0" zoomcentercursor="1" dblclickfullscreen="0" invertwheel="0" invertcontrol="1" rubberband="0" speedwheel="1" contextfullscreen="0" lockedkeyboard="0" contextprojections="0" sensitivity="8" lockedmouse="0" hideabout="1">
+      <menulink text="Created By TURIYA" url="https://turiya.co/"/>
+    </control>
+  </panorama>
+  <panorama hideabout="1" id="node20">
+    <input leveltilesize="472" width="2250" levelingpitch="0" height="2250" levelingroll="0" overlap="1" leveltileurl="tiles/node20/cf_%c/l_%l/c_%x/tile_%y.webp" levelbias="0.400" levelbiashidpi="1.000">
+      <level height="2250" preload="0" width="2250" predecode="0"/>
+      <level height="1125" preload="0" width="1125" predecode="0"/>
+      <level height="562" preload="0" width="562" predecode="0"/>
+      <level height="281" preload="1" width="281" predecode="1"/>
+      <preview color="0x808080" strip="1"/>
+    </input>
+    <view pannorth="0" fovmode="0">
+      <start tilt="0" fov="75" pan="14.51" projection="4"/>
+      <flyin tilt="-90" fov="170" pan="0" projection="9"/>
+      <min tilt="-90" fov="75" pan="0"/>
+      <max fovstereographic="330" tilt="90" fov="75" fovfisheye="360" pan="360" scaletofit="1"/>
+    </view>
+    <userdata title="Mysore Pak Counter" copyright="" datetime="11-09-25 7:34" source="DSC06778 Panorama.jpg" info="" latitude="" nodeid="node20" author="" longitude="" description="" comment="" tags="9K|TheExperienceStore" heading="0" customnodeid="MysorePakCounter">
+      <custompropertyvalue value="false" variablename="varDayNight"/>
+      <custompropertyvalue value="" variablename="varNodeID"/>
+      <custompropertyvalue value="" variablename="varMode"/>
+    </userdata>
+    <hotspots wordwrap="1" height="0" smoothmovement="1" width="180">
+      <label bordercolor="0x000000" borderalpha="1" backgroundalpha="1" width="180" border="1" background="1" enabled="0" textcolor="0x000000" borderradius="1" wordwrap="1" height="0" textalpha="1" backgroundcolor="0xffffff"/>
+      <polystyle bordercolor="0x0000ff" mode="1" borderalpha="1" backgroundalpha="0.25098" backgroundcolor="0x0000ff" handcursor="1"/>
+      <hotspot title="Packed Products" description="" tilt="0" url="{node18}" target="159.4/0/75.0" skinid="ht_node" pan="-252.8" id="Point01">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Origin of Mysore Pak" description="" tilt="0" url="{node21}" target="-166.3/0/75.0" skinid="ht_node" pan="-38.56" id="Point02">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Premium Gifting" description="" tilt="0" url="{node23}" target="104.1/0.0/75.0" skinid="ht_node" pan="-305.07" id="Point03">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Mysore Pak" description="&lt;h2 style=&quot;margin:0px;&quot;>Mysore Pak&lt;/h2>&#xa;&lt;div>Indulge in the melt-in-your-mouth richness of our ghee-infused sweets, where traditional recipes meet premium ingredients. Each Mysore Pak is handcrafted with 100% pure ghee and the finest gram flour, delivering a soft, buttery texture and a royal South Indian flavor. From classic to nut-enhanced varieties, every piece is a celebration of heritage and sweetness — perfect for festivals, gifting, or treating yourself.&lt;/div>" tilt="-10.57" url="https://www.worldofmysorepak.com/collections/buy-fresh-ghee-mysore-pak-soft-rich-sweets-online" target="_blank" skinid="ht_url" pan="-347.25" id="Point04">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+    </hotspots>
+    <media/>
+    <transition blendtime="1" blendcolor="0x000000" softedge="0" zoomout="0" zoomoutpause="1" enabled="1" zoomafteroutfov="40" zoomin="7" zoomspeed="2" zoomfov="75" zoomafterinfov="140" type="mesh" delay="none"/>
+    <animation clipsrandom="0" useinautorotation="0" syncanimationwithvideo="0" animsequence="Animation01"/>
+    <control simulatemass="1" lockedwheel="1" contextvr="0" lockedkeyboardzoom="0" zoomcentercursor="1" dblclickfullscreen="0" invertwheel="0" invertcontrol="1" rubberband="0" speedwheel="1" contextfullscreen="0" lockedkeyboard="0" contextprojections="0" sensitivity="8" lockedmouse="0" hideabout="1">
+      <menulink text="Created By TURIYA" url="https://turiya.co/"/>
+    </control>
+  </panorama>
+  <panorama hideabout="1" id="node21">
+    <input leveltilesize="472" width="2250" levelingpitch="0" height="2250" levelingroll="0" overlap="1" leveltileurl="tiles/node21/cf_%c/l_%l/c_%x/tile_%y.webp" levelbias="0.400" levelbiashidpi="1.000">
+      <level height="2250" preload="0" width="2250" predecode="0"/>
+      <level height="1125" preload="0" width="1125" predecode="0"/>
+      <level height="562" preload="0" width="562" predecode="0"/>
+      <level height="281" preload="1" width="281" predecode="1"/>
+      <preview color="0x808080" strip="1"/>
+    </input>
+    <view pannorth="0" fovmode="0">
+      <start tilt="0" fov="75" pan="8.85" projection="4"/>
+      <flyin tilt="-90" fov="170" pan="0" projection="9"/>
+      <min tilt="-90" fov="75" pan="0"/>
+      <max fovstereographic="330" tilt="90" fov="75" fovfisheye="360" pan="360" scaletofit="1"/>
+    </view>
+    <userdata title="Origin of Mysore Pak" copyright="" datetime="11-09-25 7:36" source="DSC06796 Panorama.jpg" info="" latitude="" nodeid="node21" author="" longitude="" description="" comment="" tags="9K|hidepopup|TheExperienceStore" heading="0" customnodeid="OriginofMysorePak">
+      <custompropertyvalue value="false" variablename="varDayNight"/>
+      <custompropertyvalue value="" variablename="varNodeID"/>
+      <custompropertyvalue value="" variablename="varMode"/>
+    </userdata>
+    <hotspots wordwrap="1" height="0" smoothmovement="1" width="180">
+      <label bordercolor="0x000000" borderalpha="1" backgroundalpha="1" width="180" border="1" background="1" enabled="0" textcolor="0x000000" borderradius="1" wordwrap="1" height="0" textalpha="1" backgroundcolor="0xffffff"/>
+      <polystyle bordercolor="0x0000ff" mode="1" borderalpha="1" backgroundalpha="0.25098" backgroundcolor="0x0000ff" handcursor="1"/>
+      <hotspot title="Mysore Pak Counter" description="" tilt="0" url="{node20}" target="13.5/0/75.0" skinid="ht_node" pan="-313.36" id="Point01">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Sweets &amp; Namkeens" description="" tilt="0" url="{node22}" target="168.8/0/75.0" skinid="ht_node" pan="-23.52" id="Point02">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Billing Counter" description="" tilt="-17.58" url="" target="" skinid="ht_tag" pan="-348.2" id="Point03">
+        <custompropertyvalue value="Billing Counter" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <polyhotspot title="Popup" bordercolor="0x0000ff" borderalpha="1" target="" url="" backgroundalpha="0" id="Poly" description="&lt;img src=&quot;images/WOMPFrame2.jpg&quot; style=&quot;width: 100%;&quot; />&#xa;" backgroundcolor="0x0000ff">
+        <polystring>-137.62/44.55|-163.35/49.25|-163.9/12.09|-138.05/10.31</polystring>
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </polyhotspot>
+      <polyhotspot title="Popup" bordercolor="0x0000ff" borderalpha="1" target="" url="" backgroundalpha="0" id="Poly" description="&lt;img src=&quot;images/WOMPFrame3.jpg&quot; style=&quot;width: 100%;&quot;>" backgroundcolor="0x0000ff">
+        <polystring>-194.2/46.29|-213.56/39.55|-213.73/9.29|-194.91/11.3</polystring>
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </polyhotspot>
+      <polyhotspot title="Popup" bordercolor="0x0000ff" borderalpha="1" target="" url="" backgroundalpha="0" id="Poly" description="&lt;img src=&quot;images/WOMPFrame4.jpg&quot; style=&quot;width: 100%;&quot;>" backgroundcolor="0x0000ff">
+        <polystring>-226.19/32.58|-233.36/26.8|-233.33/6.01|-226.38/7.24</polystring>
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </polyhotspot>
+      <polyhotspot title="Popup" bordercolor="0x0000ff" borderalpha="1" target="" url="" backgroundalpha="0" id="Poly" description="&lt;img src=&quot;images/WOMPFrame1.jpg&quot; style=&quot;width: 100%;&quot;>&#xa;" backgroundcolor="0x0000ff">
+        <polystring>-108.9/30.04|-119.05/36.48|-119.13/7.59|-109.1/5.91</polystring>
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </polyhotspot>
+    </hotspots>
+    <media/>
+    <transition blendtime="1" blendcolor="0x000000" softedge="0" zoomout="0" zoomoutpause="1" enabled="1" zoomafteroutfov="40" zoomin="7" zoomspeed="2" zoomfov="75" zoomafterinfov="140" type="mesh" delay="none"/>
+    <animation clipsrandom="0" useinautorotation="0" syncanimationwithvideo="0" animsequence="Animation01"/>
+    <control simulatemass="1" lockedwheel="1" contextvr="0" lockedkeyboardzoom="0" zoomcentercursor="1" dblclickfullscreen="0" invertwheel="0" invertcontrol="1" rubberband="0" speedwheel="1" contextfullscreen="0" lockedkeyboard="0" contextprojections="0" sensitivity="8" lockedmouse="0" hideabout="1">
+      <menulink text="Created By TURIYA" url="https://turiya.co/"/>
+    </control>
+  </panorama>
+  <panorama hideabout="1" id="node22">
+    <input leveltilesize="472" width="2250" levelingpitch="0" height="2250" levelingroll="0" overlap="1" leveltileurl="tiles/node22/cf_%c/l_%l/c_%x/tile_%y.webp" levelbias="0.400" levelbiashidpi="1.000">
+      <level height="2250" preload="0" width="2250" predecode="0"/>
+      <level height="1125" preload="0" width="1125" predecode="0"/>
+      <level height="562" preload="0" width="562" predecode="0"/>
+      <level height="281" preload="1" width="281" predecode="1"/>
+      <preview color="0x808080" strip="1"/>
+    </input>
+    <view pannorth="0" fovmode="0">
+      <start tilt="0" fov="75" pan="-100.85" projection="4"/>
+      <flyin tilt="-90" fov="170" pan="0" projection="9"/>
+      <min tilt="-90" fov="75" pan="0"/>
+      <max fovstereographic="330" tilt="90" fov="75" fovfisheye="360" pan="360" scaletofit="1"/>
+    </view>
+    <userdata title="Sweets &amp; Namkeens" copyright="" datetime="11-09-25 7:38" source="DSC06814 Panorama.jpg" info="" latitude="" nodeid="node22" author="" longitude="" description="" comment="" tags="9K|TheExperienceStore" heading="0" customnodeid="SweetsNamkeens">
+      <custompropertyvalue value="false" variablename="varDayNight"/>
+      <custompropertyvalue value="" variablename="varNodeID"/>
+      <custompropertyvalue value="" variablename="varMode"/>
+    </userdata>
+    <hotspots wordwrap="1" height="0" smoothmovement="1" width="180">
+      <label bordercolor="0x000000" borderalpha="1" backgroundalpha="1" width="180" border="1" background="1" enabled="0" textcolor="0x000000" borderradius="1" wordwrap="1" height="0" textalpha="1" backgroundcolor="0xffffff"/>
+      <polystyle bordercolor="0x0000ff" mode="1" borderalpha="1" backgroundalpha="0.25098" backgroundcolor="0x0000ff" handcursor="1"/>
+      <hotspot title="Origin of Mysore Pak" description="" tilt="0" url="{node21}" target="-169.6/0/75.0" skinid="ht_node" pan="-46.96" id="Point01">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Premium Gifting" description="" tilt="0" url="{node23}" target="-165.4/0/75.0" skinid="ht_node" pan="-190.92" id="Point02">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Kitchen Area" description="" tilt="0" url="{node24}" target="-170.0/0.0/75.0" skinid="ht_node" pan="-225.86" id="Point03">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Ghee Sweets" description="&lt;h2 style=&quot;margin:0px;&quot;>Ghee Sweets&lt;/h2>&lt;div>Experience the timeless richness of pure ghee in every bite. Our Fresh Authentic Ghee Sweets are handcrafted using traditional recipes, premium ingredients, and abundant ghee—delivering soft textures, aromatic flavors, and an unforgettable indulgence. From Soan Papdi to Badam Halwa, each sweet is a tribute to heritage and purity, perfect for celebrations or heartfelt gifting.&lt;/div>" tilt="-16.06" url="https://www.worldofmysorepak.com/collections/buy-fresh-authentic-ghee-sweets-online" target="_blank" skinid="ht_url" pan="-94.49" id="Point04">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Namkeen" description="&lt;h2 style=&quot;margin:0px;&quot;>Namkeen&lt;/h2>&#xa;&lt;div>Crispy, spicy, and packed with flavor — our traditional Namkeen collection brings you the best of Karnataka’s savory heritage. From crunchy chakkuli and kodubale to masala peanuts, fried green peas, ribbon muruku and beyond, every bite is handcrafted with authentic ingredients and generations of taste. Perfect for snack time, gifting, or a flavourful break — discover something new in every pack.&lt;/div>" tilt="-7.52" url="https://www.worldofmysorepak.com/collections/buy-authentic-traditional-namkeen-savory-snacks-online" target="_blank" skinid="ht_url" pan="-151.19" id="Point05">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Beverages &amp; Bengali Sweets" description="" tilt="-15.54" url="" target="" skinid="ht_tag" pan="-58.13" id="Point06">
+        <custompropertyvalue value="Beverages &amp; Bengali Sweets" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Fresh Chocolates" description="&lt;h2 style=&quot;margin:0px;&quot;>Fresh Chocolates&lt;/h2>&lt;div>Dive into decadence with our artisanal chocolate sweets—a perfect fusion of Indian tradition and rich cocoa indulgence. From silky milk chocolate to bold dark and nut-infused creations, each piece is handcrafted to elevate your sweet experience. Whether for gifting, festive treats, or a personal delight, our chocolate collection is the sweet symphony your taste buds deserve.&lt;/div>" tilt="-30.37" url="https://www.worldofmysorepak.com/collections/buy-exclusive-chocolate-sweets-delivery-online" target="_blank" skinid="ht_url" pan="-106.83" id="Point07">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+    </hotspots>
+    <media/>
+    <transition blendtime="1" blendcolor="0x000000" softedge="0" zoomout="0" zoomoutpause="1" enabled="1" zoomafteroutfov="40" zoomin="7" zoomspeed="2" zoomfov="75" zoomafterinfov="140" type="mesh" delay="none"/>
+    <animation clipsrandom="0" useinautorotation="0" syncanimationwithvideo="0" animsequence="Animation01"/>
+    <control simulatemass="1" lockedwheel="1" contextvr="0" lockedkeyboardzoom="0" zoomcentercursor="1" dblclickfullscreen="0" invertwheel="0" invertcontrol="1" rubberband="0" speedwheel="1" contextfullscreen="0" lockedkeyboard="0" contextprojections="0" sensitivity="8" lockedmouse="0" hideabout="1">
+      <menulink text="Created By TURIYA" url="https://turiya.co/"/>
+    </control>
+  </panorama>
+  <panorama hideabout="1" id="node24">
+    <input leveltilesize="472" width="2250" levelingpitch="0" height="2250" levelingroll="0" overlap="1" leveltileurl="tiles/node24/cf_%c/l_%l/c_%x/tile_%y.webp" levelbias="0.400" levelbiashidpi="1.000">
+      <level height="2250" preload="0" width="2250" predecode="0"/>
+      <level height="1125" preload="0" width="1125" predecode="0"/>
+      <level height="562" preload="0" width="562" predecode="0"/>
+      <level height="281" preload="1" width="281" predecode="1"/>
+      <preview color="0x808080" strip="1"/>
+    </input>
+    <view pannorth="0" fovmode="0">
+      <start tilt="0" fov="75" pan="-170.04" projection="4"/>
+      <flyin tilt="-90" fov="170" pan="0" projection="9"/>
+      <min tilt="-90" fov="75" pan="0"/>
+      <max fovstereographic="330" tilt="90" fov="75" fovfisheye="360" pan="360" scaletofit="1"/>
+    </view>
+    <userdata title="Kitchen Area" copyright="" datetime="11-09-25 7:46" source="DSC06859 Panorama.jpg" info="" latitude="" nodeid="node24" author="" longitude="" description="" comment="" tags="9K|LiveKitchen|hidepopup" heading="0" customnodeid="KitchenArea_01">
+      <custompropertyvalue value="false" variablename="varDayNight"/>
+      <custompropertyvalue value="" variablename="varNodeID"/>
+      <custompropertyvalue value="" variablename="varMode"/>
+    </userdata>
+    <hotspots wordwrap="1" height="0" smoothmovement="1" width="180">
+      <label bordercolor="0x000000" borderalpha="1" backgroundalpha="1" width="180" border="1" background="1" enabled="0" textcolor="0x000000" borderradius="1" wordwrap="1" height="0" textalpha="1" backgroundcolor="0xffffff"/>
+      <polystyle bordercolor="0x0000ff" mode="1" borderalpha="1" backgroundalpha="0.25098" backgroundcolor="0x0000ff" handcursor="1"/>
+      <hotspot title="Kitchen Area" description="" tilt="0" url="{node25}" target="-6.8/0/75.0" skinid="ht_node" pan="-180.46" id="Point01">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Premium Gifting" description="" tilt="3.37" url="{node23}" target="-76.4/0/75.0" skinid="ht_node" pan="-52.67" id="Point02">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Mysore Pak&lt;br>Making Machine" description="&lt;h2 style=&quot;margin:0px;&quot;>ಮೈಸೂರ್ ಪಾಕ್ ತಯಾರಿಸುವ ಯಂತ್ರ&lt;/h2>&#xa;&lt;div>ಮೈಸೂ‌ರ್ ಪಾಕ್ ತಯಾರಿಸುವ ಯಂತ್ರವು ಖಾಸಗಿ ಉಪಕರಣವಾಗಿದ್ದು, ಇದು ಮೈಸೂರ್ ಪಾಕ್‌ ತಯಾರಿಕೆಯನ್ನು ಉನ್ನತ ಕಾರ್ಯಕ್ಷಮತೆ, ಕಡಿಮೆ ವಿದ್ಯುತ್ ಬಳಕೆ ಮತ್ತು ಇಚ್ಛಿತ ಸಮರಸತೆಯನ್ನು ತಲುಪಿಸಲು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಪಾಕ ಮಾಡಲು ವಿನ್ಯಾಸಗೊಳಿಸಲಾಗಿದೆ.&lt;/div>&#xa;&#xa;&lt;h2 style=&quot;margin:0px;&quot;>MYSORE PAK MAKING MACHINE&lt;/h2>&#xa;&lt;div>Mysore Pak making machine is a specialized kitchen equipment specifically designed to automate the process of preparing Mysore Pak with high efficiency, low power consumption and cooking them to desired consistency.&lt;/div>" tilt="-3.07" url="" target="" skinid="ht_info" pan="-228.11" id="Point03">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Mysore Pak&lt;br>Cutting Machine" description="&lt;h2 style=&quot;margin:0px;&quot;>ಮೈಸೂರ್ ಪಾಕ್ ಕಟ್ ಮಾಡುವ ಯಂತ್ರ&lt;/h2>&#xa;&lt;div>ಸ್ವಯಂಚಾಲಿತ ಮೈಸೂರ್ ಪಾಕ್ ಕಟ್ ಮಾಡುವ ಯಂತ್ರವು ಕಟ್ ಮಾಡುವ ಪ್ರಕ್ರಿಯೆಯನ್ನು ಸುಗಮಗೊಳಿಸುತ್ತದೆ, ಇದು ಸತತ ಫಲಿತಾಂಶಗಳನ್ನು ಖಚಿತಪಡಿಸುತ್ತದೆ. ಇದು ಉನ್ನತ ಕಟ್ ತಂತ್ರಜ್ಞಾನಗಳನ್ನು ಒಳಗೊಂಡಿರುತ್ತದೆ, ಮತ್ತು ಮೈಸೂರ್ ಪಾಕ್‌ನ ಸಮಾನ ಚದರಗಳನ್ನು ಸರಿಯಾಗಿ ಕಟ್ ಮಾಡಿ, ಸಾಂಪ್ರದಾಯಿಕ ರಚನೆ ಮತ್ತು ಗುಣಮಟ್ಟವನ್ನು ಕಾಯ್ದುಕೊಳ್ಳುತ್ತದೆ ಮತ್ತು ಆಕರ್ಷಕ ಪ್ರದರ್ಶನವನ್ನು ನೀಡುತ್ತದೆ.&lt;/div>&#xa;&#xa;&lt;h2 style=&quot;margin:0px;&quot;>MYSORE PAK CUTTING MACHINE&lt;/h2>&#xa;&lt;div>The automatic Mysore Pak cutting machine streamlines the cutting process ensuring consistent results. Equipped with advanced cutting mechanisms, this machine delivers accurate slices of Mysore Pak, maintaining the traditional texture and quality of the sweet ensuring an attractive presentation.&lt;/div>" tilt="-24.11" url="" target="" skinid="ht_info" pan="6.21" id="Point04">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Mysore Pak Single Piece&lt;br>Packing Machine" description="&lt;h2 style=&quot;margin:0px;&quot;>ಮೈಸೂರ್ ಪಾಕ್ ಸಿಂಗಲ್ ಪೀಸ್ ಪ್ಯಾಕಿಂಗ್ ಯಂತ್ರ&lt;/h2>&#xa;&lt;div>ಮೈಸೂರ್ ಪಾಕ್ ಸಿಂಗಲ್ ಪೀಸ್ ಪ್ಯಾಕಿಂಗ್ ಯಂತ್ರವು ಅರೆ-ಸ್ವಯಂಚಾಲಿತ ಪ್ಯಾಕೇಜಿಂಗ್ ಯಂತ್ರವಾಗಿದ್ದು, ಇದು ಮೈಸೂರ್ ಪಾಕ್‌ನ ಪ್ರತ್ಯೇಕ ಮಾದರಿಯನ್ನು ಸ್ವಚ್ಛತೆಯಿಂದ ಮತ್ತು ಸಮರ್ಥವಾಗಿ ಪ್ಯಾಕ್ ಮಾಡುವಂತೆ ವಿನ್ಯಾಸಗೊಳಿಸಲಾಗಿದೆ. ಇದರಲ್ಲಿನ ಫೀಡಿಂಗ್ ವ್ಯವಸ್ಥೆಯು ತಯಾರಾದ ಮೈಸೂ‌ರ್ ಪಾಕ್‌ನ ಮಾದರಿಗಳನ್ನು ಪ್ಯಾಕಿಂಗ್ ವಿಭಾಗಕ್ಕೆ ತಲುಪಿಸಿ, ಪ್ರತಿ ಮಾದರಿಯನ್ನು ಆಹಾರ ಗುಣಮಟ್ಟದ ಕವರ್‌ಗಳಲ್ಲಿ ಪ್ಯಾಕ್ ಮಾಡಲಾಗುತ್ತದೆ.&lt;/div>&#xa;&#xa;&lt;h2 style=&quot;margin:0px;&quot;>MYSORE PAK SINGLE PIECE PACKING MACHINE&lt;/h2>&#xa;&lt;div>Mysore Pak single-piece packing machine is a semi-automatic packaging machine designed to pack individual pieces of Mysore Pak in a hygienic and efficient manner. It includes a feeding system that moves prepared Mysore Pak pieces into the packaging section where each piece of Mysore Pak is wrapped in food-grade wrapping material.&lt;/div>" tilt="-10.8" url="" target="" skinid="ht_info" pan="-60.11" id="Point05">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+    </hotspots>
+    <media/>
+    <transition blendtime="1" blendcolor="0x000000" softedge="0" zoomout="0" zoomoutpause="1" enabled="1" zoomafteroutfov="40" zoomin="7" zoomspeed="2" zoomfov="75" zoomafterinfov="140" type="mesh" delay="none"/>
+    <animation clipsrandom="0" useinautorotation="0" syncanimationwithvideo="0" animsequence="Animation01"/>
+    <control simulatemass="1" lockedwheel="1" contextvr="0" lockedkeyboardzoom="0" zoomcentercursor="1" dblclickfullscreen="0" invertwheel="0" invertcontrol="1" rubberband="0" speedwheel="1" contextfullscreen="0" lockedkeyboard="0" contextprojections="0" sensitivity="8" lockedmouse="0" hideabout="1">
+      <menulink text="Created By TURIYA" url="https://turiya.co/"/>
+    </control>
+  </panorama>
+  <panorama hideabout="1" id="node25">
+    <input leveltilesize="472" width="2250" levelingpitch="0" height="2250" levelingroll="0" overlap="1" leveltileurl="tiles/node25/cf_%c/l_%l/c_%x/tile_%y.webp" levelbias="0.400" levelbiashidpi="1.000">
+      <level height="2250" preload="0" width="2250" predecode="0"/>
+      <level height="1125" preload="0" width="1125" predecode="0"/>
+      <level height="562" preload="0" width="562" predecode="0"/>
+      <level height="281" preload="1" width="281" predecode="1"/>
+      <preview color="0x808080" strip="1"/>
+    </input>
+    <view pannorth="0" fovmode="0">
+      <start tilt="0" fov="75" pan="173.38" projection="4"/>
+      <flyin tilt="-90" fov="170" pan="0" projection="9"/>
+      <min tilt="-90" fov="75" pan="0"/>
+      <max fovstereographic="330" tilt="90" fov="75" fovfisheye="360" pan="360" scaletofit="1"/>
+    </view>
+    <userdata title="Kitchen Area" copyright="" datetime="11-09-25 7:49" source="DSC06895 Panorama.jpg" info="" latitude="" nodeid="node25" author="" longitude="" description="" comment="" tags="9K|LiveKitchen|hidepopup" heading="0" customnodeid="KitchenArea_02">
+      <custompropertyvalue value="false" variablename="varDayNight"/>
+      <custompropertyvalue value="" variablename="varNodeID"/>
+      <custompropertyvalue value="" variablename="varMode"/>
+    </userdata>
+    <hotspots wordwrap="1" height="0" smoothmovement="1" width="180">
+      <label bordercolor="0x000000" borderalpha="1" backgroundalpha="1" width="180" border="1" background="1" enabled="0" textcolor="0x000000" borderradius="1" wordwrap="1" height="0" textalpha="1" backgroundcolor="0xffffff"/>
+      <polystyle bordercolor="0x0000ff" mode="1" borderalpha="1" backgroundalpha="0.25098" backgroundcolor="0x0000ff" handcursor="1"/>
+      <hotspot title="Kitchen Area" description="" tilt="0" url="{node24}" target="10.5/0/75.0" skinid="ht_node" pan="-196.99" id="Point01">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Mysore Pak&lt;br>Making Machine" description="&lt;h2 style=&quot;margin:0px;&quot;>ಮೈಸೂರ್ ಪಾಕ್ ತಯಾರಿಸುವ ಯಂತ್ರ&lt;/h2>&#xa;&lt;div>ಮೈಸೂ‌ರ್ ಪಾಕ್ ತಯಾರಿಸುವ ಯಂತ್ರವು ಖಾಸಗಿ ಉಪಕರಣವಾಗಿದ್ದು, ಇದು ಮೈಸೂರ್ ಪಾಕ್‌ ತಯಾರಿಕೆಯನ್ನು ಉನ್ನತ ಕಾರ್ಯಕ್ಷಮತೆ, ಕಡಿಮೆ ವಿದ್ಯುತ್ ಬಳಕೆ ಮತ್ತು ಇಚ್ಛಿತ ಸಮರಸತೆಯನ್ನು ತಲುಪಿಸಲು ಸ್ವಯಂಚಾಲಿತವಾಗಿ ಪಾಕ ಮಾಡಲು ವಿನ್ಯಾಸಗೊಳಿಸಲಾಗಿದೆ.&lt;/div>&#xa;&#xa;&lt;h2 style=&quot;margin:0px;&quot;>MYSORE PAK MAKING MACHINE&lt;/h2>&#xa;&lt;div>Mysore Pak making machine is a specialized kitchen equipment specifically designed to automate the process of preparing Mysore Pak with high efficiency, low power consumption and cooking them to desired consistency.&lt;/div>" tilt="-5.64" url="" target="" skinid="ht_info" pan="-149.34" id="Point02">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+      <hotspot title="Premium Gifting" description="" tilt="0" url="{node23}" target="-76.4/0/75.0" skinid="ht_node" pan="-230.03" id="Point03">
+        <custompropertyvalue value="" variablename="FlagTitle"/>
+        <custompropertyvalue value="" variablename="FlagDescription"/>
+        <custompropertyvalue value="" variablename="FlagType"/>
+      </hotspot>
+    </hotspots>
+    <media/>
+    <transition blendtime="1" blendcolor="0x000000" softedge="0" zoomout="0" zoomoutpause="1" enabled="1" zoomafteroutfov="40" zoomin="7" zoomspeed="2" zoomfov="75" zoomafterinfov="140" type="mesh" delay="none"/>
+    <animation clipsrandom="0" useinautorotation="0" syncanimationwithvideo="0" animsequence="Animation01"/>
+    <control simulatemass="1" lockedwheel="1" contextvr="0" lockedkeyboardzoom="0" zoomcentercursor="1" dblclickfullscreen="0" invertwheel="0" invertcontrol="1" rubberband="0" speedwheel="1" contextfullscreen="0" lockedkeyboard="0" contextprojections="0" sensitivity="8" lockedmouse="0" hideabout="1">
+      <menulink text="Created By TURIYA" url="https://turiya.co/"/>
+    </control>
+  </panorama>
+  <masternode>
+    <userdata title="World Of Mysore Pak | Mysuru" description="A Sweet Legacy Unveiled in Mysuru&#xa;&#xa;The city of palaces and rich traditions welcomes an iconic addition to its culinary landscape. The World of Mysore Pak - The Sweet Experience Store has officially opened its doors, offering an immersive journey into the heritage and artistry of this beloved South Indian sweet.&#xa;&#xa;In a world where traditions often fade, three passionate entrepreneurs have taken on the mission of preserving the legacy of Mysore Pak. From idea to execution, this ambitious project spanned two years, with rigorous trials and innovation to perfect every bite of the delicacy." copyright="Sweet Shop Virtual Tour" comment="https://www.turiya.co/360/WOMP/" tags="" author="Turiya Avasta"/>
+    <animationsequences>
+      <sequence title="Animation01"/>
+    </animationsequences>
+  </masternode>
+  <customproperty defaultvalue="false" variabletype="2" variablename="varDayNight" propertytype="0"/>
+  <customproperty defaultvalue="" variabletype="0" variablename="varNodeID" propertytype="0"/>
+  <customproperty defaultvalue="" variabletype="0" variablename="varMode" propertytype="0"/>
+  <customproperty defaultvalue="" variabletype="0" variablename="FlagTitle" propertytype="1"/>
+  <customproperty defaultvalue="" variabletype="0" variablename="FlagDescription" propertytype="1"/>
+  <customproperty defaultvalue="" variabletype="0" variablename="FlagType" propertytype="1"/>
+  <customproperty defaultvalue="" variabletype="0" variablename="clipTitle" propertytype="2"/>
+</tour>

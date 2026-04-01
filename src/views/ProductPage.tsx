@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useParams } from "next/navigation";
 import Link from "next/link";
+import Image from "next/image";
 import { motion } from "framer-motion";
 import { ShoppingBag, ArrowLeft } from "lucide-react";
 import type { Product } from "@/data/products";
@@ -70,7 +71,7 @@ const ProductPage = () => {
   const currentWeight = product.weights[selectedWeight];
 
   return (
-    <div className="pt-20">
+    <div className="pt-28 sm:pt-32">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
         <Link href="/shop" className="inline-flex items-center gap-2 text-sm text-muted-foreground hover:text-primary transition-colors mb-8">
           <ArrowLeft className="h-4 w-4" />
@@ -81,9 +82,19 @@ const ProductPage = () => {
           <motion.div
             initial={{ opacity: 0, x: -20 }}
             animate={{ opacity: 1, x: 0 }}
-            className="aspect-square rounded-xl overflow-hidden bg-card"
+            className="relative aspect-square rounded-xl overflow-hidden bg-card"
           >
-            <img src={product.image} alt={product.name} className="w-full h-full object-cover" />
+            <Image
+              src={product.image}
+              alt={product.name}
+              fill
+              sizes="(max-width: 1024px) 100vw, 50vw"
+              className={`object-cover ${
+                product.category?.toLowerCase() === "namkeens"
+                  ? "object-bottom"
+                  : "object-center"
+              }`}
+            />
           </motion.div>
 
           <motion.div

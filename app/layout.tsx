@@ -31,7 +31,7 @@ export const viewport: Viewport = {
 export const metadata: Metadata = {
   title: "World of Mysore Pak — Premium Authentic Sweets",
   description:
-    "Handcrafted Mysore Pak made with pure ghee and traditional recipes. Shop online and get authentic Mysuru sweets delivered to your door.",
+    "Traditional Mysore Pak made with pure ghee and traditional recipes. Shop online and get authentic Mysuru sweets delivered to your door.",
   keywords: ["Mysore Pak", "Indian sweets", "ghee sweets", "online sweet shop"],
 };
 

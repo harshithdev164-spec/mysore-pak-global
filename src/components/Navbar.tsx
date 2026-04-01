@@ -6,16 +6,12 @@ import { usePathname } from "next/navigation";
 import { User, Menu, X } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  Show,
-  SignInButton,
-  UserButton,
-} from "@clerk/nextjs";
 
 const navLinks = [
   { label: "Home", to: "/" },
   { label: "Our Story", to: "/our-story" },
   { label: "Shop", to: "/shop" },
+  { label: "Careers", to: "/careers" },
 ];
 
 const Navbar = () => {
@@ -83,8 +79,50 @@ const Navbar = () => {
               </Link>
             </div>
 
-            {/* Right — cart (both) + auth (desktop) */}
+            {/* Right — Swiggy/Zomato (desktop) + cart (both) */}
             <div className="flex-1 flex items-center justify-end gap-2 sm:gap-3">
+              {/* Swiggy & Zomato — desktop only, before cart */}
+              <div className="hidden md:flex items-center gap-2">
+                <motion.a
+                  href="https://www.swiggy.com/menu/1141143?source=sharing"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex flex-col items-center gap-0.5 px-1 py-1 group"
+                  title="Order on Swiggy"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/swiggy logo.png"
+                    alt="Swiggy"
+                    className="h-8 w-8 object-contain drop-shadow-sm group-hover:drop-shadow-md transition-all duration-200"
+                  />
+                  <span className="font-body text-[8px] font-semibold tracking-wide text-[#1B3A2D]/60 group-hover:text-[#FC8019] transition-colors duration-200">
+                    Swiggy
+                  </span>
+                </motion.a>
+                <motion.a
+                  href="https://zomato.onelink.me/xqzv/f3nszzru"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  whileHover={{ scale: 1.1, y: -2 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="flex flex-col items-center gap-0.5 px-1 py-1 group"
+                  title="Order on Zomato"
+                >
+                  {/* eslint-disable-next-line @next/next/no-img-element */}
+                  <img
+                    src="/zomato logo.png"
+                    alt="Zomato"
+                    className="h-8 w-8 object-contain drop-shadow-sm group-hover:drop-shadow-md transition-all duration-200"
+                  />
+                  <span className="font-body text-[8px] font-semibold tracking-wide text-[#1B3A2D]/60 group-hover:text-[#E23744] transition-colors duration-200">
+                    Zomato
+                  </span>
+                </motion.a>
+              </div>
+
               {/* Cart — visible on both mobile and desktop */}
               <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
                 <Link
@@ -114,28 +152,6 @@ const Navbar = () => {
                 </Link>
               </motion.div>
 
-              {/* Auth — desktop only */}
-              <div className="hidden md:flex items-center">
-                <Show when="signed-out">
-                  <SignInButton mode="redirect">
-                    <button className="flex items-center gap-1.5 font-body text-xs font-semibold text-[#1B3A2D]/60 hover:text-[#1B3A2D] transition-colors px-3 py-2.5 rounded-full hover:bg-[#1B3A2D]/5">
-                      <User className="h-4 w-4" />
-                      <span>Sign In</span>
-                    </button>
-                  </SignInButton>
-                </Show>
-                <Show when="signed-in">
-                  <Link
-                    href="/profile"
-                    className={`font-body text-xs font-semibold tracking-wider uppercase transition-colors duration-300 mr-3 ${
-                      pathname === "/profile" ? "text-[#1B3A2D]" : "text-foreground/50 hover:text-[#1B3A2D]"
-                    }`}
-                  >
-                    My Orders
-                  </Link>
-                  <UserButton />
-                </Show>
-              </div>
             </div>
           </div>
         </div>
@@ -177,32 +193,37 @@ const Navbar = () => {
                   </Link>
                 ))}
 
-                {/* Auth section in mobile menu */}
-                <div className="pt-4">
-                  <Show when="signed-out">
-                    <SignInButton mode="redirect">
-                      <button
-                        className="w-full flex items-center gap-2 font-body text-sm font-semibold text-[#1B3A2D]/60 hover:text-[#1B3A2D] transition-colors py-2"
-                        onClick={() => setMobileOpen(false)}
-                      >
-                        <User className="h-4 w-4" />
-                        Sign In
-                      </button>
-                    </SignInButton>
-                  </Show>
-                  <Show when="signed-in">
-                    <div className="flex items-center gap-3">
-                      <UserButton />
-                      <Link
-                        href="/profile"
-                        onClick={() => setMobileOpen(false)}
-                        className="font-body text-sm font-semibold text-[#1B3A2D]/60 hover:text-[#1B3A2D] transition-colors"
-                      >
-                        My Orders
-                      </Link>
-                    </div>
-                  </Show>
+                {/* Swiggy & Zomato — 5th option */}
+                <div className="py-3 border-b border-[#1B3A2D]/6">
+                  <p className="font-body text-[10px] font-semibold tracking-[0.15em] uppercase text-[#C9972D] mb-2">
+                    For orders within Mysore
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <a
+                      href="https://www.swiggy.com/menu/1141143?source=sharing"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#FC8019]/10 hover:bg-[#FC8019]/20 transition-colors"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="/swiggy logo.png" alt="Swiggy" className="h-7 w-7 object-contain" />
+                      <span className="font-body text-sm font-semibold text-[#1B3A2D]">Swiggy</span>
+                    </a>
+                    <a
+                      href="https://zomato.onelink.me/xqzv/f3nszzru"
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      onClick={() => setMobileOpen(false)}
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#E23744]/10 hover:bg-[#E23744]/20 transition-colors"
+                    >
+                      {/* eslint-disable-next-line @next/next/no-img-element */}
+                      <img src="/zomato logo.png" alt="Zomato" className="h-7 w-7 object-contain" />
+                      <span className="font-body text-sm font-semibold text-[#1B3A2D]">Zomato</span>
+                    </a>
+                  </div>
                 </div>
+
               </div>
             </motion.div>
           </>

@@ -134,14 +134,15 @@ export const TilePatternBg = ({
   className = "",
   opacity = 0.06,
   color = "#2D5A3D",
-}: TilePatternProps) => (
+  patternId = "mysuru-tile",
+}: TilePatternProps & { patternId?: string }) => (
   <div
     className={`absolute inset-0 pointer-events-none overflow-hidden ${className}`}
     style={{ opacity }}
   >
     <svg width="100%" height="100%" xmlns="http://www.w3.org/2000/svg">
       <defs>
-        <pattern id="mysuru-tile" x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
+        <pattern id={patternId} x="0" y="0" width="80" height="80" patternUnits="userSpaceOnUse">
           {/* Center star */}
           <path d="M40 28 L44 36 L52 40 L44 44 L40 52 L36 44 L28 40 L36 36 Z" fill={color} />
           {/* Corner petal clusters */}
@@ -160,7 +161,7 @@ export const TilePatternBg = ({
           <line x1="52" y1="40" x2="60" y2="40" stroke={color} strokeWidth="3" />
         </pattern>
       </defs>
-      <rect width="100%" height="100%" fill="url(#mysuru-tile)" />
+      <rect width="100%" height="100%" fill={`url(#${patternId})`} />
     </svg>
   </div>
 );

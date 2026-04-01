@@ -304,14 +304,18 @@
   /* Faster scroll strip = fewer composited frames to paint per second */
   .animate-photo-scroll { animation-duration: 18s; }
 
-  /* Announcement marquee — stop scrolling on mobile (static text, no paint) */
-  .animate-marquee { animation-play-state: paused; }
+  /* Announcement marquee — keep scrolling on mobile */
 
   /* Ensure every section uses content-visibility on mobile */
   section {
     content-visibility: auto;
     contain-intrinsic-size: 0 500px;
   }
+}
+
+/* Hide the floating VideoPopup button while a product sheet is open */
+body.sheet-open [data-videopopup] {
+  display: none;
 }
 
 @keyframes grain {

@@ -6,7 +6,6 @@ import { usePathname } from "next/navigation";
 import { Home, BookOpen, Store, User } from "lucide-react";
 import { useCart } from "@/context/CartContext";
 import { motion } from "framer-motion";
-import { Show, SignInButton, UserButton } from "@clerk/nextjs";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type NavItem = { label: string; to: string; icon: React.ComponentType<any> | null };
@@ -81,7 +80,7 @@ export default function MobileBottomNav() {
           );
         })}
 
-        {/* Account tab */}
+        {/* Account tab — placeholder until new auth is added */}
         <div className="flex-1 flex flex-col items-center justify-center gap-[3px] relative select-none">
           {isActive("/profile") && (
             <motion.span
@@ -90,38 +89,19 @@ export default function MobileBottomNav() {
               transition={{ type: "spring", stiffness: 400, damping: 30 }}
             />
           )}
-          <Show when="signed-in">
-            <Link href="/profile" className="flex flex-col items-center gap-[3px]">
-              <UserButton
-                appearance={{
-                  elements: {
-                    avatarBox: "w-[22px] h-[22px]",
-                    userButtonPopoverCard: "z-[200]",
-                  },
-                }}
-              />
-              <span
-                className={`text-[10px] font-semibold font-body tracking-wider uppercase leading-none transition-colors duration-200 ${
-                  isActive("/profile") ? "text-[#1B3A2D]" : "text-[#1B3A2D]/40"
-                }`}
-              >
-                Account
-              </span>
-            </Link>
-          </Show>
-          <Show when="signed-out">
-            <SignInButton mode="redirect">
-              <button className="flex flex-col items-center gap-[3px]">
-                <User
-                  className="h-[22px] w-[22px] text-[#1B3A2D]/40"
-                  strokeWidth={1.7}
-                />
-                <span className="text-[10px] font-semibold font-body tracking-wider uppercase leading-none text-[#1B3A2D]/40">
-                  Account
-                </span>
-              </button>
-            </SignInButton>
-          </Show>
+          <Link href="/profile" className="flex flex-col items-center gap-[3px]">
+            <User
+              className={`h-[22px] w-[22px] transition-colors duration-200 ${isActive("/profile") ? "text-[#1B3A2D]" : "text-[#1B3A2D]/40"}`}
+              strokeWidth={isActive("/profile") ? 2.2 : 1.7}
+            />
+            <span
+              className={`text-[10px] font-semibold font-body tracking-wider uppercase leading-none transition-colors duration-200 ${
+                isActive("/profile") ? "text-[#1B3A2D]" : "text-[#1B3A2D]/40"
+              }`}
+            >
+              Account
+            </span>
+          </Link>
         </div>
       </div>
     </nav>

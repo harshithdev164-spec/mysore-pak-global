@@ -52,11 +52,11 @@ export function useAdminFetch<T>(url: string) {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [url]);
 
-  // Call mutate() after a write (create/update/delete) to force a fresh fetch
-  const mutate = useCallback(() => {
+  // Call mutate() after a write — silent=true skips loading skeleton
+  const mutate = useCallback((silent = false) => {
     delete CACHE[url];
-    setLoading(true);
-    load(false);
+    if (!silent) setLoading(true);
+    load(silent);
   }, [url, load]);
 
   return { data, loading, error, mutate };

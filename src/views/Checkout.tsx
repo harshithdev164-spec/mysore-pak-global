@@ -4,7 +4,6 @@ import { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useCart } from "@/context/CartContext";
-import { useUser } from "@clerk/nextjs";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -49,8 +48,6 @@ interface CourierRate {
 const Checkout = () => {
   const { items, subtotal, clearCart } = useCart();
   const router = useRouter();
-  const { user } = useUser();
-
   const [loading, setLoading] = useState(false);
   const [errorMsg, setErrorMsg] = useState("");
   const [paymentMethod, setPaymentMethod] = useState<"razorpay" | "cod">("razorpay");
@@ -76,16 +73,6 @@ const Checkout = () => {
   useEffect(() => {
     if (mounted && items.length === 0 && !orderComplete) router.push("/shop");
   }, [mounted, items.length, router, orderComplete]);
-
-  useEffect(() => {
-    if (user) {
-      setForm((prev) => ({
-        ...prev,
-        name: prev.name || user.fullName || "",
-        email: prev.email || user.primaryEmailAddress?.emailAddress || "",
-      }));
-    }
-  }, [user]);
 
   const totalWeight = items.reduce(
     (sum, item) => sum + parseWeightKg(item.weight) * item.quantity,
@@ -116,8 +103,15 @@ const Checkout = () => {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [form.pincode]);
 
-  const shipping = subtotal > 1500 ? 0 : (cheapestRate?.rate ?? 99);
-  const total = subtotal + shipping;
+  const shipping = subtotal > 1500 ? 0 : (cheapestRate?.rate ?? 0);
+
+  // Calculate GST: Chocolates 18%, Others 5%
+  const gst = items.reduce((sum, item) => {
+    const gstRate = item.product.category?.toLowerCase().includes("chocolate") ? 0.18 : 0.05;
+    return sum + (item.price * item.quantity * gstRate);
+  }, 0);
+
+  const total = subtotal + shipping + gst;
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
@@ -277,11 +271,6 @@ const Checkout = () => {
             <div className="bg-card border border-border rounded-xl p-6">
               <div className="flex items-center justify-between mb-4">
                 <h3 className="font-heading text-lg font-semibold text-foreground">Shipping Details</h3>
-                {user && (
-                  <span className="font-body text-xs text-[#C9972D] bg-[#C9972D]/10 px-2.5 py-1 rounded-full">
-                    Auto-filled from your account
-                  </span>
-                )}
               </div>
               <div className="grid sm:grid-cols-2 gap-4">
                 {[
@@ -410,9 +399,9 @@ const Checkout = () => {
                     Processing…
                   </span>
                 ) : paymentMethod === "cod" ? (
-                  `Place Order — Pay ₹${total} on Delivery`
+                  `Place Order — Pay ₹${total.toFixed(2)} on Delivery`
                 ) : (
-                  `Pay ₹${total} with Razorpay`
+                  `Pay ₹${total.toFixed(2)} with Razorpay`
                 )}
               </Button>
 
@@ -443,7 +432,7 @@ const Checkout = () => {
                 <div className="flex justify-between text-sm text-muted-foreground mt-1">
                   <span>Shipping</span>
                   <span>
-                    {subtotal > 1500 ? "Free" : cheapestRate ? `₹${cheapestRate.rate}` : "₹99"}
+                    {subtotal > 1500 ? "Free" : cheapestRate ? `₹${cheapestRate.rate}` : "—"}
                   </span>
                 </div>
                 {cheapestRate && subtotal <= 1500 && (
@@ -451,8 +440,12 @@ const Checkout = () => {
                     via {cheapestRate.courier_name} · {cheapestRate.etd} days
                   </p>
                 )}
+                <div className="flex justify-between text-sm text-muted-foreground mt-1">
+                  <span>GST</span>
+                  <span>₹{gst.toFixed(2)}</span>
+                </div>
                 <div className="flex justify-between font-semibold text-foreground mt-3 pt-3 border-t border-border">
-                  <span>Total</span><span className="text-primary">₹{total}</span>
+                  <span>Total</span><span className="text-primary">₹{total.toFixed(2)}</span>
                 </div>
               </div>
             </div>

@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
+import { useAdminFetch } from "@/lib/useAdminFetch";
 
 interface Category {
   id: string;
@@ -13,8 +14,9 @@ interface Category {
 const emptyForm = { name: "", slug: "", image: "", description: "" };
 
 export default function AdminCategoriesPage() {
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
+  const { data, loading, error: fetchError, mutate } = useAdminFetch<Category[]>("/api/categories");
+  const categories = data ?? [];
+
   const [saving, setSaving] = useState(false);
   const [deleting, setDeleting] = useState<string | null>(null);
   const [error, setError] = useState("");
@@ -26,20 +28,6 @@ export default function AdminCategoriesPage() {
   // Edit form
   const [editId, setEditId] = useState<string | null>(null);
   const [editForm, setEditForm] = useState(emptyForm);
-
-  function loadCategories() {
-    setLoading(true);
-    fetch("/api/categories", { cache: "no-store" })
-      .then((r) => r.json())
-      .then((j) => {
-        if (j.error) setError(j.error);
-        else setCategories(j.data ?? []);
-      })
-      .catch((e) => setError(String(e)))
-      .finally(() => setLoading(false));
-  }
-
-  useEffect(() => { loadCategories(); }, []);
 
   function handleAddNameChange(name: string) {
     const slug = name
@@ -69,9 +57,9 @@ export default function AdminCategoriesPage() {
       });
       const json = await res.json();
       if (!res.ok) { setError(json.error ?? "Failed to create"); return; }
-      setCategories((prev) => [...prev, json.data]);
       setAddForm(emptyForm);
       setShowAdd(false);
+      mutate();
     } finally {
       setSaving(false);
     }
@@ -106,8 +94,8 @@ export default function AdminCategoriesPage() {
       });
       const json = await res.json();
       if (!res.ok) { setError(json.error ?? "Failed to update"); return; }
-      setCategories((prev) => prev.map((c) => (c.id === editId ? json.data : c)));
       setEditId(null);
+      mutate();
     } finally {
       setSaving(false);
     }
@@ -119,7 +107,7 @@ export default function AdminCategoriesPage() {
     try {
       const res = await fetch(`/api/categories/${id}`, { method: "DELETE" });
       if (res.ok) {
-        setCategories((prev) => prev.filter((c) => c.id !== id));
+        mutate();
       } else {
         const j = await res.json();
         alert(j.error ?? "Failed to delete");
@@ -128,6 +116,8 @@ export default function AdminCategoriesPage() {
       setDeleting(null);
     }
   }
+
+  const displayError = error || fetchError;
 
   return (
     <div className="max-w-4xl">
@@ -141,8 +131,8 @@ export default function AdminCategoriesPage() {
         </button>
       </div>
 
-      {error && (
-        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm mb-4">{error}</div>
+      {displayError && (
+        <div className="bg-red-50 border border-red-200 text-red-700 rounded-lg px-4 py-3 text-sm mb-4">{displayError}</div>
       )}
 
       {/* Add Form */}
@@ -215,11 +205,17 @@ export default function AdminCategoriesPage() {
       {/* Categories Table */}
       <div className="bg-white rounded-xl border border-gray-200">
         {loading ? (
-          <div className="p-8 text-center text-gray-400 text-sm">Loading categories...</div>
-        ) : error ? (
-          <div className="p-8">
-            <p className="text-red-600 font-medium text-sm">Error loading categories</p>
-            <p className="text-red-400 text-xs font-mono mt-1">{error}</p>
+          <div className="divide-y divide-gray-50">
+            {[...Array(5)].map((_, i) => (
+              <div key={i} className="px-4 py-3 flex items-center gap-4 animate-pulse">
+                <div className="flex-1 space-y-2">
+                  <div className="h-3 bg-gray-100 rounded w-1/4" />
+                  <div className="h-2 bg-gray-100 rounded w-1/6" />
+                </div>
+                <div className="h-3 bg-gray-100 rounded w-32" />
+                <div className="h-3 bg-gray-100 rounded w-16" />
+              </div>
+            ))}
           </div>
         ) : (
           <table className="w-full text-sm">

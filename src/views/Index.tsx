@@ -1,10 +1,10 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { ArrowRight, Star, Gift, ChefHat, Flame, Truck, CheckCircle2, Package, Award, Sparkles, Heart, Instagram } from "lucide-react";
+import { ArrowRight, Star, StarHalf, Gift, ChefHat, Flame, Truck, CheckCircle2, Package, Award, Sparkles, Heart, Instagram } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
 import { testimonials } from "@/data/products";
 import type { Product } from "@/data/products";
@@ -35,13 +35,11 @@ function mapApiProduct(p: any): Product {
 
 
 const INSTAGRAM_POSTS = [
-  { src: "/Mysore Pak.webp",   likes: "2.4k", caption: "The golden beauty of freshly made Mysore Pak ✨ Pure ghee, pure love." },
-  { src: "/Ghee Sweets.webp",  likes: "1.8k", caption: "Melt-in-mouth ghee sweets made fresh every day 🍯" },
-  { src: "/Gift Boxes.webp",   likes: "4.2k", caption: "Festival season is gift season 🎁 Premium hampers, now available." },
-  { src: "/Namkeen.webp",      likes: "3.1k", caption: "Crunchy, spicy, irresistible — our Namkeen range 🤍 #WorldOfMysorePak" },
-  { src: "/Choclates.webp",    likes: "2.9k", caption: "Where tradition meets indulgence 📸 Our chocolate collection." },
-  { src: "/Specials.webp",     likes: "1.6k", caption: "Limited specials — crafted for the season 💛 Order yours today." },
-  { src: "/story 5.webp",      likes: "3.5k", caption: "From Mysuru, to your home 🏠 Authentic taste, everywhere." },
+  { src: "/A bite that begins with a crunch and ends in nostalgia.Golden samosa perfection folded with slo.jpg",   caption: "A bite that begins with a crunch and ends in nostalgia. Golden samosa perfection folded with love." },
+  { src: "/A royal crunch of tradition in every bite — our Avarekal Mixture is your perfect festive snack .jpg",   caption: "A royal crunch of tradition in every bite — our Avarekal Mixture is your perfect festive snack." },
+  { src: "/Golden, soft, and irresistibly rich, our Motichur Laddoos are crafted to turn every moment into.jpg",   caption: "Golden, soft, and irresistibly rich, our Motichur Laddoos are crafted to turn every moment into magic." },
+  { src: "/One for you, one for me Because happiness is sweeter when shared.[Premium Indian sweets, Tradit.jpg",   caption: "One for you, one for me. Because happiness is sweeter when shared. Premium Indian sweets, tradition." },
+  { src: "/Slow%20moments%2C%20classic%20flavours%2C%20and%20a%20recipe%20that%20time%20can%27t%20change.Experience%20the%20richness%20of%20.jpg", caption: "Slow moments, classic flavours, and a recipe that time can't change. Experience the richness of tradition." },
 ];
 
 
@@ -49,10 +47,10 @@ const INSTAGRAM_POSTS = [
 /* ══════════════════════════════════════════
    INSTAGRAM POST CARD
    ══════════════════════════════════════════ */
-function InstaCard({ post }: { post: { src: string; likes: string; caption: string } }) {
+function InstaCard({ post }: { post: { src: string; caption: string } }) {
   return (
     <a
-      href="https://www.instagram.com/worldofmysorepak"
+      href="https://www.instagram.com/worldofmysorepakofficial?igsh=MThheDhvMXUyazhrYw=="
       target="_blank"
       rel="noopener noreferrer"
       className="group relative w-52 h-52 sm:w-60 sm:h-60 rounded-2xl overflow-hidden flex-shrink-0 border border-[#2D5A3D]/10 cursor-pointer block"
@@ -66,11 +64,7 @@ function InstaCard({ post }: { post: { src: string; likes: string; caption: stri
       />
       {/* Hover overlay */}
       <div className="absolute inset-0 bg-[#1B3A2D]/75 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex flex-col items-center justify-center gap-3 px-4">
-        <div className="flex items-center gap-1.5 text-white">
-          <Heart className="w-4 h-4 fill-white" />
-          <span className="font-body text-sm font-bold">{post.likes}</span>
-        </div>
-        <p className="text-white/80 font-body text-xs text-center line-clamp-3 leading-relaxed">{post.caption}</p>
+        <p className="text-white/90 font-body text-xs text-center line-clamp-4 leading-relaxed">{post.caption}</p>
       </div>
       {/* Instagram badge */}
       <div className="absolute top-2.5 right-2.5 w-7 h-7 rounded-full bg-white/95 flex items-center justify-center shadow-md opacity-0 group-hover:opacity-100 transition-all duration-300 scale-75 group-hover:scale-100">
@@ -100,29 +94,36 @@ const stagger = {
 /* ══════════════════════════════════════════
    PAGE COMPONENT
    ══════════════════════════════════════════ */
-const Index = () => {
-  const [featured, setFeatured] = useState<Product[]>([]);
-  const [isMobile, setIsMobile] = useState(false);
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
+  const [nearFooter, setNearFooter] = useState(false);
 
   useEffect(() => {
-    setIsMobile(window.innerWidth < 640);
+    function onScroll() {
+      const scrollBottom = window.scrollY + window.innerHeight;
+      const threshold = document.body.scrollHeight - 320;
+      const isNear = scrollBottom >= threshold;
+      setNearFooter((prev) => (prev === isNear ? prev : isNear));
+    }
+    window.addEventListener("scroll", onScroll, { passive: true });
+    return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  useEffect(() => {
-    // Try featured products first; fall back to newest 6 if none are starred
-    fetch("/api/products?featured=true&limit=6")
-      .then((r) => r.json())
-      .then((j) => {
-        if (j.data && j.data.length > 0) {
-          setFeatured(j.data.map(mapApiProduct));
-        } else {
-          return fetch("/api/products?limit=6")
-            .then((r) => r.json())
-            .then((j2) => { if (j2.data) setFeatured(j2.data.map(mapApiProduct)); });
-        }
-      })
-      .catch(console.error);
-  }, []);
+  // Order server-fetched products to match FEATURED_SLUGS order
+  const featured = useMemo<Product[]>(() => {
+    const FEATURED_SLUGS = [
+      "spl-mysore-pak",
+      "carrot-mysore-pak",
+      "hazelnut-dark-chocolate",
+      "milk-chocolate",
+      "badam-halwa",
+      "soan-cake",
+    ];
+    const mapped = initialFeatured.map(mapApiProduct);
+    return FEATURED_SLUGS
+      .map((slug) => mapped.find((p) => p.slug === slug))
+      .filter(Boolean) as Product[];
+  }, [initialFeatured]);
 
   return (
     <div className="overflow-hidden">
@@ -131,56 +132,28 @@ const Index = () => {
       ══════════════════════════════════════════ */}
       {/* Mobile: fixed-height e-commerce banner | Desktop: full-screen hero */}
       <section className="relative h-[70vh] sm:h-screen min-h-[320px] sm:min-h-[640px] overflow-hidden select-none">
-        {/* Image — Ken Burns on desktop only (expensive on mobile) */}
-        <motion.div
-          initial={{ scale: isMobile ? 1 : 1.04 }}
-          animate={{ scale: 1 }}
-          transition={isMobile ? { duration: 0 } : { duration: 6, ease: "linear" }}
-          className="absolute inset-x-0 bottom-0 top-[4rem] sm:top-[5.5rem]"
-        >
+        {/* Hero image — CSS-based responsive swap, no JS flash */}
+        <div className="absolute inset-x-0 bottom-0 top-[4rem] sm:top-[5.5rem]">
+          {/* Mobile image — hidden on sm+ */}
           <Image
-            src="/hero 1.jpeg"
+            src="/hero mobile.png"
             alt="World of Mysore Pak"
             fill
             priority
-            className="object-cover object-center"
+            className="block sm:hidden object-contain object-center"
             sizes="100vw"
           />
-        </motion.div>
-
-        {/* Gradient overlay — stronger on mobile for text legibility */}
-        <div className="absolute inset-x-0 bottom-0 top-[4rem] sm:top-[5.5rem] bg-gradient-to-b from-black/40 via-black/10 to-black/70 sm:from-black/30 sm:via-transparent sm:to-black/55" />
-
-        {/* Mobile-only: brand headline overlaid in centre */}
-        <div className="sm:hidden absolute inset-x-0 top-1/2 -translate-y-1/2 flex flex-col items-center gap-2 px-6 text-center pointer-events-none">
-          <h1 className="font-heading text-3xl font-bold text-white leading-tight drop-shadow-lg">
-            World of<br />Mysore Pak
-          </h1>
-          <p className="font-body text-xs text-white/80 mt-1">Pure Ghee Sweets from Mysuru</p>
+          {/* Desktop image — hidden below sm */}
+          <Image
+            src="/hero pc.png"
+            alt="World of Mysore Pak"
+            fill
+            priority
+            className="hidden sm:block object-cover object-center"
+            sizes="100vw"
+          />
         </div>
 
-        {/* CTA — pinned to bottom */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.55, delay: 0.3 }}
-          className="absolute bottom-6 sm:bottom-14 inset-x-0 flex justify-center items-center gap-3 px-4"
-        >
-          <Link
-            href="/shop"
-            className="btn-glow inline-flex items-center gap-2 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-body text-sm font-bold tracking-wide shadow-lg shadow-black/30 hover:opacity-90 transition-opacity"
-            style={{ backgroundColor: "#1B3A2D", color: "#FBF7F0" }}
-          >
-            Shop Now
-            <ArrowRight className="w-3.5 h-3.5" />
-          </Link>
-          <Link
-            href="/our-story"
-            className="inline-flex items-center gap-1.5 px-6 sm:px-8 py-2.5 sm:py-3 rounded-full font-body text-sm font-semibold tracking-wide border-2 border-white/40 text-white hover:border-white/70 transition-colors"
-          >
-            Our Story
-          </Link>
-        </motion.div>
       </section>
 
       {/* ── Tagline bridge ── */}
@@ -189,18 +162,18 @@ const Index = () => {
         <div className="absolute inset-y-0 left-0 w-24 bg-gradient-to-r from-[#FBF7F0] to-transparent pointer-events-none z-10" />
         <div className="absolute inset-y-0 right-0 w-24 bg-gradient-to-l from-[#FBF7F0] to-transparent pointer-events-none z-10" />
 
-        <div className="relative z-20 flex items-center justify-center gap-5 sm:gap-10">
+        <div className="relative z-20 flex items-center justify-center gap-3 sm:gap-10 px-4">
           {/* Decorative side rule */}
-          <svg width="60" height="12" viewBox="0 0 60 12" className="hidden sm:block opacity-30">
+          <svg width="60" height="12" viewBox="0 0 60 12" className="hidden sm:block opacity-30 shrink-0">
             <line x1="0" y1="6" x2="44" y2="6" stroke="#C9972D" strokeWidth="1" />
             <path d="M48 6 L54 2 L60 6 L54 10 Z" fill="#C9972D" />
           </svg>
 
-          {["Authentic", "Handcrafted", "Pure"].map((word, i) => (
-            <div key={word} className="flex items-center gap-5 sm:gap-10">
-              <span className="font-body text-[11px] sm:text-xs font-black uppercase tracking-[0.4em] text-[#1B3A2D]">{word}</span>
+          {["Authentic", "Traditional", "Pure"].map((word, i) => (
+            <div key={word} className="flex items-center gap-3 sm:gap-10 shrink-0">
+              <span className="font-body text-[10px] sm:text-xs font-black uppercase tracking-[0.15em] sm:tracking-[0.4em] text-[#1B3A2D]">{word}</span>
               {i < 2 && (
-                <svg width="10" height="10" viewBox="0 0 10 10" className="flex-shrink-0">
+                <svg width="8" height="8" viewBox="0 0 10 10" className="flex-shrink-0">
                   <path d="M5 0 L6.2 3.8 L10 5 L6.2 6.2 L5 10 L3.8 6.2 L0 5 L3.8 3.8 Z" fill="#C9972D" />
                 </svg>
               )}
@@ -208,7 +181,7 @@ const Index = () => {
           ))}
 
           {/* Decorative side rule — mirrored */}
-          <svg width="60" height="12" viewBox="0 0 60 12" className="hidden sm:block opacity-30" style={{ transform: "scaleX(-1)" }}>
+          <svg width="60" height="12" viewBox="0 0 60 12" className="hidden sm:block opacity-30 shrink-0" style={{ transform: "scaleX(-1)" }}>
             <line x1="0" y1="6" x2="44" y2="6" stroke="#C9972D" strokeWidth="1" />
             <path d="M48 6 L54 2 L60 6 L54 10 Z" fill="#C9972D" />
           </svg>
@@ -243,11 +216,11 @@ const Index = () => {
           >
             {[
               { name: "Mysore Pak",  slug: "mysore-pak",  img: "/Mysore Pak.webp",   accent: "#C9972D" },
-              { name: "Ghee Sweets", slug: "ghee-sweets", img: "/Ghee Sweets.webp",  accent: "#1B3A2D" },
               { name: "Gift Boxes",  slug: "gift-boxes",  img: "/Gift Boxes.webp",   accent: "#C4512A" },
+              { name: "Ghee Sweets", slug: "ghee-sweets", img: "/Ghee sweets.webp",  accent: "#1B3A2D" },
               { name: "Namkeens",    slug: "namkeens",    img: "/Namkeen.webp",       accent: "#1B3A2D" },
-              { name: "Chocolates",  slug: "chocolates",  img: "/Choclates.webp",     accent: "#C9972D" },
-              { name: "Specials",    slug: "specials",    img: "/Specials.webp",      accent: "#C4512A" },
+              { name: "Chocolates",  slug: "chocolates",  img: "/chocolates.webp",     accent: "#C9972D" },
+              { name: "Specials",    slug: "specials",    img: "/specials.webp",      accent: "#C4512A" },
             ].map((cat) => (
               <motion.div
                 key={cat.slug}
@@ -316,8 +289,8 @@ const Index = () => {
             </div>
           ) : (
             <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 lg:gap-8">
-              {featured.map((product) => (
-                <ProductCard key={product.id} product={product} />
+              {featured.map((product, i) => (
+                <ProductCard key={product.id} product={product} priority={i < 4} />
               ))}
             </div>
           )}
@@ -389,7 +362,7 @@ const Index = () => {
       </section>
 
       {/* ══ HOW IT'S MADE — PROCESS VIDEOS ══ */}
-      <section className="py-20 sm:py-28 bg-[#FBF7F0] relative overflow-hidden section-lazy">
+      <section className="py-20 sm:py-28 bg-[#FBF7F0] relative overflow-hidden section-lazy section-gpu">
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
           <motion.div
             initial={{ opacity: 0 }}
@@ -404,25 +377,18 @@ const Index = () => {
             </h2>
           </motion.div>
 
-          <motion.div
-            className="grid grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-14 relative"
-            variants={{ hidden: {}, show: { transition: { staggerChildren: 0.12 } } }}
-            initial="hidden"
-            whileInView="show"
-            viewport={{ once: true, margin: "-50px" }}
-          >
+          <div className="grid grid-cols-2 lg:grid-cols-4 gap-10 sm:gap-14 relative">
             {/* Connector line — runs through video circle centres */}
             <div className="hidden lg:block absolute top-[6.5rem] left-[14%] right-[14%] h-px bg-gradient-to-r from-transparent via-[#C9972D]/40 to-transparent pointer-events-none" />
 
             {[
-              { step: "01", title: "Source Pure Ghee",     desc: "100% pure ghee from trusted Karnataka dairies — the soul of every piece.",                  accent: "#F5B800", video: "" },
-              { step: "02", title: "Traditional Recipe",   desc: "Master confectioners follow century-old recipes, mixing besan into golden ghee.",             accent: "#C9972D", video: "" },
-              { step: "03", title: "Cooked to Perfection", desc: "Slow-cooked until it hits the perfect melt-in-mouth texture Mysore Pak is famous for.",      accent: "#1B3A2D", video: "" },
-              { step: "04", title: "Packed & Dispatched",  desc: "Sealed and sent the same day so you get it at its absolute freshest.",                        accent: "#C4512A", video: "" },
+              { step: "01", title: "Sweet Foundation",  desc: "Sugar and water are slowly cooked to form the perfect syrup, the foundation of every great Mysore Pak.", accent: "#F5B800", video: "/video1.MOV" },
+              { step: "02", title: "Besan Magic",       desc: "Finely sifted gram flour is gently mixed in, creating a rich and smooth consistency.",                          accent: "#C9972D", video: "/video2.MOV" },
+              { step: "03", title: "Ghee Indulgence",   desc: "Pure, aromatic ghee is poured in, giving the Mysore Pak its signature richness and melt-in-the-mouth texture.", accent: "#1B3A2D", video: "/video3.MOV" },
+              { step: "04", title: "Final Craft",       desc: "The mixture is carefully set, cooled, and cut into perfectly crafted pieces.",                                   accent: "#C4512A", video: "/video4.MOV" },
             ].map((item, i) => (
-              <motion.div
+              <div
                 key={i}
-                variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.4 } } }}
                 className="flex flex-col items-center text-center gap-4"
               >
                 {/* Circular video */}
@@ -436,34 +402,16 @@ const Index = () => {
                     className="relative w-36 h-36 sm:w-44 sm:h-44 rounded-full overflow-hidden shadow-xl border-2"
                     style={{ borderColor: `${item.accent}50` }}
                   >
-                    {/* ── REPLACE src="" WITH YOUR VIDEO FILE WHEN READY ── */}
                     <video
-                      src={item.video || undefined}
+                      key={item.video}
                       autoPlay
                       muted
                       loop
                       playsInline
                       className="w-full h-full object-cover"
-                      style={{ display: item.video ? "block" : "none" }}
+                      preload="none"
+                      src={item.video}
                     />
-                    {/* Placeholder shown until real video is added */}
-                    {!item.video && (
-                      <div
-                        className="absolute inset-0 flex flex-col items-center justify-center gap-2"
-                        style={{ background: `linear-gradient(135deg, ${item.accent}22 0%, ${item.accent}44 100%)` }}
-                      >
-                        {/* Play icon */}
-                        <div
-                          className="w-10 h-10 rounded-full flex items-center justify-center shadow-lg"
-                          style={{ backgroundColor: item.accent }}
-                        >
-                          <svg viewBox="0 0 20 20" fill="white" className="w-4 h-4 ml-0.5">
-                            <path d="M6 4l10 6-10 6V4z" />
-                          </svg>
-                        </div>
-                        <span className="font-body text-[9px] uppercase tracking-[0.2em] text-[#1B3A2D]/50">Video coming soon</span>
-                      </div>
-                    )}
                   </div>
                   {/* Step badge */}
                   <div
@@ -478,9 +426,9 @@ const Index = () => {
                   <h3 className="font-heading text-sm sm:text-base font-bold text-[#1B3A2D] mb-1.5">{item.title}</h3>
                   <p className="font-body text-xs sm:text-sm text-muted-foreground leading-relaxed">{item.desc}</p>
                 </div>
-              </motion.div>
+              </div>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
@@ -509,8 +457,8 @@ const Index = () => {
             {[
               { img: "/Mysore Pak.webp",  name: "Classic Mysore Pak",    sub: "The original, perfected"     },
               { img: "/Gift Boxes.webp",  name: "Premium Gift Hampers",  sub: "For every celebration"       },
-              { img: "/Specials.webp",    name: "Artisan Specials",      sub: "Limited seasonal drops"      },
-              { img: "/Choclates.webp",   name: "Flavored Collection",   sub: "Bold new combinations"       },
+              { img: "/specials.webp",    name: "Artisan Specials",      sub: "Limited seasonal drops"      },
+              { img: "/chocolates.webp",   name: "Flavored Collection",   sub: "Bold new combinations"       },
             ].map((col, i) => (
               <motion.div
                 key={i}
@@ -573,14 +521,15 @@ const Index = () => {
 
             {/* Rating display */}
             <div className="flex items-center justify-center gap-3 mt-6">
-              <span className="font-heading text-5xl font-bold" style={{ color: "#E8B84B" }}>5.0</span>
+              <span className="font-heading text-5xl font-bold" style={{ color: "#E8B84B" }}>4.5</span>
               <div className="flex flex-col items-start gap-1">
                 <div className="flex gap-1">
-                  {[...Array(5)].map((_, i) => (
+                  {[...Array(4)].map((_, i) => (
                     <Star key={i} className="w-5 h-5 fill-[#FBBC05] text-[#FBBC05]" />
                   ))}
+                  <StarHalf className="w-5 h-5 fill-[#FBBC05] text-[#FBBC05]" />
                 </div>
-                <span className="font-body text-xs text-[#FBF7F0]/50 tracking-wide">Based on all Google reviews</span>
+                <span className="font-body text-xs text-[#FBF7F0]/50 tracking-wide">Based on 3.5k+ Google reviews</span>
               </div>
             </div>
           </motion.div>
@@ -643,7 +592,7 @@ const Index = () => {
         {/* View on Google CTA */}
         <div className="text-center mt-12">
           <motion.a
-            href="https://www.google.com/maps/search/World+of+Mysore+Pak"
+            href="https://share.google/WJfPSrgZKS7MyEJ5v"
             target="_blank"
             rel="noopener noreferrer"
             whileHover={{ scale: 1.04 }}
@@ -663,7 +612,10 @@ const Index = () => {
       </section>
 
       {/* ══ INSTAGRAM — EVERY PIXEL TELLS A STORY ══ */}
-      <section className="py-20 sm:py-28 bg-[#FBF7F0] overflow-hidden relative section-lazy">
+      <motion.section
+        animate={{ opacity: nearFooter ? 0 : 1, y: nearFooter ? 24 : 0, pointerEvents: nearFooter ? "none" : "auto" }}
+        transition={{ duration: 0.4, ease: "easeInOut" }}
+        className="py-20 sm:py-28 bg-[#FBF7F0] overflow-hidden relative section-lazy">
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-12 text-center">
           <motion.div
             initial={{ opacity: 0 }}
@@ -692,7 +644,7 @@ const Index = () => {
 
         <div className="text-center mt-12">
           <a
-            href="https://www.instagram.com/worldofmysorepak"
+            href="https://www.instagram.com/worldofmysorepakofficial?igsh=MThheDhvMXUyazhrYw=="
             target="_blank"
             rel="noopener noreferrer"
             className="inline-flex items-center gap-2 font-body text-sm font-bold text-[#1B3A2D] hover:text-[#C9972D] transition-colors"
@@ -700,7 +652,7 @@ const Index = () => {
             Follow our journey <ArrowRight className="w-4 h-4" />
           </a>
         </div>
-      </section>
+      </motion.section>
 
     </div>
   );

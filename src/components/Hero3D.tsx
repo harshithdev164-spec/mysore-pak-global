@@ -2,6 +2,7 @@
 
 import { useRef, useEffect, useState, useCallback } from "react";
 import { motion, useMotionValue, useSpring, useTransform } from "framer-motion";
+import Image from "next/image";
 
 /* ─── Floating Image with 3D Perspective ─── */
 interface FloatingImageProps {
@@ -12,6 +13,7 @@ interface FloatingImageProps {
   delay?: number;
   rotation?: number;
   size?: string;
+  priority?: boolean;
 }
 
 const FloatingImage = ({
@@ -22,6 +24,7 @@ const FloatingImage = ({
   delay = 0,
   rotation = 0,
   size = "w-48 h-48",
+  priority = false,
 }: FloatingImageProps) => {
   return (
     <motion.div
@@ -49,17 +52,19 @@ const FloatingImage = ({
         }}
       >
         <div
-          className={`${size} rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20`}
+          className={`${size} rounded-2xl overflow-hidden shadow-2xl border-2 border-white/20 relative`}
           style={{
             transform: `perspective(800px) rotateY(${rotation}deg)`,
             boxShadow: `0 ${20 * depth}px ${40 * depth}px rgba(27, 58, 45, ${0.15 * depth})`,
           }}
         >
-          <img
+          <Image
             src={src}
             alt={alt}
-            className="w-full h-full object-cover"
-            loading="eager"
+            fill
+            className="object-cover"
+            sizes="(max-width: 640px) 10rem, (max-width: 1024px) 13rem, 16rem"
+            priority={priority}
           />
         </div>
       </motion.div>
@@ -163,16 +168,18 @@ const Hero3D = () => {
             transition={{ duration: 5, repeat: Infinity, ease: "easeInOut" }}
           >
             <div
-              className="w-56 h-56 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-3xl overflow-hidden border-3 border-[#C9972D]/30"
+              className="w-56 h-56 sm:w-72 sm:h-72 lg:w-80 lg:h-80 rounded-3xl overflow-hidden border-3 border-[#C9972D]/30 relative"
               style={{
                 boxShadow: "0 30px 60px rgba(27, 58, 45, 0.3), 0 0 80px rgba(201, 151, 45, 0.15)",
               }}
             >
-              <img
+              <Image
                 src="/hero-stack.png"
                 alt="Mysore Pak Stack"
-                className="w-full h-full object-cover"
-                loading="eager"
+                fill
+                className="object-cover"
+                sizes="(max-width: 640px) 14rem, (max-width: 1024px) 18rem, 20rem"
+                priority
               />
             </div>
             {/* Reflection glow underneath */}

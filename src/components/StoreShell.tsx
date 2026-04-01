@@ -3,9 +3,11 @@
 import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
+import VideoPopup from "./VideoPopup";
 
 const ANNOUNCEMENT_ITEMS = [
-  "Free Shipping on Orders Above ₹999",
+  "For Orders Within Mysore · Order via Swiggy & Zomato",
+  "Free Shipping on Orders Above ₹1999",
   "100% Pure Ghee",
   "Traditional Mysuru Recipe",
   "Fresh Daily Batches",
@@ -42,6 +44,7 @@ export default function StoreShell({ children }: { children: React.ReactNode }) 
       <Navbar />
       <main className="min-h-screen pt-8">{children}</main>
       <Footer />
+      <VideoPopup />
     </>
   );
 }
