@@ -189,7 +189,7 @@ const Hero3D = () => {
               }}
             >
               <Image
-                src={isMobile ? "/hero mobile.png" : "/hero pc.png"}
+                src={isMobile ? "/mobile heroo.webp" : "/pc heroo.webp"}
                 alt="Mysore Pak Hero"
                 fill
                 className="object-cover"
