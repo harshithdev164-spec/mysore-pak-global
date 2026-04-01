@@ -94,7 +94,7 @@ const Navbar = () => {
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/swiggy logo.png"
+                    src="/swiggy-logo.svg"
                     alt="Swiggy"
                     className="h-8 w-8 object-contain drop-shadow-sm group-hover:drop-shadow-md transition-all duration-200"
                   />
@@ -113,7 +113,7 @@ const Navbar = () => {
                 >
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src="/zomato logo.png"
+                    src="/zomato logo (2).png"
                     alt="Zomato"
                     className="h-8 w-8 object-contain drop-shadow-sm group-hover:drop-shadow-md transition-all duration-200"
                   />
@@ -207,7 +207,7 @@ const Navbar = () => {
                       className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#FC8019]/10 hover:bg-[#FC8019]/20 transition-colors"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/swiggy logo.png" alt="Swiggy" className="h-7 w-7 object-contain" />
+                      <img src="/swiggy-logo.svg" alt="Swiggy" className="h-7 w-7 object-contain" />
                       <span className="font-body text-sm font-semibold text-[#1B3A2D]">Swiggy</span>
                     </a>
                     <a
@@ -218,7 +218,7 @@ const Navbar = () => {
                       className="flex items-center gap-2 px-3 py-2 rounded-xl bg-[#E23744]/10 hover:bg-[#E23744]/20 transition-colors"
                     >
                       {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src="/zomato logo.png" alt="Zomato" className="h-7 w-7 object-contain" />
+                      <img src="/zomato logo (2).png" alt="Zomato" className="h-7 w-7 object-contain" />
                       <span className="font-body text-sm font-semibold text-[#1B3A2D]">Zomato</span>
                     </a>
                   </div>
