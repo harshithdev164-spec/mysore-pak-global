@@ -569,7 +569,7 @@ const OurStory = () => {
                       alt={founder.name}
                       fill
                       className="object-cover"
-                      style={{ objectPosition: i < 2 ? "center 75%" : "center center" }}
+                      style={{ objectPosition: i < 2 ? "center 25%" : "center center" }}
                       sizes="7rem"
                     />
                   </div>
