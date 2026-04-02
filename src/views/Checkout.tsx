@@ -166,7 +166,10 @@ const Checkout = () => {
         prefill: { name: form.name, email: form.email, contact: form.phone },
         notes: { order_number },
         theme: { color: "#C9972D" },
-        modal: { ondismiss: () => setLoading(false) },
+        modal: { ondismiss: () => {
+          setLoading(false);
+          setErrorMsg("Payment cancelled. Please try again.");
+        } },
         handler: async (response: {
           razorpay_payment_id: string;
           razorpay_order_id: string;
