@@ -563,13 +563,15 @@ const OurStory = () => {
                 className="group flex flex-col items-center text-center"
               >
                 <div className="relative mb-6">
-                  <div
-                    className="w-28 h-28 rounded-full flex items-center justify-center shadow-xl group-hover:shadow-2xl transition-shadow duration-500"
-                    style={{ background: "linear-gradient(135deg, #1B3A2D, #2D5A3D)", border: "2px solid rgba(201,151,45,0.3)" }}
-                  >
-                    <span className="font-heading text-3xl font-black text-[#C9972D]">
-                      {founder.name.split(" ").map((n) => n[0]).join("")}
-                    </span>
+                  <div className="w-28 h-28 rounded-full overflow-hidden shadow-xl group-hover:shadow-2xl transition-shadow duration-500 relative">
+                    <Image
+                      src={`/${founder.name.split(" ")[0].toLowerCase()}.webp`}
+                      alt={founder.name}
+                      fill
+                      className="object-cover"
+                      style={{ objectPosition: i < 2 ? "center 75%" : "center center" }}
+                      sizes="7rem"
+                    />
                   </div>
                   <div className="absolute -inset-2 rounded-full border border-[#C9972D]/20 group-hover:border-[#C9972D]/50 transition-colors duration-500" />
                 </div>
