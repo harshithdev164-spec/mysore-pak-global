@@ -119,7 +119,7 @@ const Footer = () => (
                   <MapPin className="w-3.5 h-3.5 text-[#C9972D]" />
                 </div>
                 <span className="text-[#FBF7F0]/45 text-sm font-body leading-relaxed">
-                  Mysuru, Karnataka, India 570001
+                  Mysuru, Karnataka, India 570011
                 </span>
               </li>
               <li className="flex items-center gap-3">
