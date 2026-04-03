@@ -1,8 +1,8 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
-import { useAdminFetch } from "@/lib/useAdminFetch";
+import { useAdminFetch, invalidateCache } from "@/lib/useAdminFetch";
 
 interface Order {
   id: string;
@@ -53,8 +53,16 @@ function exportToCSV(orders: Order[]) {
 }
 
 export default function AdminOrdersPage() {
-  const { data: orders, loading, error } = useAdminFetch<Order[]>("/api/admin/orders");
+  const { data: orders, loading, error, mutate } = useAdminFetch<Order[]>("/api/admin/orders");
   const [statusFilter, setStatusFilter] = useState("all");
+
+  // Auto-refresh every 30 seconds (background)
+  useEffect(() => {
+    const interval = setInterval(() => {
+      mutate(true); // silent refresh
+    }, 30000);
+    return () => clearInterval(interval);
+  }, [mutate]);
 
   const list = orders ?? [];
   const filtered = statusFilter === "all" ? list : list.filter((o) => o.status === statusFilter);
@@ -65,6 +73,13 @@ export default function AdminOrdersPage() {
         <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
         <div className="flex items-center gap-3">
           <span className="text-sm text-gray-500">{filtered.length} orders</span>
+          <button
+            onClick={() => mutate(false)}
+            disabled={loading}
+            className="bg-white border border-gray-300 hover:border-gray-400 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 flex items-center gap-1.5"
+          >
+            <span className={loading ? "animate-spin" : ""}>↻</span> Refresh
+          </button>
           <button
             onClick={() => exportToCSV(filtered)}
             disabled={filtered.length === 0}

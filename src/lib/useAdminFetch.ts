@@ -3,12 +3,14 @@ import { useState, useEffect, useCallback } from "react";
 // Module-level cache — survives client-side navigation (SPA behavior)
 // Keys are URLs, values are { data, timestamp }
 const CACHE: Record<string, { data: unknown; ts: number }> = {};
-const TTL = 60_000; // 60 seconds
+const TTL = 60_000; // 60 seconds default (overridden for /admin/orders)
 
 export function useAdminFetch<T>(url: string) {
+  // Orders endpoint needs shorter cache (15s) for real-time visibility
+  const ttl = url.includes("/api/admin/orders") ? 15_000 : TTL;
   const now = Date.now();
   const hit = CACHE[url];
-  const initialData = hit && now - hit.ts < TTL ? (hit.data as T) : null;
+  const initialData = hit && now - hit.ts < ttl ? (hit.data as T) : null;
 
   const [data, setData] = useState<T | null>(initialData);
   const [loading, setLoading] = useState<boolean>(initialData === null);
