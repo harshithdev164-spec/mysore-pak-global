@@ -135,7 +135,7 @@ export async function POST(request: Request) {
           pincode: addr.pincode ?? "",
           items: orderItems.map((item) => ({
             name: item.product_name,
-            sku: item.product_name.toLowerCase().replace(/\s+/g, "-"),
+            sku: `${item.product_name.toLowerCase().replace(/\s+/g, "-")}-${item.weight_label.toLowerCase().replace(/\s+/g, "")}`,
             units: item.quantity,
             selling_price: item.unit_price,
           })),
