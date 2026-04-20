@@ -11,18 +11,18 @@ const OrderItemSchema = z.object({
   product_name: z.string().min(1),
   weight_label: z.string().min(1),
   quantity: z.number().int().positive(),
-  unit_price: z.number().positive(),
+  unit_price: z.number().min(0),
 });
 
 const CreateOrderSchema = z.object({
-  customer_name: z.string().min(2),
+  customer_name: z.string().min(1),
   customer_email: z.string().email(),
-  customer_phone: z.string().min(10),
+  customer_phone: z.string().min(6),
   shipping_address: z.object({
-    address: z.string().min(5),
+    address: z.string().min(2),
     city: z.string().min(2),
     state: z.string().min(2),
-    pincode: z.string().min(6),
+    pincode: z.string().min(4),
   }),
   items: z.array(OrderItemSchema).min(1),
   payment_method: z.string().optional().default("razorpay"),
