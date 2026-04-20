@@ -83,7 +83,7 @@ export default function VideoPopup() {
       data-videopopup
       animate={{ opacity: nearFooter ? 0 : 1, y: nearFooter ? 16 : 0, pointerEvents: nearFooter ? "none" : "auto" }}
       transition={{ duration: 0.35, ease: "easeInOut" }}
-      className="fixed bottom-6 left-4 md:left-auto md:right-6 right-auto z-50 flex flex-col items-start md:items-end gap-3"
+      className="fixed bottom-6 left-4 md:left-6 z-50 flex flex-col items-start gap-3"
     >
 
       {/* ── Expanded player ── */}

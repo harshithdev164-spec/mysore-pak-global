@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { z } from "zod";
+import { generateOrderNumber } from "@/lib/order-utils";
 
 const OrderItemSchema = z.object({
   product_name: z.string().min(1),
@@ -59,10 +60,10 @@ export async function POST(request: Request) {
       ? 0
       : 99;
   const total = subtotal + shipping_cost;
-  const order_number = `WMP-${Date.now().toString(36).toUpperCase()}`;
-
+  
   // 1. Create the DB order first (payment_status: pending)
   const supabase = createServerClient();
+  const order_number = await generateOrderNumber(supabase);
 
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const insertPayload: Record<string, any> = {

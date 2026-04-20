@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
-import { useAdminFetch, invalidateCache } from "@/lib/useAdminFetch";
 
 interface Order {
   id: string;
@@ -15,6 +14,13 @@ interface Order {
   payment_status: string;
   payment_method: string | null;
   created_at: string;
+}
+
+interface PaginationInfo {
+  page: number;
+  page_size: number;
+  total: number;
+  total_pages: number;
 }
 
 const STATUS_COLORS: Record<string, string> = {
@@ -34,6 +40,7 @@ const PAYMENT_COLORS: Record<string, string> = {
 };
 
 const STATUSES = ["all", "pending", "confirmed", "processing", "shipped", "delivered", "cancelled"];
+const PAGE_SIZE_OPTIONS = [25, 50, 100, 200];
 
 function exportToCSV(orders: Order[]) {
   const headers = ["Order #", "Customer Name", "Email", "Phone", "Total (₹)", "Status", "Payment Status", "Payment Method", "Date"];
@@ -53,36 +60,101 @@ function exportToCSV(orders: Order[]) {
 }
 
 export default function AdminOrdersPage() {
-  const { data: orders, loading, error, mutate } = useAdminFetch<Order[]>("/api/admin/orders");
+  const [orders, setOrders] = useState<Order[]>([]);
+  const [pagination, setPagination] = useState<PaginationInfo>({
+    page: 1,
+    page_size: 50,
+    total: 0,
+    total_pages: 1,
+  });
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState("");
   const [statusFilter, setStatusFilter] = useState("all");
+  const [page, setPage] = useState(1);
+  const [pageSize, setPageSize] = useState(50);
+  const [searchInput, setSearchInput] = useState("");
+  const [search, setSearch] = useState("");
 
-  // Auto-refresh every 30 seconds (background)
+  // Debounce search input → actual query (300ms)
+  useEffect(() => {
+    const t = setTimeout(() => setSearch(searchInput.trim()), 300);
+    return () => clearTimeout(t);
+  }, [searchInput]);
+
+  const fetchOrders = useCallback(
+    async (silent = false) => {
+      if (!silent) {
+        setLoading(true);
+        setError("");
+      }
+      try {
+        const params = new URLSearchParams({
+          page: String(page),
+          page_size: String(pageSize),
+        });
+        if (statusFilter !== "all") params.set("status", statusFilter);
+        if (search) params.set("search", search);
+
+        const res = await fetch(`/api/admin/orders?${params.toString()}`, {
+          cache: "no-store",
+        });
+        const json = await res.json();
+        if (json.error) {
+          setError(json.error);
+        } else {
+          setOrders(json.data ?? []);
+          if (json.pagination) setPagination(json.pagination);
+        }
+      } catch (e) {
+        setError(String(e));
+      } finally {
+        setLoading(false);
+      }
+    },
+    [page, pageSize, statusFilter, search]
+  );
+
+  // Fetch whenever page / size / filter / search changes
+  useEffect(() => {
+    fetchOrders(false);
+  }, [fetchOrders]);
+
+  // Auto-refresh every 30 seconds (silent background refresh)
   useEffect(() => {
     const interval = setInterval(() => {
-      mutate(true); // silent refresh
+      fetchOrders(true);
     }, 30000);
     return () => clearInterval(interval);
-  }, [mutate]);
+  }, [fetchOrders]);
 
-  const list = orders ?? [];
-  const filtered = statusFilter === "all" ? list : list.filter((o) => o.status === statusFilter);
+  // Reset to page 1 when filter, page size, or search changes
+  useEffect(() => {
+    setPage(1);
+  }, [statusFilter, pageSize, search]);
+
+  const rangeStart = orders.length === 0 ? 0 : (pagination.page - 1) * pagination.page_size + 1;
+  const rangeEnd = (pagination.page - 1) * pagination.page_size + orders.length;
 
   return (
     <div>
       <div className="flex items-center justify-between mb-6">
         <h1 className="text-2xl font-bold text-gray-900">Orders</h1>
         <div className="flex items-center gap-3">
-          <span className="text-sm text-gray-500">{filtered.length} orders</span>
+          <span className="text-sm text-gray-500">
+            {pagination.total > 0
+              ? `${rangeStart}–${rangeEnd} of ${pagination.total}`
+              : `${pagination.total} orders`}
+          </span>
           <button
-            onClick={() => mutate(false)}
+            onClick={() => fetchOrders(false)}
             disabled={loading}
             className="bg-white border border-gray-300 hover:border-gray-400 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 flex items-center gap-1.5"
           >
-            <span className={loading ? "animate-spin" : ""}>↻</span> Refresh
+            <span className={loading ? "animate-spin inline-block" : ""}>↻</span> Refresh
           </button>
           <button
-            onClick={() => exportToCSV(filtered)}
-            disabled={filtered.length === 0}
+            onClick={() => exportToCSV(orders)}
+            disabled={orders.length === 0}
             className="bg-white border border-gray-300 hover:border-gray-400 text-gray-700 px-4 py-2 rounded-lg text-sm font-medium transition-colors disabled:opacity-40 flex items-center gap-1.5"
           >
             <span>↓</span> Export CSV
@@ -91,6 +163,40 @@ export default function AdminOrdersPage() {
       </div>
 
       <div className="bg-white rounded-xl border border-gray-200">
+        {/* Search bar */}
+        <div className="p-4 border-b border-gray-100">
+          <div className="relative max-w-md">
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              viewBox="0 0 20 20"
+              fill="currentColor"
+              className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+            >
+              <path
+                fillRule="evenodd"
+                d="M9 3.5a5.5 5.5 0 1 0 3.473 9.78l3.124 3.123a.75.75 0 1 0 1.06-1.06l-3.123-3.124A5.5 5.5 0 0 0 9 3.5ZM5 9a4 4 0 1 1 8 0 4 4 0 0 1-8 0Z"
+                clipRule="evenodd"
+              />
+            </svg>
+            <input
+              type="text"
+              value={searchInput}
+              onChange={(e) => setSearchInput(e.target.value)}
+              placeholder="Search by order #, name, email, or phone…"
+              className="w-full pl-9 pr-9 py-2 border border-gray-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-amber-500 focus:border-amber-500"
+            />
+            {searchInput && (
+              <button
+                onClick={() => setSearchInput("")}
+                className="absolute right-2 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 text-lg leading-none px-1"
+                aria-label="Clear search"
+              >
+                ×
+              </button>
+            )}
+          </div>
+        </div>
+
         {/* Filter Tabs */}
         <div className="p-4 border-b border-gray-100 flex gap-2 flex-wrap">
           {STATUSES.map((s) => (
@@ -102,9 +208,6 @@ export default function AdminOrdersPage() {
               }`}
             >
               {s}
-              {s !== "all" && (
-                <span className="ml-1 opacity-70">({list.filter((o) => o.status === s).length})</span>
-              )}
             </button>
           ))}
         </div>
@@ -143,7 +246,7 @@ export default function AdminOrdersPage() {
                 </tr>
               </thead>
               <tbody className="divide-y divide-gray-50">
-                {filtered.map((order) => (
+                {orders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
                       <Link href={`/admin/orders/${order.id}`} className="text-amber-600 hover:underline font-medium">
@@ -173,13 +276,68 @@ export default function AdminOrdersPage() {
                     </td>
                   </tr>
                 ))}
-                {filtered.length === 0 && (
+                {orders.length === 0 && (
                   <tr>
                     <td colSpan={7} className="px-4 py-10 text-center text-gray-400">No orders found.</td>
                   </tr>
                 )}
               </tbody>
             </table>
+          </div>
+        )}
+
+        {/* Pagination Controls */}
+        {!loading && !error && pagination.total > 0 && (
+          <div className="px-4 py-3 border-t border-gray-100 flex items-center justify-between flex-wrap gap-3">
+            <div className="flex items-center gap-2 text-sm text-gray-600">
+              <span>Rows per page:</span>
+              <select
+                value={pageSize}
+                onChange={(e) => setPageSize(Number(e.target.value))}
+                className="border border-gray-200 rounded-md px-2 py-1 text-sm focus:outline-none focus:ring-2 focus:ring-amber-500"
+              >
+                {PAGE_SIZE_OPTIONS.map((s) => (
+                  <option key={s} value={s}>{s}</option>
+                ))}
+              </select>
+            </div>
+
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage(1)}
+                disabled={pagination.page === 1}
+                className="px-2 py-1 text-sm border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                aria-label="First page"
+              >
+                «
+              </button>
+              <button
+                onClick={() => setPage((p) => Math.max(1, p - 1))}
+                disabled={pagination.page === 1}
+                className="px-3 py-1 text-sm border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                ← Prev
+              </button>
+              <span className="text-sm text-gray-600 px-2">
+                Page <span className="font-medium text-gray-900">{pagination.page}</span> of{" "}
+                <span className="font-medium text-gray-900">{pagination.total_pages}</span>
+              </span>
+              <button
+                onClick={() => setPage((p) => Math.min(pagination.total_pages, p + 1))}
+                disabled={pagination.page >= pagination.total_pages}
+                className="px-3 py-1 text-sm border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+              >
+                Next →
+              </button>
+              <button
+                onClick={() => setPage(pagination.total_pages)}
+                disabled={pagination.page >= pagination.total_pages}
+                className="px-2 py-1 text-sm border border-gray-200 rounded-md hover:bg-gray-50 disabled:opacity-40 disabled:cursor-not-allowed"
+                aria-label="Last page"
+              >
+                »
+              </button>
+            </div>
           </div>
         )}
       </div>

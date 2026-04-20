@@ -3,6 +3,7 @@ import { Playfair_Display, Poppins } from "next/font/google";
 import Providers from "./providers";
 import StoreShell from "@/components/StoreShell";
 import ErrorBoundary from "@/components/ErrorBoundary";
+import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import "@/index.css";
 
 // Self-hosted via next/font — no external DNS lookup, zero render-blocking
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <ErrorBoundary>
             <StoreShell>{children}</StoreShell>
           </ErrorBoundary>
+          <FloatingWhatsApp />
         </Providers>
       </body>
     </html>

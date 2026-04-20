@@ -32,9 +32,9 @@ interface Order {
   items: OrderItem[];
   created_at: string;
   updated_at: string;
-  // Shiprocket fields
-  shiprocket_order_id: number | null;
-  shiprocket_shipment_id: number | null;
+  // Delhivery fields
+  delhivery_package_id: string | null;
+  delhivery_waybill: string | null;
   awb_code: string | null;
   courier_name: string | null;
   tracking_url: string | null;
@@ -63,10 +63,10 @@ export default function AdminOrderDetailPage() {
   const [paymentStatus, setPaymentStatus] = useState("");
   const [saveMsg, setSaveMsg] = useState("");
 
-  // Shiprocket action states
-  const [srLoading, setSrLoading] = useState<string | null>(null); // which action is running
-  const [srMsg, setSrMsg] = useState("");
-  const [srData, setSrData] = useState<Partial<Order>>({});
+  // Delhivery action states
+  const [delLoading, setDelLoading] = useState<string | null>(null); // which action is running
+  const [delMsg, setDelMsg] = useState("");
+  const [delData, setDelData] = useState<Partial<Order>>({});
 
   useEffect(() => {
     if (order && !status) {
@@ -100,37 +100,34 @@ export default function AdminOrderDetailPage() {
     }
   }
 
-  async function doShiprocketAction(action: string) {
+  async function doDelhiveryAction(action: string) {
     if (!order) return;
-    setSrLoading(action);
-    setSrMsg("");
+    setDelLoading(action);
+    setDelMsg("");
     try {
-      const res = await fetch(`/api/admin/shiprocket/${order.id}?action=${action}`, {
+      const res = await fetch(`/api/admin/delhivery/${order.id}?action=${action}`, {
         method: "POST",
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Action failed");
 
-      setSrMsg(action === "create" ? "Shipment created!" : action === "label" ? "Label ready!" : "Invoice ready!");
+      setDelMsg("Shipment created!");
       // Merge returned data into local state
       if (json.data) {
-        setSrData((prev) => ({
+        setDelData((prev) => ({
           ...prev,
-          shiprocket_order_id: json.data.order_id ?? prev.shiprocket_order_id,
-          shiprocket_shipment_id: json.data.shipment_id ?? prev.shiprocket_shipment_id,
-          awb_code: json.data.awb_code ?? prev.awb_code,
-          courier_name: json.data.courier_name ?? prev.courier_name,
-          tracking_url: json.data.tracking_url ?? prev.tracking_url,
+          delhivery_package_id: json.data.package_id ?? prev.delhivery_package_id,
+          delhivery_waybill: json.data.waybill ?? prev.delhivery_waybill,
+          awb_code: json.data.waybill ?? prev.awb_code,
+          courier_name: "Delhivery",
         }));
       }
-      if (json.label_url) setSrData((prev) => ({ ...prev, label_url: json.label_url }));
-      if (json.invoice_url) setSrData((prev) => ({ ...prev, invoice_url: json.invoice_url }));
 
       invalidateCache(`/api/orders/${order.id}`);
     } catch (err) {
-      setSrMsg(err instanceof Error ? err.message : "Failed");
+      setDelMsg(err instanceof Error ? err.message : "Failed");
     } finally {
-      setSrLoading(null);
+      setDelLoading(null);
     }
   }
 
@@ -144,7 +141,7 @@ export default function AdminOrderDetailPage() {
 
   const addr = order.shipping_address ?? {};
   // Merge live API data with any updates from Shiprocket actions
-  const sr = { ...order, ...srData };
+  const sr = { ...order, ...delData };
 
   return (
     <div className="max-w-4xl">
@@ -276,15 +273,15 @@ export default function AdminOrderDetailPage() {
             </div>
           </div>
 
-          {/* Shiprocket Shipping & Tracking */}
+          {/* Delhivery Shipping & Tracking */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="font-semibold text-gray-900 mb-4">Shiprocket</h2>
+            <h2 className="font-semibold text-gray-900 mb-4">Delhivery</h2>
 
             {sr.awb_code ? (
               <div className="space-y-3">
                 {/* AWB */}
                 <div>
-                  <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">AWB Code</div>
+                  <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Waybill / AWB Code</div>
                   <div className="font-mono text-sm font-semibold text-gray-900">{sr.awb_code}</div>
                 </div>
                 {sr.courier_name && (
@@ -293,17 +290,17 @@ export default function AdminOrderDetailPage() {
                     <div className="text-sm text-gray-800">{sr.courier_name}</div>
                   </div>
                 )}
-                {sr.shiprocket_order_id && (
+                {sr.delhivery_package_id && (
                   <div>
-                    <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Shiprocket ID</div>
-                    <div className="text-sm text-gray-600">{sr.shiprocket_order_id}</div>
+                    <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Delhivery Package ID</div>
+                    <div className="text-sm text-gray-600">{sr.delhivery_package_id}</div>
                   </div>
                 )}
 
                 {/* Tracking link */}
-                {sr.tracking_url && (
+                {sr.awb_code && (
                   <a
-                    href={sr.tracking_url}
+                    href={`https://www.delhivery.com/tracking?id=${sr.awb_code}`}
                     target="_blank"
                     rel="noopener noreferrer"
                     className="inline-block text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
@@ -311,80 +308,35 @@ export default function AdminOrderDetailPage() {
                     Track Shipment ↗
                   </a>
                 )}
-
-                {/* Label / Invoice buttons */}
-                <div className="flex flex-wrap gap-2 pt-1">
-                  <button
-                    onClick={() => doShiprocketAction("label")}
-                    disabled={srLoading === "label"}
-                    className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg font-medium transition-colors disabled:opacity-50"
-                  >
-                    {srLoading === "label" ? "Loading…" : sr.label_url ? "Refresh Label" : "Get Label"}
-                  </button>
-                  {sr.label_url && (
-                    <a
-                      href={sr.label_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs bg-green-50 text-green-700 hover:bg-green-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
-                    >
-                      Print Label ↗
-                    </a>
-                  )}
-                  <button
-                    onClick={() => doShiprocketAction("invoice")}
-                    disabled={srLoading === "invoice"}
-                    className="text-xs bg-amber-50 hover:bg-amber-100 text-amber-700 px-3 py-1.5 rounded-lg font-medium transition-colors disabled:opacity-50"
-                  >
-                    {srLoading === "invoice" ? "Loading…" : sr.invoice_url ? "Refresh Invoice" : "Get Invoice"}
-                  </button>
-                  {sr.invoice_url && (
-                    <a
-                      href={sr.invoice_url}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="text-xs bg-amber-50 text-amber-700 hover:bg-amber-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
-                    >
-                      Print Invoice ↗
-                    </a>
-                  )}
-                </div>
               </div>
-            ) : sr.shiprocket_order_id ? (
-              /* Order created but no AWB yet */
+            ) : sr.delhivery_package_id ? (
+              /* Order created but no AWB yet (Delhivery usually assigns instantly though) */
               <div className="space-y-3">
                 <div>
-                  <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Shiprocket ID</div>
-                  <div className="text-sm text-gray-600">{sr.shiprocket_order_id}</div>
+                  <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Delhivery Package ID</div>
+                  <div className="text-sm text-gray-600">{sr.delhivery_package_id}</div>
                 </div>
                 <p className="text-xs text-yellow-600 bg-yellow-50 rounded-lg px-3 py-2">
                   Shipment created — AWB not yet assigned
                 </p>
-                <button
-                  onClick={() => doShiprocketAction("label")}
-                  disabled={srLoading === "label"}
-                  className="text-xs bg-gray-100 hover:bg-gray-200 text-gray-700 px-3 py-1.5 rounded-lg font-medium transition-colors disabled:opacity-50"
-                >
-                  {srLoading === "label" ? "Loading…" : "Get Label"}
-                </button>
               </div>
             ) : (
-              /* No Shiprocket order yet */
+              /* No Delhivery order yet */
               <div className="space-y-3">
                 <p className="text-sm text-gray-400">No shipment created yet.</p>
                 <button
-                  onClick={() => doShiprocketAction("create")}
-                  disabled={srLoading === "create"}
+                  onClick={() => doDelhiveryAction("create")}
+                  disabled={delLoading === "create"}
                   className="w-full text-sm bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
                 >
-                  {srLoading === "create" ? "Creating shipment…" : "Create Shipment"}
+                  {delLoading === "create" ? "Creating shipment…" : "Create Shipment"}
                 </button>
               </div>
             )}
 
-            {srMsg && (
-              <p className={`text-xs mt-2 ${srMsg.includes("Failed") || srMsg.includes("failed") ? "text-red-500" : "text-green-600"}`}>
-                {srMsg}
+            {delMsg && (
+              <p className={`text-xs mt-2 ${delMsg.includes("Failed") || delMsg.includes("failed") ? "text-red-500" : "text-green-600"}`}>
+                {delMsg}
               </p>
             )}
           </div>

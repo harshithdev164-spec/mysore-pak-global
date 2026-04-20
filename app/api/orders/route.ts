@@ -2,7 +2,8 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { z } from "zod";
-import { createShiprocketOrder, parseWeightKg } from "@/lib/shiprocket";
+import { createDelhiveryOrder, parseWeightKg } from "@/lib/delhivery";
+import { generateOrderNumber } from "@/lib/order-utils";
 
 const OrderItemSchema = z.object({
   product_id: z.string().uuid().optional(),
@@ -63,7 +64,7 @@ export async function POST(request: Request) {
   const total = subtotal + shipping_cost;
 
   // Generate human-readable order number
-  const order_number = `WMP-${Date.now().toString(36).toUpperCase()}`;
+  const order_number = await generateOrderNumber(supabase);
 
   const isCod = payment_method === "cod";
 
@@ -146,8 +147,8 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: itemsError.message }, { status: 500 });
   }
 
-  // Auto-create Shiprocket order for COD (best-effort — never blocks the response)
-  if (isCod && process.env.SHIPROCKET_EMAIL) {
+  // Auto-create Delhivery order for COD (best-effort — never blocks the response)
+  if (isCod && process.env.DELHIVERY_TOKEN) {
     try {
       const totalWeight = items.reduce(
         (sum, item) => sum + parseWeightKg(item.weight_label) * item.quantity,
@@ -158,7 +159,7 @@ export async function POST(request: Request) {
         .replace("T", " ")
         .slice(0, 16);
 
-      const srResult = await createShiprocketOrder({
+      const delResult = await createDelhiveryOrder({
         order_number: order.order_number,
         order_date: orderDate,
         customer_name,
@@ -177,21 +178,21 @@ export async function POST(request: Request) {
         subtotal,
         shipping_charges: shipping_cost,
         weight_kg: Math.max(totalWeight, 0.1),
+        payment_method: "COD"
       });
 
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const srUpdate: Record<string, any> = {
-        shiprocket_order_id: srResult.order_id,
-        shiprocket_shipment_id: srResult.shipment_id,
+      const dbUpdate: Record<string, any> = {
+        delhivery_package_id: delResult.package_id,
+        delhivery_waybill: delResult.waybill,
       };
-      if (srResult.awb_code) srUpdate.awb_code = srResult.awb_code;
-      if (srResult.courier_name) srUpdate.courier_name = srResult.courier_name;
-      if (srResult.tracking_url) srUpdate.tracking_url = srResult.tracking_url;
-      if (srResult.label_url) srUpdate.label_url = srResult.label_url;
+      // Delhivery manifest usually sets a waybill code
+      if (delResult.waybill) dbUpdate.awb_code = delResult.waybill;
+      dbUpdate.courier_name = "Delhivery";
 
-      await supabase.from("orders").update(srUpdate).eq("id", order.id);
+      await supabase.from("orders").update(dbUpdate).eq("id", order.id);
     } catch (err) {
-      console.error("[Shiprocket] COD order creation failed:", err);
+      console.error("[Delhivery] COD order creation failed:", err);
     }
   }
 
