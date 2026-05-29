@@ -35,11 +35,6 @@ export const metadata: Metadata = {
   description:
     "Traditional Mysore Pak made with pure ghee and traditional recipes. Shop online and get authentic Mysuru sweets delivered to your door.",
   keywords: ["Mysore Pak", "Indian sweets", "ghee sweets", "online sweet shop"],
-  icons: {
-    icon: "/logo.svg",
-    shortcut: "/logo.svg",
-    apple: "/logo.svg",
-  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
