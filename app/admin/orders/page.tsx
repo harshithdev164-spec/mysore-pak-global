@@ -2,6 +2,7 @@
 
 import { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
+import { COUNTRY_BY_CODE } from "@/lib/countries";
 
 interface Order {
   id: string;
@@ -13,6 +14,9 @@ interface Order {
   status: string;
   payment_status: string;
   payment_method: string | null;
+  shipping_address: { country?: string } | null;
+  awb_code: string | null;          // tracking number — both Delhivery + DHL write here
+  courier_name: string | null;
   created_at: string;
 }
 
@@ -26,6 +30,7 @@ interface PaginationInfo {
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
   confirmed: "bg-blue-100 text-blue-800",
+  pickup: "bg-orange-100 text-orange-800",
   processing: "bg-purple-100 text-purple-800",
   shipped: "bg-indigo-100 text-indigo-800",
   delivered: "bg-green-100 text-green-800",
@@ -39,7 +44,22 @@ const PAYMENT_COLORS: Record<string, string> = {
   refunded: "bg-gray-100 text-gray-700",
 };
 
-const STATUSES = ["all", "pending", "confirmed", "processing", "shipped", "delivered", "cancelled"];
+// Filter tabs.
+//   value: "international"      → sent as country=intl filter (not a status)
+//   value: comma-separated set  → sent as status= multi-status filter (e.g. "shipped,delivered")
+//   otherwise                   → single status filter
+const STATUS_TABS: { label: string; value: string }[] = [
+  { label: "All", value: "all" },
+  { label: "Pending", value: "pending" },
+  { label: "Confirmed", value: "confirmed" },
+  { label: "Pickup", value: "pickup" },
+  { label: "Shipped", value: "shipped" },
+  { label: "Delivered", value: "delivered" },
+  { label: "Fulfilled", value: "shipped,delivered" },
+  { label: "🌍 International", value: "international" },
+  { label: "Cancelled", value: "cancelled" },
+];
+
 const PAGE_SIZE_OPTIONS = [25, 50, 100, 200];
 
 function exportToCSV(orders: Order[]) {
@@ -92,7 +112,11 @@ export default function AdminOrdersPage() {
           page: String(page),
           page_size: String(pageSize),
         });
-        if (statusFilter !== "all") params.set("status", statusFilter);
+        if (statusFilter === "international") {
+          params.set("country", "intl");
+        } else if (statusFilter !== "all") {
+          params.set("status", statusFilter);
+        }
         if (search) params.set("search", search);
 
         const res = await fetch(`/api/admin/orders?${params.toString()}`, {
@@ -119,12 +143,36 @@ export default function AdminOrdersPage() {
     fetchOrders(false);
   }, [fetchOrders]);
 
-  // Auto-refresh every 30 seconds (silent background refresh)
+  // Auto-refresh every 10 seconds (silent background refresh for near real-time)
   useEffect(() => {
     const interval = setInterval(() => {
       fetchOrders(true);
-    }, 30000);
+    }, 10000);
     return () => clearInterval(interval);
+  }, [fetchOrders]);
+
+  // Trigger Delhivery + DHL tracking sync periodically so pickup → shipped → delivered
+  // transitions propagate automatically. Runs on mount + every 2 minutes.
+  useEffect(() => {
+    let cancelled = false;
+    const runSync = async () => {
+      try {
+        const results = await Promise.all([
+          fetch("/api/admin/delhivery/sync", { method: "POST", cache: "no-store" }).then((r) => r.json()).catch(() => ({})),
+          fetch("/api/admin/dhl/sync", { method: "POST", cache: "no-store" }).then((r) => r.json()).catch(() => ({})),
+        ]);
+        const totalUpdated = results.reduce((sum, j) => sum + (j?.updated ?? 0), 0);
+        if (!cancelled && totalUpdated > 0) fetchOrders(true);
+      } catch {
+        // ignore — surfaced via per-order admin sync button if needed
+      }
+    };
+    runSync();
+    const interval = setInterval(runSync, 120000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
   }, [fetchOrders]);
 
   // Reset to page 1 when filter, page size, or search changes
@@ -199,15 +247,19 @@ export default function AdminOrdersPage() {
 
         {/* Filter Tabs */}
         <div className="p-4 border-b border-gray-100 flex gap-2 flex-wrap">
-          {STATUSES.map((s) => (
+          {STATUS_TABS.map((t) => (
             <button
-              key={s}
-              onClick={() => setStatusFilter(s)}
-              className={`px-3 py-1.5 rounded-full text-xs font-medium capitalize transition-colors ${
-                statusFilter === s ? "bg-amber-600 text-white" : "bg-gray-100 text-gray-600 hover:bg-gray-200"
+              key={t.value}
+              onClick={() => setStatusFilter(t.value)}
+              className={`px-3 py-1.5 rounded-full text-xs font-medium transition-colors ${
+                statusFilter === t.value
+                  ? t.label === "Fulfilled"
+                    ? "bg-emerald-600 text-white"
+                    : "bg-amber-600 text-white"
+                  : "bg-gray-100 text-gray-600 hover:bg-gray-200"
               }`}
             >
-              {s}
+              {t.label}
             </button>
           ))}
         </div>
@@ -242,6 +294,7 @@ export default function AdminOrdersPage() {
                   <th className="text-left px-4 py-3 font-medium text-gray-500">Status</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">Payment</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500">Date</th>
+                  <th className="text-left px-4 py-3 font-medium text-gray-500">Tracking</th>
                   <th className="text-left px-4 py-3 font-medium text-gray-500"></th>
                 </tr>
               </thead>
@@ -249,9 +302,18 @@ export default function AdminOrdersPage() {
                 {orders.map((order) => (
                   <tr key={order.id} className="hover:bg-gray-50 transition-colors">
                     <td className="px-4 py-3">
-                      <Link href={`/admin/orders/${order.id}`} className="text-amber-600 hover:underline font-medium">
-                        {order.order_number}
-                      </Link>
+                      {(() => {
+                        const country = order.shipping_address?.country ?? "IN";
+                        const isIntl = country !== "IN";
+                        return (
+                          <Link href={`/admin/orders/${order.id}`} className="text-amber-600 hover:underline font-medium inline-flex items-center gap-1.5">
+                            <span title={country}>
+                              {isIntl ? COUNTRY_BY_CODE[country]?.flag ?? "🌍" : "🇮🇳"}
+                            </span>
+                            {order.order_number}
+                          </Link>
+                        );
+                      })()}
                     </td>
                     <td className="px-4 py-3">
                       <div className="font-medium text-gray-900">{order.customer_name}</div>
@@ -272,13 +334,42 @@ export default function AdminOrdersPage() {
                       {new Date(order.created_at).toLocaleDateString("en-IN")}
                     </td>
                     <td className="px-4 py-3">
+                      {(() => {
+                        // awb_code is the universal tracking field — both Delhivery (domestic)
+                        // and DHL (international) write to it on shipment creation.
+                        // delhivery_waybill is a legacy fallback for older orders.
+                        const trackingNum = order.awb_code;
+                        if (!trackingNum) {
+                          return <span className="text-gray-300">—</span>;
+                        }
+                        const country = order.shipping_address?.country ?? "IN";
+                        const isIntl = country !== "IN";
+                        const url = isIntl
+                          ? `https://www.dhl.com/global-en/home/tracking/tracking-express.html?submit=1&tracking-id=${trackingNum}`
+                          : `https://www.delhivery.com/tracking?id=${trackingNum}`;
+                        const courier = isIntl ? "DHL Express" : (order.courier_name ?? "Delhivery");
+                        return (
+                          <a
+                            href={url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            title={`Track on ${courier}`}
+                            className="inline-flex items-center gap-1 text-xs font-mono text-blue-600 hover:underline"
+                          >
+                            <span aria-hidden="true">↗</span>
+                            {trackingNum}
+                          </a>
+                        );
+                      })()}
+                    </td>
+                    <td className="px-4 py-3">
                       <Link href={`/admin/orders/${order.id}`} className="text-xs text-blue-600 hover:underline">View →</Link>
                     </td>
                   </tr>
                 ))}
                 {orders.length === 0 && (
                   <tr>
-                    <td colSpan={7} className="px-4 py-10 text-center text-gray-400">No orders found.</td>
+                    <td colSpan={8} className="px-4 py-10 text-center text-gray-400">No orders found.</td>
                   </tr>
                 )}
               </tbody>

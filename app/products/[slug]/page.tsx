@@ -4,7 +4,8 @@ import Image from "next/image";
 import { ArrowLeft } from "lucide-react";
 import { createServerClient } from "@/lib/supabase";
 import ProductActions from "@/components/ProductActions";
-import type { Product } from "@/data/products";
+import { products, type Product } from "@/data/products";
+import type { Metadata } from "next";
 
 export const revalidate = 60;
 
@@ -20,6 +21,26 @@ export async function generateStaticParams() {
 
 interface PageProps {
   params: { slug: string };
+}
+
+export async function generateMetadata({ params }: PageProps): Promise<Metadata> {
+  const product = products.find((p) => p.slug === params.slug);
+  
+  if (!product) {
+    return {
+      title: "Product Not Found | World of Mysore Pak",
+    };
+  }
+
+  return {
+    title: product.seoTitle || `${product.name} | World of Mysore Pak`,
+    description: product.seoDescription || product.description,
+    openGraph: {
+      title: product.seoTitle || product.name,
+      description: product.seoDescription || product.description,
+      images: [product.image],
+    },
+  };
 }
 
 export default async function ProductDetailPage({ params }: PageProps) {

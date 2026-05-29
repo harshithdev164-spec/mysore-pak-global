@@ -82,7 +82,8 @@ export interface CreateOrderPayload {
   address: string;
   city: string;
   state: string;
-  pincode: string;
+  pincode: string;          // for IN: 6-digit pincode; for intl: postal code
+  country?: string;         // ISO-2 (default "IN"); pass for international shipments
   items: { name: string; sku: string; units: number; selling_price: number }[];
   subtotal: number;
   shipping_charges: number;
@@ -90,11 +91,42 @@ export interface CreateOrderPayload {
   payment_method: "Prepaid" | "COD";
 }
 
+// ISO-2 → full country name expected by Delhivery (and DHL India for that matter).
+// Add countries here as you start shipping to them.
+const COUNTRY_NAMES: Record<string, string> = {
+  IN: "India",
+  US: "United States",
+  GB: "United Kingdom",
+  AE: "United Arab Emirates",
+  SA: "Saudi Arabia",
+  QA: "Qatar",
+  SG: "Singapore",
+  CA: "Canada",
+  AU: "Australia",
+  DE: "Germany",
+  MY: "Malaysia",
+  OM: "Oman",
+  KW: "Kuwait",
+};
+
+function countryNameFor(code: string | undefined): string {
+  if (!code) return "India";
+  const upper = code.toUpperCase();
+  return COUNTRY_NAMES[upper] ?? upper;
+}
+
 export interface DelhiveryOrderResult {
   package_id?: string;
   waybill?: string;
   status: boolean;
   message?: string;
+}
+
+/** Optional capture of the last Delhivery createOrder exchange — used by the debug endpoint. */
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+let lastExchange: { request: any; status: number; response: string; parsed?: any } | null = null;
+export function getLastDelhiveryExchange() {
+  return lastExchange;
 }
 
 export async function createDelhiveryOrder(p: CreateOrderPayload): Promise<DelhiveryOrderResult> {
@@ -109,6 +141,9 @@ export async function createDelhiveryOrder(p: CreateOrderPayload): Promise<Delhi
   // Format items nicely
   const productsDesc = p.items.map(i => `${i.name} (x${i.units})`).join(", ");
 
+  const destinationCountry = countryNameFor(p.country);
+  // Return goes back to India (our pickup origin), regardless of destination.
+
   const payload = {
     shipments: [
       {
@@ -117,19 +152,20 @@ export async function createDelhiveryOrder(p: CreateOrderPayload): Promise<Delhi
         pin: p.pincode,
         city: p.city,
         state: p.state,
-        country: "India",
+        country: destinationCountry,
         phone: p.customer_phone,
         order: p.order_number,
-        payment_mode: p.payment_method, // "Pre-paid" or "COD"
-        return_pin: p.pincode,
-        return_city: p.city,
-        return_phone: p.customer_phone,
-        return_add: p.address,
-        return_state: p.state,
+        payment_mode: p.payment_method === "Prepaid" ? "Prepaid" : p.payment_method, // Delhivery documentation says "Prepaid"
+        pickup_location: pickupLocation, // MANDATORY inside shipment object too
+        return_pin: process.env.DELHIVERY_PICKUP_PINCODE ?? "570011",
+        return_city: process.env.DHL_PICKUP_CITY ?? "Mysuru",
+        return_phone: process.env.DHL_PICKUP_PHONE ?? p.customer_phone,
+        return_add: process.env.DHL_PICKUP_ADDRESS_LINE1 ?? p.address,
+        return_state: process.env.DHL_PICKUP_STATE_NAME ?? "Karnataka",
         return_country: "India",
         products_desc: productsDesc.substring(0, 200), // Enforce limit
         hsn_code: "",
-        cod_amount: p.payment_method === "COD" ? p.subtotal + p.shipping_charges : "0",
+        cod_amount: p.payment_method === "COD" ? String(p.subtotal + p.shipping_charges) : "0",
         order_date: p.order_date,
         total_amount: String(p.subtotal + p.shipping_charges),
         seller_inv: p.order_number,
@@ -157,26 +193,44 @@ export async function createDelhiveryOrder(p: CreateOrderPayload): Promise<Delhi
     body: form.toString()
   });
 
+  const responseText = await res.text();
+  let parsedResponse: unknown = null;
+  try {
+    parsedResponse = JSON.parse(responseText);
+  } catch {
+    // leave parsedResponse as null
+  }
+  lastExchange = {
+    request: payload,
+    status: res.status,
+    response: responseText,
+    parsed: parsedResponse,
+  };
+
   if (!res.ok) {
-    const err = await res.text().catch(() => "");
-    throw new Error(`Delhivery createOrder failed (${res.status}): ${err}`);
+    throw new Error(
+      `Delhivery createOrder failed (${res.status}): ${responseText.slice(0, 600)}`
+    );
   }
 
-  const json = await res.json();
-  
-  if (!json.success) {
-      // Sometimes it returns success: false with an error array
-      const errs = json.rmk || json.error || "Unknown Error";
-      throw new Error(`Delhivery returned failure: ${JSON.stringify(errs)}`);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const json = parsedResponse as any;
+
+  if (!json?.success) {
+    // Delhivery's failure responses often include richer detail in `packages[0].remarks`
+    // than the top-level `rmk` field. Surface the most informative thing we can.
+    const remarks = json?.packages?.[0]?.remarks;
+    const errs = remarks ?? json?.rmk ?? json?.error ?? "Unknown Error";
+    throw new Error(`Delhivery returned failure: ${JSON.stringify(errs)}`);
   }
 
   const packageRef = json.packages && json.packages[0];
-  
+
   return {
     status: json.success,
     waybill: packageRef?.waybill,
     package_id: packageRef?.refnum,
-    message: json.rmk
+    message: json.rmk,
   };
 }
 

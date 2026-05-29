@@ -227,7 +227,7 @@ const ProductCard = ({ product, priority = false }: ProductCardProps) => {
       )}
 
       <div className="group relative">
-        <Link href={`/product/${product.slug}`} className="block">
+        <Link href={`/products/${product.slug}`} className="block">
           <div className="relative overflow-hidden rounded-2xl bg-white border border-border/50 transition-shadow duration-300 group-hover:shadow-xl group-hover:shadow-[#2D5A3D]/10 group-hover:-translate-y-1 transition-transform">
             {/* Image */}
             <div className="aspect-square overflow-hidden relative">

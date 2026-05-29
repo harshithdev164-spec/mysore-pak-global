@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Playfair_Display, Poppins } from "next/font/google";
 import Providers from "./providers";
 import StoreShell from "@/components/StoreShell";
@@ -34,6 +35,11 @@ export const metadata: Metadata = {
   description:
     "Traditional Mysore Pak made with pure ghee and traditional recipes. Shop online and get authentic Mysuru sweets delivered to your door.",
   keywords: ["Mysore Pak", "Indian sweets", "ghee sweets", "online sweet shop"],
+  icons: {
+    icon: "/logo.svg",
+    shortcut: "/logo.svg",
+    apple: "/logo.svg",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
@@ -54,13 +60,33 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <noscript>
           <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Felix+Titling&display=swap" />
         </noscript>
+        {/* Mapbox GL CSS */}
+        <link href="https://api.mapbox.com/mapbox-gl-js/v3.2.0/mapbox-gl.css" rel="stylesheet" />
+        {/* Google Tag Manager */}
+        <Script id="google-tag-manager" strategy="afterInteractive">
+          {`(function(w,d,s,l,i){w[l]=w[l]||[];w[l].push({'gtm.start':
+          new Date().getTime(),event:'gtm.js'});var f=d.getElementsByTagName(s)[0],
+          j=d.createElement(s),dl=l!='dataLayer'?'&l='+l:'';j.async=true;j.src=
+          'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
+          })(window,document,'script','dataLayer','GTM-PLN4TZZR');`}
+        </Script>
+        {/* End Google Tag Manager */}
       </head>
       <body>
+        {/* Google Tag Manager (noscript) */}
+        <noscript>
+          <iframe
+            src="https://www.googletagmanager.com/ns.html?id=GTM-PLN4TZZR"
+            height="0"
+            width="0"
+            style={{ display: "none", visibility: "hidden" }}
+          ></iframe>
+        </noscript>
+        {/* End Google Tag Manager (noscript) */}
         <Providers>
           <ErrorBoundary>
             <StoreShell>{children}</StoreShell>
           </ErrorBoundary>
-          <FloatingWhatsApp />
         </Providers>
       </body>
     </html>

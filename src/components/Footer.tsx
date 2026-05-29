@@ -10,7 +10,7 @@ const Footer = () => (
     {/* ── SVG DESIGN DIVIDER ── */}
     <div className="bg-[#FBF7F0] -mb-px">
       <img
-        src="/footer iconn.svg"
+        src="/footer icon.svg?v=2"
         alt=""
         aria-hidden="true"
         className="w-full h-auto block"

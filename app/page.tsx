@@ -5,12 +5,12 @@ import Index from "@/views/Index";
 export const revalidate = 60;
 
 const FEATURED_SLUGS = [
-  "spl-mysore-pak",
-  "carrot-mysore-pak",
-  "hazelnut-dark-chocolate",
-  "milk-chocolate",
-  "badam-halwa",
-  "soan-cake",
+  "buy-special-mysore-pak-online",
+  "buy-carrot-mysore-pak-online",
+  "buy-hazelnut-dark-chocolate-online",
+  "buy-milk-chocolate-online",
+  "buy-badam-halwa-almond-online",
+  "buy-soft-soan-cake-online",
 ];
 
 export default async function Home() {

@@ -17,9 +17,12 @@ const BodySchema = z.object({
   customer_phone: z.string().min(6),
   shipping_address: z.object({
     address: z.string().min(2),
+    address2: z.string().optional(),
     city: z.string().min(2),
     state: z.string().min(2),
-    pincode: z.string().min(4),
+    pincode: z.string().min(3),                       // accepts intl postal codes (3+ chars)
+    postal_code: z.string().optional(),               // intl alias; mirrors pincode when present
+    country: z.string().length(2).optional(),         // ISO-2; defaults to 'IN'
   }),
   items: z.array(OrderItemSchema).min(1),
   notes: z.string().optional(),
@@ -50,11 +53,16 @@ export async function POST(request: Request) {
   const { customer_name, customer_email, customer_phone, shipping_address, items, notes, courier_id } =
     parsed.data;
 
+  const country = (shipping_address.country ?? "IN").toUpperCase();
+  const isIntl = country !== "IN";
+
   const subtotal = items.reduce((s, i) => s + i.unit_price * i.quantity, 0);
-  // Use Shiprocket-provided rate if available; fallback to threshold logic
+  // Domestic free-shipping threshold does NOT apply internationally.
   const shipping_cost =
     parsed.data.shipping_cost !== undefined
       ? parsed.data.shipping_cost
+      : isIntl
+      ? 0 // intl must include shipping_cost; server fallback is 0 (rate-fetch failed)
       : subtotal > 1500
       ? 0
       : 99;
@@ -64,6 +72,18 @@ export async function POST(request: Request) {
   const supabase = createServerClient();
   const order_number = await generateOrderNumber(supabase);
 
+  // Normalize shipping_address: ensure country present, mirror postal_code↔pincode for compat
+  const normalizedAddress = {
+    ...shipping_address,
+    country,
+    postal_code: shipping_address.postal_code ?? shipping_address.pincode,
+    pincode: shipping_address.pincode ?? shipping_address.postal_code,
+  };
+
+  // Country is stored inside `shipping_address.country` (JSONB) — that's the
+  // source of truth. The denormalized `shipping_country` column from the
+  // optional add_dhl_columns.sql migration is for indexing only; we don't
+  // require it on insert so this route works whether or not the migration ran.
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const insertPayload: Record<string, any> = {
     order_number,
@@ -76,7 +96,7 @@ export async function POST(request: Request) {
     total,
     payment_method: "razorpay",
     payment_status: "pending",
-    shipping_address,
+    shipping_address: normalizedAddress,
     notes: notes ?? null,
     status: "pending",
   };

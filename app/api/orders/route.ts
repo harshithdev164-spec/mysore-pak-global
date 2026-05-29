@@ -147,8 +147,7 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: itemsError.message }, { status: 500 });
   }
 
-  // Auto-create Delhivery order for COD (best-effort — never blocks the response)
-  if (isCod && process.env.DELHIVERY_TOKEN) {
+  if (isCod) {
     try {
       const totalWeight = items.reduce(
         (sum, item) => sum + parseWeightKg(item.weight_label) * item.quantity,
@@ -159,40 +158,85 @@ export async function POST(request: Request) {
         .replace("T", " ")
         .slice(0, 16);
 
-      const delResult = await createDelhiveryOrder({
-        order_number: order.order_number,
-        order_date: orderDate,
-        customer_name,
-        customer_email,
-        customer_phone,
-        address: shipping_address.address,
-        city: shipping_address.city,
-        state: shipping_address.state,
-        pincode: shipping_address.pincode,
-        items: items.map((item) => ({
-          name: item.product_name,
-          sku: `${item.product_name.toLowerCase().replace(/\s+/g, "-")}-${item.weight_label.toLowerCase().replace(/\s+/g, "")}`,
-          units: item.quantity,
-          selling_price: item.unit_price,
-        })),
-        subtotal,
-        shipping_charges: shipping_cost,
-        weight_kg: Math.max(totalWeight, 0.1),
-        payment_method: "COD"
-      });
+      if (courier_id === 200) {
+        // ── DTDC Express ──
+        try {
+          const { createDtdcOrder } = await import("@/lib/dtdc");
+          const dtdcResult = await createDtdcOrder({
+            order_number: order.order_number,
+            customer_name,
+            customer_email,
+            customer_phone,
+            address: shipping_address.address,
+            city: shipping_address.city,
+            state: shipping_address.state,
+            pincode: shipping_address.pincode,
+            items: items.map((item) => ({
+              name: item.product_name,
+              units: item.quantity,
+              selling_price: item.unit_price,
+            })),
+            subtotal,
+            shipping_charges: shipping_cost,
+            weight_kg: Math.max(totalWeight, 0.5),
+            payment_method: "COD"
+          });
 
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const dbUpdate: Record<string, any> = {
-        delhivery_package_id: delResult.package_id,
-        delhivery_waybill: delResult.waybill,
-      };
-      // Delhivery manifest usually sets a waybill code
-      if (delResult.waybill) dbUpdate.awb_code = delResult.waybill;
-      dbUpdate.courier_name = "Delhivery";
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const dbUpdate: Record<string, any> = {
+            courier_name: "DTDC Express",
+          };
+          if (dtdcResult.reference_number) {
+            dbUpdate.awb_code = dtdcResult.reference_number;
+            dbUpdate.status = "pickup";
+          }
 
-      await supabase.from("orders").update(dbUpdate).eq("id", order.id);
+          await supabase.from("orders").update(dbUpdate).eq("id", order.id);
+        } catch (dtdcErr) {
+          const errMsg = dtdcErr instanceof Error ? dtdcErr.message : String(dtdcErr);
+          console.error("[DTDC] Order creation failed:", errMsg);
+          // Update order with error note for admin to see
+          await supabase.from("orders").update({
+            courier_name: "DTDC Express",
+            notes: `DTDC shipment creation failed: ${errMsg.slice(0, 200)}`
+          }).eq("id", order.id);
+        }
+      } else if (process.env.DELHIVERY_TOKEN) {
+        const delResult = await createDelhiveryOrder({
+          order_number: order.order_number,
+          order_date: orderDate,
+          customer_name,
+          customer_email,
+          customer_phone,
+          address: shipping_address.address,
+          city: shipping_address.city,
+          state: shipping_address.state,
+          pincode: shipping_address.pincode,
+          items: items.map((item) => ({
+            name: item.product_name,
+            sku: `${item.product_name.toLowerCase().replace(/\s+/g, "-")}-${item.weight_label.toLowerCase().replace(/\s+/g, "")}`,
+            units: item.quantity,
+            selling_price: item.unit_price,
+          })),
+          subtotal,
+          shipping_charges: shipping_cost,
+          weight_kg: Math.max(totalWeight, 0.1),
+          payment_method: "COD"
+        });
+
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const dbUpdate: Record<string, any> = {
+          delhivery_package_id: delResult.package_id,
+          delhivery_waybill: delResult.waybill,
+        };
+        // Delhivery manifest usually sets a waybill code
+        if (delResult.waybill) dbUpdate.awb_code = delResult.waybill;
+        dbUpdate.courier_name = "Delhivery";
+
+        await supabase.from("orders").update(dbUpdate).eq("id", order.id);
+      }
     } catch (err) {
-      console.error("[Delhivery] COD order creation failed:", err);
+      console.error("[Courier] COD order creation failed:", err);
     }
   }
 

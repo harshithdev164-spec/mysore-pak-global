@@ -32,3 +32,36 @@ export const createAdminClient = () => {
     auth: { autoRefreshToken: false, persistSession: false },
   });
 };
+
+export const IMAGE_BUCKET = 'places-image';
+
+export function getImageUrl(placeId: string): string {
+  return `${supabaseUrl}/storage/v1/object/public/${IMAGE_BUCKET}/${placeId}.jpg?t=${Date.now()}`;
+}
+
+export interface PlaceDetail {
+  id: string;
+  name: string;
+  description: string;
+  entry_fee: string;
+  best_time: string;
+  time_needed: string;
+  rating: number;
+  tip: string;
+  hours: string | null;
+  image_url: string;
+  category: string;
+  lat: number;
+  lng: number;
+}
+
+export async function fetchPlaceDetail(id: string): Promise<PlaceDetail | null> {
+  const { data, error } = await (supabase as any)
+    .from('places')
+    .select('*')
+    .eq('id', id)
+    .single();
+  if (error) return null;
+  return data as PlaceDetail;
+}
+

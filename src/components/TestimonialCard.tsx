@@ -39,7 +39,7 @@ const TestimonialCard = ({ name, location, text, rating }: TestimonialCardProps)
 
     {/* Quote */}
     <p className="font-body text-foreground/70 text-sm leading-relaxed mb-6">
-      "{text}"
+      &ldquo;{text}&rdquo;
     </p>
 
     {/* Author */}

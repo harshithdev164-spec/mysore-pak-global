@@ -34,3 +34,4 @@ out
 
 # Claude
 .claude
+.env*.local

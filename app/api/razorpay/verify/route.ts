@@ -3,6 +3,8 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase";
 import crypto from "crypto";
 import { createDelhiveryOrder, parseWeightKg } from "@/lib/delhivery";
+import { createDhlShipment, isDhlConfigured } from "@/lib/dhl";
+import { HS_CODE_SWEETS } from "@/lib/countries";
 
 export async function POST(request: Request) {
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -92,32 +94,88 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "Failed to update order" }, { status: 500 });
   }
 
-  // Auto-create Delhivery order (best-effort — payment is already confirmed above)
-  if (process.env.DELHIVERY_TOKEN) {
-    try {
-      // Fetch full order details
-      const { data: fullOrder } = await supabase
-        .from("orders")
-        .select(`
-          id, order_number, customer_name, customer_email, customer_phone,
-          subtotal, shipping_cost, courier_id, shipping_address,
-          created_at,
-          items:order_items(product_name, weight_label, quantity, unit_price)
-        `)
-        .eq("id", db_order_id)
-        .single();
+  // Auto-create courier shipment (best-effort — payment is already confirmed above).
+  // Branches on customer's chosen courier (`courier_id`):
+  //   100 → DHL Express (CSB-V customs form)
+  //   else → Delhivery (domestic + international, default)
+  try {
+    // Fetch full order details
+    const { data: fullOrder } = await supabase
+      .from("orders")
+      .select(`
+        id, order_number, customer_name, customer_email, customer_phone,
+        subtotal, shipping_cost, courier_id, shipping_address,
+        created_at,
+        items:order_items(product_name, weight_label, quantity, unit_price)
+      `)
+      .eq("id", db_order_id)
+      .single();
 
-      if (fullOrder) {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const addr = (fullOrder.shipping_address ?? {}) as Record<string, any>;
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const orderItems = (fullOrder.items ?? []) as any[];
+    if (fullOrder) {
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const addr = (fullOrder.shipping_address ?? {}) as Record<string, any>;
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      const orderItems = (fullOrder.items ?? []) as any[];
 
-        // Total weight in kg
-        const totalWeight = orderItems.reduce((sum: number, item: { weight_label: string; quantity: number }) => {
+      const country = String(addr.country ?? "IN").toUpperCase();
+      const courierId = (fullOrder as { courier_id?: number }).courier_id ?? 1;
+
+      // Total weight in kg
+      const totalWeight = orderItems.reduce(
+        (sum: number, item: { weight_label: string; quantity: number }) => {
           return sum + parseWeightKg(item.weight_label) * item.quantity;
-        }, 0);
+        },
+        0
+      );
 
+      const useDhl = courierId === 100 && country !== "IN" && isDhlConfigured();
+      const useDtdc = courierId === 200;
+
+      if (useDtdc) {
+        // ── DTDC: domestic India ──
+        try {
+          const { createDtdcOrder } = await import("@/lib/dtdc");
+          const dtdcResult = await createDtdcOrder({
+            order_number: fullOrder.order_number,
+            customer_name: fullOrder.customer_name,
+            customer_email: fullOrder.customer_email,
+            customer_phone: fullOrder.customer_phone,
+            address: addr.address ?? "",
+            city: addr.city ?? "",
+            state: addr.state ?? "",
+            pincode: addr.pincode ?? addr.postal_code ?? "",
+            items: orderItems.map((item) => ({
+              name: item.product_name,
+              units: item.quantity,
+              selling_price: item.unit_price,
+            })),
+            subtotal: fullOrder.subtotal,
+            shipping_charges: fullOrder.shipping_cost ?? 0,
+            weight_kg: Math.max(totalWeight, 0.5),
+            payment_method: "Prepaid",
+          });
+
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          const dbUpdate: Record<string, any> = {
+            courier_name: "DTDC Express",
+          };
+          if (dtdcResult.reference_number) {
+            dbUpdate.awb_code = dtdcResult.reference_number;
+            dbUpdate.status = "pickup";
+          }
+
+          await supabase.from("orders").update(dbUpdate).eq("id", db_order_id);
+        } catch (dtdcErr) {
+          const errMsg = dtdcErr instanceof Error ? dtdcErr.message : String(dtdcErr);
+          console.error("[DTDC verify] Order creation failed:", errMsg);
+          // Update order with error note for admin to see
+          await supabase.from("orders").update({
+            courier_name: "DTDC Express",
+            notes: `DTDC shipment creation failed: ${errMsg.slice(0, 200)}`
+          }).eq("id", db_order_id);
+        }
+      } else if (!useDhl && process.env.DELHIVERY_TOKEN) {
+        // ── Delhivery: domestic AND international (when customer picked it) ──
         const orderDate = new Date(fullOrder.created_at)
           .toISOString()
           .replace("T", " ")
@@ -132,7 +190,8 @@ export async function POST(request: Request) {
           address: addr.address ?? "",
           city: addr.city ?? "",
           state: addr.state ?? "",
-          pincode: addr.pincode ?? "",
+          pincode: addr.pincode ?? addr.postal_code ?? "",
+          country,
           items: orderItems.map((item) => ({
             name: item.product_name,
             sku: `${item.product_name.toLowerCase().replace(/\s+/g, "-")}-${item.weight_label.toLowerCase().replace(/\s+/g, "")}`,
@@ -145,21 +204,63 @@ export async function POST(request: Request) {
           payment_method: "Prepaid",
         });
 
-        // Store Delhivery details back in the order
         // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const dbUpdate: Record<string, any> = {
-          delhivery_package_id: delResult.package_id,
-          delhivery_waybill: delResult.waybill,
+          courier_name: "Delhivery",
         };
-        if (delResult.waybill) dbUpdate.awb_code = delResult.waybill;
-        dbUpdate.courier_name = "Delhivery";
+        if (delResult.waybill) {
+          dbUpdate.awb_code = delResult.waybill;
+          dbUpdate.status = "pickup";
+        }
+
+        await supabase.from("orders").update(dbUpdate).eq("id", db_order_id);
+      } else if (useDhl) {
+        // ── DHL Express (only when customer explicitly picked it) ──
+        const dhlResult = await createDhlShipment({
+          order_number: fullOrder.order_number,
+          customer_name: fullOrder.customer_name,
+          customer_email: fullOrder.customer_email,
+          customer_phone: fullOrder.customer_phone,
+          address: addr.address ?? "",
+          address2: addr.address2,
+          city: addr.city ?? "",
+          state: addr.state ?? "",
+          postal_code: addr.postal_code ?? addr.pincode ?? "",
+          country,
+          items: orderItems.map((item) => ({
+            name: item.product_name,
+            sku: `${item.product_name.toLowerCase().replace(/\s+/g, "-")}-${item.weight_label.toLowerCase().replace(/\s+/g, "")}`,
+            units: item.quantity,
+            selling_price_inr: item.unit_price,
+            weight_kg: parseWeightKg(item.weight_label),
+            hs_code: HS_CODE_SWEETS,
+          })),
+          declared_value_inr: fullOrder.subtotal,
+          weight_kg: Math.max(totalWeight, 0.5),
+          payment_method: "Prepaid",
+        });
+
+        // Persist only the universal fields. DHL-specific columns (label PDF,
+        // invoice PDF) require add_dhl_columns.sql migration and are skipped
+        // here so the verify route stays portable.
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        const dbUpdate: Record<string, any> = {
+          courier_name: "DHL Express",
+        };
+        if (dhlResult.tracking_number) {
+          dbUpdate.awb_code = dhlResult.tracking_number;
+          dbUpdate.status = "pickup";
+        }
 
         await supabase.from("orders").update(dbUpdate).eq("id", db_order_id);
       }
-    } catch (err) {
-      // Log but never block the payment confirmation response
-      console.error("[Delhivery] auto-create failed:", err);
     }
+  } catch (err) {
+    // Log but never block the payment confirmation response
+    console.error(
+      "[verify] courier auto-create failed:",
+      err instanceof Error ? err.message : err
+    );
   }
 
   return NextResponse.json({ success: true, order_number: data.order_number });

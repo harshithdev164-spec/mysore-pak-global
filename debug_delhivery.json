@@ -1,0 +1,28 @@
+{
+  "cash_pickups_count": 0,
+  "package_count": 1,
+  "prepaid_count": 0,
+  "pickups_count": 0,
+  "replacement_count": 0,
+  "cash_pickups": 0,
+  "cod_amount": 0,
+  "cod_count": 0,
+  "upload_wbn": "UPL11756086338118110588",
+  "packages": [
+    {
+      "waybill": "",
+      "refnum": "TEST-1776692346691",
+      "client": "2bedb7-WORLDOFMYSOREPAK-do",
+      "payment": "Pre-paid",
+      "cod_amount": 0,
+      "status": "Fail",
+      "sort_code": "BAN/MJG",
+      "serviceable": true,
+      "remarks": [
+        "Crashing while saving package due to exception 'Prepaid client manifest charge API failed due to insufficient balance'. Package might have been partially saved."
+      ]
+    }
+  ],
+  "success": false,
+  "rmk": "An internal Error has occurred, Please get in touch with client.support@delhivery.com"
+}

@@ -4,6 +4,7 @@ import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import VideoPopup from "./VideoPopup";
+import ChatBot from "./ChatBot";
 
 const ANNOUNCEMENT_ITEMS = [
   "For Orders Within Mysore · Order via Swiggy & Zomato",
@@ -20,9 +21,10 @@ const announcementContent =
 
 export default function StoreShell({ children }: { children: React.ReactNode }) {
   const pathname = usePathname();
+  const isTourGuide = pathname?.startsWith("/tour-guide");
   const isAdmin = pathname?.startsWith("/admin");
 
-  if (isAdmin) return <>{children}</>;
+  if (isAdmin || isTourGuide) return <>{children}</>;
 
   return (
     <>
@@ -45,6 +47,7 @@ export default function StoreShell({ children }: { children: React.ReactNode }) 
       <main className="min-h-screen pt-8">{children}</main>
       <Footer />
       <VideoPopup />
+      <ChatBot />
     </>
   );
 }

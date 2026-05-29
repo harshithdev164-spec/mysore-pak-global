@@ -99,7 +99,7 @@ export async function PUT(
   await deleteCached(`product:${params.id}`, `product:${product.slug}`);
   await bumpProductsVersion();
   revalidatePath("/shop");
-  revalidatePath(`/product/${product.slug}`);
+  revalidatePath(`/products/${product.slug}`);
 
   return NextResponse.json({ data: product });
 }
@@ -125,7 +125,7 @@ export async function DELETE(
   await deleteCached(...keysToDelete);
   await bumpProductsVersion();
   revalidatePath("/shop");
-  if (existing?.slug) revalidatePath(`/product/${existing.slug}`);
+  if (existing?.slug) revalidatePath(`/products/${existing.slug}`);
 
   return NextResponse.json({ success: true });
 }

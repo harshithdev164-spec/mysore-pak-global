@@ -1,0 +1,70 @@
+// Day organization matches the brochure exactly
+// Day 1: left → right  |  Day 2: right → left (serpentine)  |  Day 3: left → right
+
+export const ITINERARY_DAYS = [
+  {
+    day: 1,
+    label: 'DAY-1',
+    title: 'Royal Mysore',
+    subtitle: 'Temples · Silk · Palaces',
+    theme: "Begin at the sacred Chamundi Hills, wind through Mysore's silk and culture, end at the illuminated palace",
+    color: 'hsl(43, 80%, 55%)',
+    borderColor: 'hsl(43, 80%, 65%)',
+    emoji: '👑',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/4/43/Mysore_Palace_Morning.jpg/480px-Mysore_Palace_Morning.jpg',
+    direction: 'ltr' as const,
+    placeIds: [
+      'chamundi-hills',
+      'world-of-mysore-pak',
+      'silk-emporium',
+      'sand-museum',
+      'mysore-zoo',
+      'jaganmohan-palace',
+      'mysore-palace',
+    ],
+  },
+  {
+    day: 2,
+    label: 'DAY-2',
+    title: 'Sacred & Beyond',
+    subtitle: 'Railways · Cathedrals · Gardens',
+    theme: 'From vintage steam engines to Gothic spires, Brindavan fountains and sacred southern temples',
+    color: 'hsl(28, 90%, 55%)',
+    borderColor: 'hsl(28, 90%, 65%)',
+    emoji: '⛰️',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/e/eb/KRS_dam%2Cbrindavan_gardens.jpg/480px-KRS_dam%2Cbrindavan_gardens.jpg',
+    direction: 'rtl' as const,
+    placeIds: [
+      'rail-museum',
+      'st-philomena-church',
+      'brindavan-gardens',
+      'nanjangudu',
+      'shuka-vana',
+      'wax-museum',
+    ],
+  },
+  {
+    day: 3,
+    label: 'DAY-3',
+    title: 'Nature & Adventure',
+    subtitle: 'History · Wildlife · Thrills',
+    theme: 'Island forts, bird sanctuaries, underwater worlds and the thrill of Karnataka\'s finest adventure parks',
+    color: 'hsl(142, 50%, 45%)',
+    borderColor: 'hsl(142, 50%, 55%)',
+    emoji: '🌿',
+    image: 'https://upload.wikimedia.org/wikipedia/commons/thumb/2/2e/Ranganathittu_Bird_Sanctuary.jpg/480px-Ranganathittu_Bird_Sanctuary.jpg',
+    direction: 'ltr' as const,
+    placeIds: [
+      'lalitha-mahal',
+      'payana-vintage-cars',
+      'shrirangapatna',
+      'ranganathittu',
+      'lokaranjan-aqua',
+      'grs-fantasy-park',
+      'grs-snow-park',
+      'grs-updown-museum',
+    ],
+  },
+] as const;
+
+export type ItineraryDay = (typeof ITINERARY_DAYS)[number];

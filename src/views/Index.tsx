@@ -110,20 +110,24 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Order server-fetched products to match FEATURED_SLUGS order
+  // Order server-fetched products to match FEATURED_SLUGS order.
+  // Slugs must match what `app/page.tsx` fetches from the DB (the long SEO form).
   const featured = useMemo<Product[]>(() => {
     const FEATURED_SLUGS = [
-      "spl-mysore-pak",
-      "carrot-mysore-pak",
-      "hazelnut-dark-chocolate",
-      "milk-chocolate",
-      "badam-halwa",
-      "soan-cake",
+      "buy-special-mysore-pak-online",
+      "buy-carrot-mysore-pak-online",
+      "buy-hazelnut-dark-chocolate-online",
+      "buy-milk-chocolate-online",
+      "buy-badam-halwa-almond-online",
+      "buy-soft-soan-cake-online",
     ];
     const mapped = initialFeatured.map(mapApiProduct);
-    return FEATURED_SLUGS
+    // Order by the FEATURED_SLUGS list; if a slug isn't found, fall back to
+    // whatever the server returned so the section never stays in skeleton state.
+    const ordered = FEATURED_SLUGS
       .map((slug) => mapped.find((p) => p.slug === slug))
       .filter(Boolean) as Product[];
+    return ordered.length > 0 ? ordered : mapped;
   }, [initialFeatured]);
 
   return (

@@ -80,11 +80,12 @@ export default function AdminDashboard() {
       )}
 
       {/* Quick Links */}
-      <div className="grid grid-cols-3 gap-4 mb-8">
+      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-8">
         {[
           { href: "/admin/orders", label: "Manage Orders", desc: "View and update order statuses" },
           { href: "/admin/products/new", label: "Add Product", desc: "Create a new product listing" },
           { href: "/admin/categories", label: "Manage Categories", desc: "Edit product categories" },
+          { href: "/admin/explore", label: "Manage Discovery", desc: "Upload images for tour guide" },
         ].map((link) => (
           <Link
             key={link.href}

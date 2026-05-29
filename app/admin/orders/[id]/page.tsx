@@ -29,25 +29,32 @@ interface Order {
   total: number;
   notes: string | null;
   shipping_address: Record<string, string>;
+  shipping_country?: string | null;  // optional (denormalized column from add_dhl_columns.sql migration; may be absent)
   items: OrderItem[];
   created_at: string;
   updated_at: string;
-  // Delhivery fields
-  delhivery_package_id: string | null;
-  delhivery_waybill: string | null;
+  // Tracking — awb_code is the single canonical AWB column
   awb_code: string | null;
   courier_name: string | null;
-  tracking_url: string | null;
-  label_url: string | null;
-  invoice_url: string | null;
+  // Optional convenience columns from migrations that may not be present
+  delhivery_package_id?: string | null;
+  delhivery_waybill?: string | null;
+  tracking_url?: string | null;
+  label_url?: string | null;
+  invoice_url?: string | null;
+  dhl_shipment_id?: string | null;
+  dhl_tracking_number?: string | null;
+  dhl_label_url?: string | null;
+  dhl_invoice_url?: string | null;
 }
 
-const ORDER_STATUSES = ["pending", "confirmed", "processing", "shipped", "delivered", "cancelled"];
+const ORDER_STATUSES = ["pending", "confirmed", "pickup", "processing", "shipped", "delivered", "cancelled"];
 const PAYMENT_STATUSES = ["pending", "paid", "failed", "refunded"];
 
 const STATUS_COLORS: Record<string, string> = {
   pending: "bg-yellow-100 text-yellow-800",
   confirmed: "bg-blue-100 text-blue-800",
+  pickup: "bg-orange-100 text-orange-800",
   processing: "bg-purple-100 text-purple-800",
   shipped: "bg-indigo-100 text-indigo-800",
   delivered: "bg-green-100 text-green-800",
@@ -100,32 +107,72 @@ export default function AdminOrderDetailPage() {
     }
   }
 
-  async function doDelhiveryAction(action: string) {
+  async function doCourierAction(courier: "delhivery" | "dhl", action: string) {
     if (!order) return;
     setDelLoading(action);
     setDelMsg("");
     try {
-      const res = await fetch(`/api/admin/delhivery/${order.id}?action=${action}`, {
+      const res = await fetch(`/api/admin/${courier}/${order.id}?action=${action}`, {
         method: "POST",
       });
       const json = await res.json();
       if (!res.ok) throw new Error(json.error ?? "Action failed");
 
       setDelMsg("Shipment created!");
-      // Merge returned data into local state
       if (json.data) {
-        setDelData((prev) => ({
-          ...prev,
-          delhivery_package_id: json.data.package_id ?? prev.delhivery_package_id,
-          delhivery_waybill: json.data.waybill ?? prev.delhivery_waybill,
-          awb_code: json.data.waybill ?? prev.awb_code,
-          courier_name: "Delhivery",
-        }));
+        if (courier === "delhivery") {
+          setDelData((prev) => ({
+            ...prev,
+            delhivery_package_id: json.data.package_id ?? prev.delhivery_package_id,
+            delhivery_waybill: json.data.waybill ?? prev.delhivery_waybill,
+            awb_code: json.data.waybill ?? prev.awb_code,
+            courier_name: "Delhivery",
+          }));
+        } else {
+          setDelData((prev) => ({
+            ...prev,
+            dhl_shipment_id: json.data.shipment_id ?? prev.dhl_shipment_id,
+            dhl_tracking_number: json.data.tracking_number ?? prev.dhl_tracking_number,
+            dhl_label_url: json.data.label_url ?? prev.dhl_label_url,
+            dhl_invoice_url: json.data.invoice_url ?? prev.dhl_invoice_url,
+            awb_code: json.data.tracking_number ?? prev.awb_code,
+            courier_name: "DHL Express",
+          }));
+        }
       }
 
       invalidateCache(`/api/orders/${order.id}`);
     } catch (err) {
       setDelMsg(err instanceof Error ? err.message : "Failed");
+    } finally {
+      setDelLoading(null);
+    }
+  }
+
+  async function syncTracking(courier: "delhivery" | "dhl") {
+    if (!order) return;
+    setDelLoading("sync");
+    setDelMsg("");
+    try {
+      const res = await fetch(`/api/admin/${courier}/sync`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ order_id: order.id }),
+      });
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error ?? "Sync failed");
+
+      const info = json.orders?.[0];
+      const label = courier === "delhivery" ? "Delhivery" : "DHL";
+      if (info?.to) {
+        setDelMsg(`Status updated: ${info.from} → ${info.to}`);
+        setStatus(info.to);
+        invalidateCache(`/api/orders/${order.id}`);
+      } else {
+        setDelMsg(`No change (${label}: ${info?.raw ?? "unknown"})`);
+      }
+    } catch (err) {
+      setDelMsg(err instanceof Error ? err.message : "Sync failed");
     } finally {
       setDelLoading(null);
     }
@@ -154,6 +201,13 @@ export default function AdminOrderDetailPage() {
         <span className={`px-3 py-1 rounded-full text-xs font-semibold ${STATUS_COLORS[order.status] ?? "bg-gray-100 text-gray-700"}`}>
           {order.status}
         </span>
+        <Link
+          href={`/admin/invoices/${order.id}`}
+          target="_blank"
+          className="ml-auto inline-flex items-center gap-1.5 text-xs bg-amber-50 text-amber-700 hover:bg-amber-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
+        >
+          📄 Invoice
+        </Link>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -273,73 +327,214 @@ export default function AdminOrderDetailPage() {
             </div>
           </div>
 
-          {/* Delhivery Shipping & Tracking */}
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h2 className="font-semibold text-gray-900 mb-4">Delhivery</h2>
+          {/* Shipping & Tracking — branches on country */}
+          {(() => {
+            const country = (
+              sr.shipping_country ??
+              (sr.shipping_address as Record<string, string> | undefined)?.country ??
+              "IN"
+            ).toUpperCase();
+            const isIntl = country !== "IN";
 
-            {sr.awb_code ? (
-              <div className="space-y-3">
-                {/* AWB */}
-                <div>
-                  <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Waybill / AWB Code</div>
-                  <div className="font-mono text-sm font-semibold text-gray-900">{sr.awb_code}</div>
+            if (isIntl) {
+              // ── DHL Express panel ─────────────────────────────────
+              return (
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <h2 className="font-semibold text-gray-900 mb-4 flex items-center gap-2">
+                    DHL Express
+                    <span className="text-xs font-normal text-gray-500">({country})</span>
+                  </h2>
+
+                  {sr.dhl_tracking_number ? (
+                    <div className="space-y-3">
+                      <div>
+                        <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Tracking Number</div>
+                        <div className="font-mono text-sm font-semibold text-gray-900">{sr.dhl_tracking_number}</div>
+                      </div>
+                      <div>
+                        <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Courier</div>
+                        <div className="text-sm text-gray-800">{sr.courier_name ?? "DHL Express"}</div>
+                      </div>
+                      {sr.dhl_shipment_id && sr.dhl_shipment_id !== sr.dhl_tracking_number && (
+                        <div>
+                          <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Shipment ID</div>
+                          <div className="text-sm text-gray-600">{sr.dhl_shipment_id}</div>
+                        </div>
+                      )}
+
+                      <div className="flex gap-2 flex-wrap">
+                        <a
+                          href={`https://www.dhl.com/global-en/home/tracking/tracking-express.html?submit=1&tracking-id=${sr.dhl_tracking_number}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block text-xs bg-yellow-50 text-yellow-700 hover:bg-yellow-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
+                        >
+                          Track Shipment ↗
+                        </a>
+                        {sr.dhl_label_url && (
+                          <a
+                            href={sr.dhl_label_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download={`label-${sr.order_number}.pdf`}
+                            className="inline-block text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
+                          >
+                            Label PDF ↓
+                          </a>
+                        )}
+                        {sr.dhl_invoice_url && (
+                          <a
+                            href={sr.dhl_invoice_url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            download={`invoice-${sr.order_number}.pdf`}
+                            className="inline-block text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
+                          >
+                            Commercial Invoice ↓
+                          </a>
+                        )}
+                        <button
+                          onClick={() => syncTracking("dhl")}
+                          disabled={delLoading === "sync"}
+                          className="inline-flex items-center gap-1 text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-3 py-1.5 rounded-lg font-medium transition-colors disabled:opacity-50"
+                        >
+                          <span className={delLoading === "sync" ? "animate-spin inline-block" : ""}>↻</span>
+                          {delLoading === "sync" ? "Syncing…" : "Sync status"}
+                        </button>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-400">No DHL shipment created yet.</p>
+                      <button
+                        onClick={() => doCourierAction("dhl", "create")}
+                        disabled={delLoading === "create"}
+                        className="w-full text-sm bg-yellow-500 hover:bg-yellow-600 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                      >
+                        {delLoading === "create" ? "Creating shipment…" : "Create DHL Shipment"}
+                      </button>
+                    </div>
+                  )}
+
+                  {delMsg && (
+                    <p className={`text-xs mt-2 ${delMsg.includes("Failed") || delMsg.includes("failed") ? "text-red-500" : "text-green-600"}`}>
+                      {delMsg}
+                    </p>
+                  )}
                 </div>
-                {sr.courier_name && (
-                  <div>
-                    <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Courier</div>
-                    <div className="text-sm text-gray-800">{sr.courier_name}</div>
+              );
+            }
+
+            // ── DTDC panel (domestic) ─────────────────────────
+            const isDtdc = sr.courier_name?.toLowerCase().includes("dtdc");
+            if (isDtdc) {
+              return (
+                <div className="bg-white rounded-xl border border-gray-200 p-6">
+                  <h2 className="font-semibold text-gray-900 mb-4">DTDC Express</h2>
+
+                  {sr.awb_code ? (
+                    <div className="space-y-3">
+                      <div>
+                        <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Reference / AWB Code</div>
+                        <div className="font-mono text-sm font-semibold text-gray-900">{sr.awb_code}</div>
+                      </div>
+
+                      <div className="flex gap-2 flex-wrap">
+                        <a
+                          href={`https://www.dtdc.in/tracking.asp`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
+                        >
+                          Track Shipment ↗
+                        </a>
+                      </div>
+                    </div>
+                  ) : (
+                    <div className="space-y-3">
+                      <p className="text-sm text-gray-400">No DTDC shipment created or AWB not synced.</p>
+                    </div>
+                  )}
+                </div>
+              );
+            }
+
+            // ── Delhivery panel (domestic) ─────────────────────────
+            return (
+              <div className="bg-white rounded-xl border border-gray-200 p-6">
+                <h2 className="font-semibold text-gray-900 mb-4">Delhivery</h2>
+
+                {sr.awb_code ? (
+                  <div className="space-y-3">
+                    <div>
+                      <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Waybill / AWB Code</div>
+                      <div className="font-mono text-sm font-semibold text-gray-900">{sr.awb_code}</div>
+                    </div>
+                    {sr.courier_name && (
+                      <div>
+                        <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Courier</div>
+                        <div className="text-sm text-gray-800">{sr.courier_name}</div>
+                      </div>
+                    )}
+                    {sr.delhivery_package_id && (
+                      <div>
+                        <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Delhivery Package ID</div>
+                        <div className="text-sm text-gray-600">{sr.delhivery_package_id}</div>
+                      </div>
+                    )}
+
+                    <div className="flex gap-2 flex-wrap">
+                      {sr.awb_code && (
+                        <a
+                          href={`https://www.delhivery.com/tracking?id=${sr.awb_code}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
+                        >
+                          Track Shipment ↗
+                        </a>
+                      )}
+                      <button
+                        onClick={() => syncTracking("delhivery")}
+                        disabled={delLoading === "sync"}
+                        className="inline-flex items-center gap-1 text-xs bg-emerald-50 text-emerald-700 hover:bg-emerald-100 px-3 py-1.5 rounded-lg font-medium transition-colors disabled:opacity-50"
+                      >
+                        <span className={delLoading === "sync" ? "animate-spin inline-block" : ""}>↻</span>
+                        {delLoading === "sync" ? "Syncing…" : "Sync status"}
+                      </button>
+                    </div>
+                  </div>
+                ) : sr.delhivery_package_id ? (
+                  <div className="space-y-3">
+                    <div>
+                      <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Delhivery Package ID</div>
+                      <div className="text-sm text-gray-600">{sr.delhivery_package_id}</div>
+                    </div>
+                    <p className="text-xs text-yellow-600 bg-yellow-50 rounded-lg px-3 py-2">
+                      Shipment created — AWB not yet assigned
+                    </p>
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    <p className="text-sm text-gray-400">No shipment created yet.</p>
+                    <button
+                      onClick={() => doCourierAction("delhivery", "create")}
+                      disabled={delLoading === "create"}
+                      className="w-full text-sm bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                    >
+                      {delLoading === "create" ? "Creating shipment…" : "Create Shipment"}
+                    </button>
                   </div>
                 )}
-                {sr.delhivery_package_id && (
-                  <div>
-                    <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Delhivery Package ID</div>
-                    <div className="text-sm text-gray-600">{sr.delhivery_package_id}</div>
-                  </div>
-                )}
 
-                {/* Tracking link */}
-                {sr.awb_code && (
-                  <a
-                    href={`https://www.delhivery.com/tracking?id=${sr.awb_code}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-block text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
-                  >
-                    Track Shipment ↗
-                  </a>
+                {delMsg && (
+                  <p className={`text-xs mt-2 ${delMsg.includes("Failed") || delMsg.includes("failed") ? "text-red-500" : "text-green-600"}`}>
+                    {delMsg}
+                  </p>
                 )}
               </div>
-            ) : sr.delhivery_package_id ? (
-              /* Order created but no AWB yet (Delhivery usually assigns instantly though) */
-              <div className="space-y-3">
-                <div>
-                  <div className="text-xs text-gray-400 uppercase tracking-wide mb-0.5">Delhivery Package ID</div>
-                  <div className="text-sm text-gray-600">{sr.delhivery_package_id}</div>
-                </div>
-                <p className="text-xs text-yellow-600 bg-yellow-50 rounded-lg px-3 py-2">
-                  Shipment created — AWB not yet assigned
-                </p>
-              </div>
-            ) : (
-              /* No Delhivery order yet */
-              <div className="space-y-3">
-                <p className="text-sm text-gray-400">No shipment created yet.</p>
-                <button
-                  onClick={() => doDelhiveryAction("create")}
-                  disabled={delLoading === "create"}
-                  className="w-full text-sm bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
-                >
-                  {delLoading === "create" ? "Creating shipment…" : "Create Shipment"}
-                </button>
-              </div>
-            )}
-
-            {delMsg && (
-              <p className={`text-xs mt-2 ${delMsg.includes("Failed") || delMsg.includes("failed") ? "text-red-500" : "text-green-600"}`}>
-                {delMsg}
-              </p>
-            )}
-          </div>
+            );
+          })()}
 
           {/* Customer Info */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">

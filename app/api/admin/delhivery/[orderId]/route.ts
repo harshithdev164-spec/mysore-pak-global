@@ -21,21 +21,28 @@ export async function POST(
 
   const supabase = createAdminClient();
 
-  // Fetch the full order
+  // Fetch only the fields the create flow actually uses. Avoids referencing
+  // legacy/optional columns (tracking_url, label_url, invoice_url, etc.) that
+  // may not exist in every deployment.
   const { data: order, error: orderError } = await supabase
     .from("orders")
     .select(`
       id, order_number, customer_name, customer_email, customer_phone,
-      subtotal, shipping_cost, courier_id, payment_method,
-      delhivery_package_id, delhivery_waybill,
-      awb_code, courier_name, tracking_url, label_url, invoice_url,
+      subtotal, shipping_cost, payment_method,
       shipping_address, created_at,
       items:order_items(product_name, weight_label, quantity, unit_price)
     `)
     .eq("id", orderId)
     .single();
 
-  if (orderError || !order) {
+  if (orderError) {
+    console.error("[Delhivery admin] order lookup failed:", orderError);
+    return NextResponse.json(
+      { error: `Order lookup failed: ${orderError.message}` },
+      { status: 500 }
+    );
+  }
+  if (!order) {
     return NextResponse.json({ error: "Order not found" }, { status: 404 });
   }
 
@@ -82,13 +89,15 @@ export async function POST(
         payment_method: isCod ? "COD" : "Prepaid"
       });
 
+      // Persist only the universal fields. delhivery_package_id/delhivery_waybill
+      // are denormalized convenience columns from a separate migration that may
+      // not exist; we don't depend on them — awb_code carries the tracking number.
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
-      const update: Record<string, any> = {
-        delhivery_package_id: delResult.package_id,
-        delhivery_waybill: delResult.waybill,
-      };
-      if (delResult.waybill) update.awb_code = delResult.waybill;
-      update.courier_name = "Delhivery";
+      const update: Record<string, any> = { courier_name: "Delhivery" };
+      if (delResult.waybill) {
+        update.awb_code = delResult.waybill;
+        update.status = "pickup";
+      }
 
       await supabase.from("orders").update(update).eq("id", orderId);
 

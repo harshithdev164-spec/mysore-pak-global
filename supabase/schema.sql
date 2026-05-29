@@ -62,7 +62,7 @@ CREATE TABLE IF NOT EXISTS orders (
   customer_email   TEXT NOT NULL,
   customer_phone   TEXT NOT NULL,
   status           TEXT DEFAULT 'pending'
-                   CHECK (status IN ('pending','confirmed','processing','shipped','delivered','cancelled')),
+                   CHECK (status IN ('pending','confirmed','pickup','processing','shipped','delivered','cancelled')),
   subtotal         NUMERIC(10, 2) NOT NULL,
   shipping_cost    NUMERIC(10, 2) DEFAULT 0,
   discount         NUMERIC(10, 2) DEFAULT 0,
@@ -70,11 +70,18 @@ CREATE TABLE IF NOT EXISTS orders (
   payment_method   TEXT,
   payment_status   TEXT DEFAULT 'pending'
                    CHECK (payment_status IN ('pending','paid','failed','refunded')),
-  shipping_address JSONB NOT NULL,        -- { address, city, state, pincode }
+  shipping_address JSONB NOT NULL,        -- { address, address2?, city, state, postal_code | pincode, country (ISO-2, default 'IN') }
+  shipping_country TEXT DEFAULT 'IN',     -- denormalized for fast filtering (matches shipping_address.country)
+  -- DHL Express identifiers (international, parallel to delhivery_*)
+  dhl_shipment_id     TEXT,
+  dhl_tracking_number TEXT,
+  dhl_label_url       TEXT,
+  dhl_invoice_url     TEXT,
   notes            TEXT,
   created_at       TIMESTAMPTZ DEFAULT NOW(),
   updated_at       TIMESTAMPTZ DEFAULT NOW()
 );
+CREATE INDEX IF NOT EXISTS orders_shipping_country_idx ON orders (shipping_country);
 
 -- Auto-update updated_at
 CREATE OR REPLACE FUNCTION update_updated_at_column()
