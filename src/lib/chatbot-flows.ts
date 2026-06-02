@@ -156,6 +156,282 @@ export const FAQ_ENTRIES: FaqEntry[] = [
     answer:
       "Most of our sweets use gram flour (besan) and are naturally gluten-free. Check the ingredient list on each product page to confirm — some specialty items contain wheat-based ingredients.",
   },
+
+  // ─────────────────────────────────────────────
+  // Extended FAQ — shipping
+  // ─────────────────────────────────────────────
+  {
+    category: "shipping",
+    question: "Do you offer cash on delivery (COD)?",
+    answer:
+      "COD is available on most India domestic orders below ₹3,000. The option appears at checkout if your pincode is serviceable. Prepaid orders qualify for occasional discount codes — keep an eye on the homepage banner.",
+  },
+  {
+    category: "shipping",
+    question: "How do I track my order?",
+    answer:
+      "Reply with your order number (e.g. *0363* or *WMP-0363*) here and I'll send the live status, courier, and AWB tracking link. You'll also get an automatic WhatsApp update when the courier picks it up and when it's delivered.",
+  },
+  {
+    category: "shipping",
+    question: "My order is late — what now?",
+    answer:
+      "Sorry about that! Reply with your order number and I'll check the latest tracking. If the courier shows no movement for more than 48 hours, our team escalates immediately — usually resolves within a day.",
+  },
+  {
+    category: "shipping",
+    question: "What if no one is home for delivery?",
+    answer:
+      "The courier will attempt re-delivery up to 2 more times. You can also call them directly with the AWB number to reschedule. After 3 failed attempts, the package returns to us and we issue a refund (minus return shipping for COD orders).",
+  },
+  {
+    category: "shipping",
+    question: "Which courier do you use?",
+    answer:
+      "We use DTDC Express, Delhivery, and (for international) DHL Express. The courier is chosen automatically based on serviceability and cost. You'll see the courier name on your shipping confirmation message.",
+  },
+  {
+    category: "shipping",
+    question: "Do you deliver to my pincode?",
+    answer:
+      "We cover 25,000+ Indian pincodes. Add a product to cart, enter your pincode at checkout, and you'll see the live rate + estimated delivery date instantly. If your area isn't serviceable, the system tells you upfront.",
+  },
+  {
+    category: "shipping",
+    question: "Can I get same-day or next-day delivery in Mysuru?",
+    answer:
+      "Yes — local Mysuru orders placed before 2 PM are delivered the same day by hand-courier. Reply with your area name and we'll confirm.",
+  },
+
+  // ─────────────────────────────────────────────
+  // Extended FAQ — payment
+  // ─────────────────────────────────────────────
+  {
+    category: "payment",
+    question: "Are there any EMI options?",
+    answer:
+      "EMI is available on most credit cards through Razorpay at checkout — minimum order value typically ₹3,000. You'll see EMI options on the payment page if your card is eligible.",
+  },
+  {
+    category: "payment",
+    question: "My payment failed but money was deducted",
+    answer:
+      "If you don't see a confirmation within 30 minutes, the payment was likely refunded automatically by your bank within 5–7 business days. Forward us the bank SMS with the reference and we'll also confirm on Razorpay's end. Email: support@worldofmysorepak.com",
+  },
+  {
+    category: "payment",
+    question: "Do you accept international cards?",
+    answer:
+      "Yes — Visa, Mastercard, and Amex international cards work via Razorpay. We charge in INR and your card issuer applies the FX rate.",
+  },
+  {
+    category: "payment",
+    question: "How long do refunds take?",
+    answer:
+      "Refunds are initiated within 24–48 hours of approval. UPI: 1–2 days. Cards/Netbanking: 5–7 business days. COD refunds (rare): we transfer to your bank — share the IFSC/account.",
+  },
+
+  // ─────────────────────────────────────────────
+  // Extended FAQ — returns & cancellations
+  // ─────────────────────────────────────────────
+  {
+    category: "returns",
+    question: "What if my package arrives damaged?",
+    answer:
+      "Open it in front of the delivery person if possible. Take photos and message us here within 24 hours with the order number. We replace or refund free of cost — no questions, no return shipping.",
+  },
+  {
+    category: "returns",
+    question: "Item missing from my order",
+    answer:
+      "Send a photo of the unpacked order + the invoice within 24 hours of delivery. We'll dispatch the missing item the same day or refund its value, your choice.",
+  },
+  {
+    category: "returns",
+    question: "Can I exchange for a different product?",
+    answer:
+      "Because sweets are perishable, we can't take returns for exchange. If you ordered the wrong product by mistake, contact us within 1 hour of placing the order — we'll usually accommodate.",
+  },
+
+  // ─────────────────────────────────────────────
+  // Extended FAQ — products & ingredients
+  // ─────────────────────────────────────────────
+  {
+    category: "products",
+    question: "What ghee do you use?",
+    answer:
+      "We use pure cow ghee, sourced fresh from local Mysuru dairy farms. No artificial fats, no palm oil, no vanaspati. Ever.",
+  },
+  {
+    category: "products",
+    question: "Do you use refined sugar or jaggery?",
+    answer:
+      "Standard Mysore Pak uses cane sugar. We also offer *Jaggery Mysore Pak*, *Jaggery Millet Mysore Pak*, and *Anjeer Mysore Pak* (sweetened with figs) for jaggery/natural-sweetener lovers. Ask for any of these by name!",
+  },
+  {
+    category: "products",
+    question: "Are products organic?",
+    answer:
+      "Our Jaggery Millet Mysore Pak uses organic jaggery and organic millets. Other products use conventional but high-grade ingredients. We're working towards more organic SKUs.",
+  },
+  {
+    category: "products",
+    question: "Any nut-free options?",
+    answer:
+      "Yes — Traditional Mysore Pak, Mango Mysore Pak, Milk Mysore Pak, and Carrot Mysore Pak are all nut-free. Avoid Kaju, Badam, Pista, and Hazelnut variants if you have a nut allergy.",
+  },
+  {
+    category: "products",
+    question: "Are products dairy-free / vegan?",
+    answer:
+      "Most of our sweets contain ghee (clarified butter) or milk solids, so they aren't vegan. Some snacks (Chakkuli, Mixture, Khakhra) are dairy-free — check the ingredient list on each product page.",
+  },
+  {
+    category: "products",
+    question: "How should I store the sweets?",
+    answer:
+      "Airtight container, cool dry place, away from direct sunlight. Refrigeration is optional but extends shelf life to 30+ days. Bring to room temperature before eating for best texture.",
+  },
+  {
+    category: "products",
+    question: "Are products fresh — when were they made?",
+    answer:
+      "Everything is made fresh in small batches in our Mysuru kitchen — typically within 48 hours of dispatch. Manufacturing and best-before dates are printed on every pack.",
+  },
+  {
+    category: "products",
+    question: "Do you have allergen labelling?",
+    answer:
+      "Every product page lists ingredients clearly. Common allergens (nuts, dairy, wheat) are flagged. If you have a specific allergy, message us with the product name and we'll confirm.",
+  },
+
+  // ─────────────────────────────────────────────
+  // Extended FAQ — ordering
+  // ─────────────────────────────────────────────
+  {
+    category: "ordering",
+    question: "Is there a minimum order?",
+    answer:
+      "No minimum. Order a single 100g pack if you like. Free shipping kicks in above ₹1,500 on Indian orders.",
+  },
+  {
+    category: "ordering",
+    question: "How do I place an order?",
+    answer:
+      "Browse https://www.worldofmysorepak.com/shop, add to cart, checkout. Or tell me which product you want here on WhatsApp (e.g. \"I want 500g Kaju Mysore Pak\") and I'll send you a direct link.",
+  },
+  {
+    category: "ordering",
+    question: "Can I add a gift message?",
+    answer:
+      "Yes — there's a *Gift message* field at checkout. Up to 200 characters; we print it on a small card tucked inside the box. Free.",
+  },
+  {
+    category: "ordering",
+    question: "Do you offer gift wrapping?",
+    answer:
+      "All our boxes are already gift-quality — gold wrap, ribbon, brand seal. For festival hampers and corporate gifting (10+ boxes), we have premium packaging options. Reply *bulk* or *corporate* for details.",
+  },
+  {
+    category: "ordering",
+    question: "Can I order without creating an account?",
+    answer:
+      "Yes — guest checkout is supported. You can still track via order number on WhatsApp or the website.",
+  },
+  {
+    category: "ordering",
+    question: "How do I add a delivery instruction?",
+    answer:
+      "On the checkout page there's a *Order notes* field — landmark, gate code, preferred time, anything. The courier and our team both see this.",
+  },
+
+  // ─────────────────────────────────────────────
+  // Extended FAQ — gifting & corporate
+  // ─────────────────────────────────────────────
+  {
+    category: "gifting",
+    question: "Do you do bulk or corporate gifting?",
+    answer:
+      "Yes! Corporate festival hampers, employee gifting, wedding favours — minimum 10 boxes. Custom branding, custom message cards, bulk pricing. Email corporate@worldofmysorepak.com or message here with quantity and date, we'll send a quote within 24 hours.",
+  },
+  {
+    category: "gifting",
+    question: "Can you ship to multiple addresses?",
+    answer:
+      "For bulk gifting yes — we accept an Excel sheet with names + addresses + custom messages. Each recipient gets a personalised pack. For regular orders, please place separate orders per address.",
+  },
+  {
+    category: "gifting",
+    question: "What's good for Diwali / festival gifting?",
+    answer:
+      "Top sellers: *Mix Mysore Pak*, *Fruit & Nut Milk Chocolate*, *Chocolate Bites*, *Roasted Almond Mysore Pak*. We also do festival hampers — message *hamper* or check https://www.worldofmysorepak.com/shop?category=gift-boxes",
+  },
+
+  // ─────────────────────────────────────────────
+  // Extended FAQ — brand & store
+  // ─────────────────────────────────────────────
+  {
+    category: "brand",
+    question: "Where are you based?",
+    answer:
+      "Mysuru, Karnataka — the birthplace of Mysore Pak. Our kitchen is in Nazarbad Mohalla, near Chamundi Hills. Pickup is available on request.",
+  },
+  {
+    category: "brand",
+    question: "Do you have a physical store?",
+    answer:
+      "Yes — visit us at 138/B 52-D, 49-D block, JC Layout, Chamundi Betta Road, Nazarbad Mohalla, Mysuru 570011. Open Mon–Sat 9 AM–7 PM. Free tastings!",
+  },
+  {
+    category: "brand",
+    question: "What's the story behind World of Mysore Pak?",
+    answer:
+      "Mysore Pak was invented in the royal kitchen of Mysuru over a century ago. We've preserved the original recipe — pure cow ghee, gram flour, sugar — and added modern variants (chocolate, jaggery, millet, fruit). Read more: https://www.worldofmysorepak.com/our-story",
+  },
+  {
+    category: "brand",
+    question: "Are you FSSAI certified?",
+    answer:
+      "Yes — FSSAI registered and audited. Our license number is printed on every pack. Hygiene-first kitchen, regular quality checks.",
+  },
+
+  // ─────────────────────────────────────────────
+  // Extended FAQ — contact & hours
+  // ─────────────────────────────────────────────
+  {
+    category: "contact",
+    question: "What are your working hours?",
+    answer:
+      "Customer support: Mon–Sat, 9 AM – 7 PM IST. WhatsApp messages (this chat) are answered within 1 hour during working hours, otherwise next morning. Online orders are accepted 24/7.",
+  },
+  {
+    category: "contact",
+    question: "How do I contact a human?",
+    answer:
+      "Reply with anything I can't answer and I'll connect you to our team. Or call +91 63648 95255 / 95254 during working hours, or email support@worldofmysorepak.com.",
+  },
+  {
+    category: "contact",
+    question: "Where can I follow you on social media?",
+    answer:
+      "Instagram: @worldofmysorepak, Facebook: /worldofmysorepak. Daily product reels, behind-the-scenes from our Mysuru kitchen, festival drops.",
+  },
+
+  // ─────────────────────────────────────────────
+  // Extended FAQ — quality & manufacturing
+  // ─────────────────────────────────────────────
+  {
+    category: "quality",
+    question: "How is the quality so consistent?",
+    answer:
+      "Small-batch production, the same master sweet-maker oversees every batch, ingredient ratios are weighed (not eyeballed), and every batch is taste-checked before packing. If anything ever feels off, we replace it — no questions.",
+  },
+  {
+    category: "quality",
+    question: "How do you maintain freshness during shipping?",
+    answer:
+      "Vacuum-sealed inner pouch + cushioned outer box + same-day-of-dispatch courier pickup. Sweets reach you within 2–5 days of being made. The vacuum seal locks in flavour.",
+  },
 ];
 
 export function getFaqsForCategory(categoryId: string): FaqEntry[] {

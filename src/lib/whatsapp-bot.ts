@@ -20,6 +20,13 @@ import {
   setWaSession,
   clearWaSession,
 } from "@/lib/whatsapp";
+import {
+  matchProducts,
+  extractWeight,
+  looksLikeOrderIntent,
+} from "@/lib/whatsapp-products";
+
+const SITE = "https://www.worldofmysorepak.com";
 
 const STATUS_LABEL: Record<string, string> = {
   pending: "⏳ Pending — awaiting payment confirmation",
@@ -153,11 +160,58 @@ async function replyGreeting(from: string): Promise<void> {
     from,
     `Namaste! 🙏 You've reached *World of Mysore Pak*. How can I help?`,
     [
+      { id: "shop", title: "Shop sweets" },
       { id: "track_order", title: "Track an order" },
-      { id: "faq", title: "Common questions" },
       { id: "human", title: "Talk to human" },
     ]
   );
+}
+
+// Reply with up to 3 matched products + their direct links.
+async function replyProductMatches(
+  from: string,
+  userText: string
+): Promise<boolean> {
+  const matches = await matchProducts(userText, 3);
+  if (matches.length === 0) return false;
+
+  const weight = extractWeight(userText);
+  const lines: string[] = [];
+  if (matches.length === 1) {
+    const p = matches[0].product;
+    const weightLine = weight
+      ? `Weight requested: *${weight}* — pick it on the product page.`
+      : "Pick your weight and check out:";
+    lines.push(`Found it! ✨`);
+    lines.push("");
+    lines.push(`*${p.name}*`);
+    if (p.weights?.length) {
+      lines.push(
+        p.weights
+          .map((w) => `• ${w.label} — ₹${Math.round(Number(w.price))}`)
+          .join("\n")
+      );
+    }
+    lines.push("");
+    lines.push(weightLine);
+    lines.push(`${SITE}/products/${p.slug}`);
+  } else {
+    lines.push(`Here's what I found that matches *"${userText.slice(0, 60)}"*:`);
+    lines.push("");
+    for (const m of matches) {
+      const cheapest = m.product.weights?.[0]
+        ? Math.min(...m.product.weights.map((w) => Number(w.price)))
+        : null;
+      lines.push(
+        `🍬 *${m.product.name}*${cheapest ? `  (from ₹${Math.round(cheapest)})` : ""}`
+      );
+      lines.push(`${SITE}/products/${m.product.slug}`);
+      lines.push("");
+    }
+    lines.push(`Not what you wanted? Browse everything: ${SITE}/shop`);
+  }
+  await sendWhatsAppText(from, lines.join("\n"));
+  return true;
 }
 
 // ──────────────────────────────────────────────
@@ -181,6 +235,14 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
       await sendWhatsAppText(
         from,
         "Sure — please reply with your order number (e.g. *0363* or *WMP-0363*)."
+      );
+      return;
+    }
+    if (buttonId === "shop") {
+      await setWaSession(from, "await_product_name");
+      await sendWhatsAppText(
+        from,
+        `Browse our full range: ${SITE}/shop\n\nOr tell me what you're craving — e.g. *Kaju Mysore Pak*, *Chocolate Bites*, *Anjeer Mysore Pak* — and I'll send a direct link. 🍬`
       );
       return;
     }
@@ -222,6 +284,18 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
     );
     return;
   }
+  if (session?.intent === "await_product_name") {
+    const matched = await replyProductMatches(from, t);
+    if (matched) {
+      await clearWaSession(from);
+      return;
+    }
+    await sendWhatsAppText(
+      from,
+      `Hmm, I couldn't find that. Try a different name — e.g. *Mysore Pak*, *Chocolate Bites*, *Kaju Barfi*, *Chakkuli*. Or browse: ${SITE}/shop`
+    );
+    return;
+  }
 
   // Escape hatch from any session
   if (/^(menu|back|cancel|restart)$/i.test(t)) {
@@ -243,13 +317,41 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
     return;
   }
 
-  // 2) FAQ keyword match
+  // "shop" / "menu" / "products" / "catalog" → shop link
+  if (/^(shop|menu|products?|catalog|catalogue|what do you sell|what do you have)\b/i.test(t)) {
+    await sendWhatsAppText(
+      from,
+      `Browse our full range: ${SITE}/shop\n\nOr tell me what you're craving and I'll send a direct link.`
+    );
+    return;
+  }
+
+  // 2) Order intent → product matcher (e.g. "I want kaju mysore pak", "send me 500g chocolate bites")
+  if (looksLikeOrderIntent(t)) {
+    const matched = await replyProductMatches(from, t);
+    if (matched) return;
+    // Intent detected but product not found — guide them
+    await sendWhatsAppText(
+      from,
+      `I couldn't pin that down. Try the product name (e.g. *Mysore Pak*, *Kaju Barfi*, *Chocolate Bites*) — or browse: ${SITE}/shop`
+    );
+    return;
+  }
+
+  // 3) FAQ keyword match
   const faq = matchFaq(t);
   if (faq) {
     await replyFaq(from, faq);
     return;
   }
 
-  // 3) Human handoff
+  // 4) Last resort — try product match without intent verb (e.g. user just says "kaju mysore pak")
+  const products = await matchProducts(t, 3);
+  if (products.length > 0 && products[0].score >= 3) {
+    await replyProductMatches(from, t);
+    return;
+  }
+
+  // 5) Human handoff
   await handoffToHuman(from, t);
 }
