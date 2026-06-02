@@ -12,3 +12,13 @@ Allow: /
 
 User-agent: *
 Allow: /
+Disallow: /admin/
+Disallow: /api/
+Disallow: /checkout
+Disallow: /cart
+Disallow: /profile
+Disallow: /sign-in
+Disallow: /sign-up
+Disallow: /order-confirmation
+
+Sitemap: https://www.worldofmysorepak.com/sitemap.xml

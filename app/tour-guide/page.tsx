@@ -195,7 +195,7 @@ export default function WanderlogStyleTourGuide() {
           >
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img
-              src="https://images.unsplash.com/photo-1588610376409-770857b64903?q=80&w=1470&auto=format&fit=crop"
+              src="/womp tour guide hero.png"
               className="w-full h-full object-cover"
               alt="Mysuru"
             />
