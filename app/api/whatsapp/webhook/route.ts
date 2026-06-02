@@ -1,6 +1,6 @@
 export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
-import { verifyWebhookSignature } from "@/lib/whatsapp";
+import { verifyWebhookSignature, logWhatsAppMessage } from "@/lib/whatsapp";
 import { routeIncomingMessage } from "@/lib/whatsapp-bot";
 
 // ──────────────────────────────────────────────
@@ -93,6 +93,10 @@ export async function POST(request: Request) {
 
           // Text message
           if (m.type === "text" && m.text?.body) {
+            await logWhatsAppMessage({
+              wa_id: m.from, direction: "inbound", msg_type: "text",
+              body: m.text.body, meta_msg_id: m.id, raw: m,
+            });
             await routeIncomingMessage({ from: m.from, text: m.text.body });
             continue;
           }
@@ -103,6 +107,11 @@ export async function POST(request: Request) {
             const list = m.interactive?.list_reply;
             const reply = btn ?? list;
             if (reply?.id) {
+              await logWhatsAppMessage({
+                wa_id: m.from, direction: "inbound", msg_type: "interactive",
+                body: `[button:${reply.id}] ${reply.title ?? ""}`,
+                meta_msg_id: m.id, raw: m,
+              });
               await routeIncomingMessage({
                 from: m.from,
                 text: reply.title ?? "",
@@ -113,6 +122,10 @@ export async function POST(request: Request) {
           }
 
           // Anything else (image, location, etc.) → handoff
+          await logWhatsAppMessage({
+            wa_id: m.from, direction: "inbound", msg_type: m.type ?? "unknown",
+            body: `(non-text: ${m.type})`, meta_msg_id: m.id, raw: m,
+          });
           await routeIncomingMessage({
             from: m.from,
             text: `(non-text message: ${m.type})`,

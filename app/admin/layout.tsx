@@ -12,6 +12,7 @@ const navItems = [
   { href: "/admin/products/bulk-upload", label: "Bulk Upload", icon: "⇪", exact: true },
   { href: "/admin/categories", label: "Categories", icon: "◉", exact: false },
   { href: "/admin/explore", label: "Manage Discovery", icon: "🗺", exact: false },
+  { href: "/admin/whatsapp", label: "WhatsApp", icon: "💬", exact: false },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {

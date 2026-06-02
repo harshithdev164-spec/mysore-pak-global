@@ -16,6 +16,9 @@ import {
   sendWhatsAppText,
   sendWhatsAppButtons,
   normalizeWhatsAppNumber,
+  getWaSession,
+  setWaSession,
+  clearWaSession,
 } from "@/lib/whatsapp";
 
 const STATUS_LABEL: Record<string, string> = {
@@ -171,13 +174,18 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
   const { from, text, buttonId } = msg;
   const t = (text ?? "").trim();
 
-  // Button replies — explicit intents
+  // Button replies — explicit intents (always reset session)
   if (buttonId) {
     if (buttonId === "track_order") {
-      await sendWhatsAppText(from, "Please reply with your order number (e.g. *#0363* or *WMP-0363*).");
+      await setWaSession(from, "await_order_number");
+      await sendWhatsAppText(
+        from,
+        "Sure — please reply with your order number (e.g. *0363* or *WMP-0363*)."
+      );
       return;
     }
     if (buttonId === "faq") {
+      await clearWaSession(from);
       await sendWhatsAppText(
         from,
         "Ask anything: delivery time, ingredients, shipping, returns, payment. I'll do my best!"
@@ -185,6 +193,7 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
       return;
     }
     if (buttonId === "human") {
+      await clearWaSession(from);
       await handoffToHuman(from, "(button: talk to human)");
       return;
     }
@@ -192,11 +201,36 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
 
   // Empty / unknown payload
   if (!t) {
+    await clearWaSession(from);
     await replyGreeting(from);
     return;
   }
 
-  // 1) Order-number → status
+  // ── Multi-turn: handle awaited prompts before keyword routing ──
+  const session = await getWaSession(from);
+  if (session?.intent === "await_order_number") {
+    const num = extractOrderNumber(t);
+    if (num) {
+      await clearWaSession(from);
+      await replyOrderStatus(from, num);
+      return;
+    }
+    // Still didn't get a valid number — gentle re-prompt, keep session open
+    await sendWhatsAppText(
+      from,
+      `That doesn't look like an order number. It's a 4-digit number from your confirmation email or SMS, e.g. *0363*. Or type *menu* to start over.`
+    );
+    return;
+  }
+
+  // Escape hatch from any session
+  if (/^(menu|back|cancel|restart)$/i.test(t)) {
+    await clearWaSession(from);
+    await replyGreeting(from);
+    return;
+  }
+
+  // 1) Order-number → status (stateless shortcut)
   const orderNum = extractOrderNumber(t);
   if (orderNum) {
     await replyOrderStatus(from, orderNum);
