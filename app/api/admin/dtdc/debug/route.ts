@@ -33,6 +33,14 @@ export async function GET(request: Request) {
     DTDC_BASE_RATE_INR: process.env.DTDC_BASE_RATE_INR ?? "80",
     DTDC_PER_KG_INR: process.env.DTDC_PER_KG_INR ?? "40",
     DTDC_ETD_DAYS: process.env.DTDC_ETD_DAYS ?? "3-5",
+    // Pickup (origin) config — DTDC-specific
+    DTDC_PICKUP_NAME: process.env.DTDC_PICKUP_NAME ?? "MISSING",
+    DTDC_PICKUP_PHONE: process.env.DTDC_PICKUP_PHONE ?? "MISSING",
+    DTDC_PICKUP_ADDRESS_LINE1: process.env.DTDC_PICKUP_ADDRESS_LINE1 ?? "MISSING",
+    DTDC_PICKUP_ADDRESS_LINE2: process.env.DTDC_PICKUP_ADDRESS_LINE2 ?? "",
+    DTDC_PICKUP_PINCODE: process.env.DTDC_PICKUP_PINCODE ?? "MISSING",
+    DTDC_PICKUP_CITY: process.env.DTDC_PICKUP_CITY ?? "MISSING",
+    DTDC_PICKUP_STATE: process.env.DTDC_PICKUP_STATE ?? "MISSING",
     configured: isDtdcConfigured(),
   };
 

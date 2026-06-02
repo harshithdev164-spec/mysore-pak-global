@@ -107,7 +107,7 @@ export default function AdminOrderDetailPage() {
     }
   }
 
-  async function doCourierAction(courier: "delhivery" | "dhl", action: string) {
+  async function doCourierAction(courier: "delhivery" | "dhl" | "dtdc", action: string) {
     if (!order) return;
     setDelLoading(action);
     setDelMsg("");
@@ -127,6 +127,12 @@ export default function AdminOrderDetailPage() {
             delhivery_waybill: json.data.waybill ?? prev.delhivery_waybill,
             awb_code: json.data.waybill ?? prev.awb_code,
             courier_name: "Delhivery",
+          }));
+        } else if (courier === "dtdc") {
+          setDelData((prev) => ({
+            ...prev,
+            awb_code: json.data.reference_number ?? json.data.waybill ?? prev.awb_code,
+            courier_name: "DTDC Express",
           }));
         } else {
           setDelData((prev) => ({
@@ -426,7 +432,11 @@ export default function AdminOrderDetailPage() {
             }
 
             // ── DTDC panel (domestic) ─────────────────────────
-            const isDtdc = sr.courier_name?.toLowerCase().includes("dtdc");
+            // Route to DTDC if the courier was already created as DTDC, OR
+            // if the customer selected DTDC at checkout (courier_id === 200).
+            const isDtdc =
+              sr.courier_name?.toLowerCase().includes("dtdc") ||
+              (sr as { courier_id?: number }).courier_id === 200;
             if (isDtdc) {
               return (
                 <div className="bg-white rounded-xl border border-gray-200 p-6">
@@ -441,19 +451,40 @@ export default function AdminOrderDetailPage() {
 
                       <div className="flex gap-2 flex-wrap">
                         <a
-                          href={`https://www.dtdc.in/tracking.asp`}
+                          href={`https://trackcourier.io/track-and-trace/dtdc/${sr.awb_code}`}
                           target="_blank"
                           rel="noopener noreferrer"
                           className="inline-block text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
                         >
                           Track Shipment ↗
                         </a>
+                        <a
+                          href={`/api/admin/dtdc/${order.id}/label`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          className="inline-block text-xs bg-blue-50 text-blue-700 hover:bg-blue-100 px-3 py-1.5 rounded-lg font-medium transition-colors"
+                        >
+                          Label PDF ↓
+                        </a>
                       </div>
                     </div>
                   ) : (
                     <div className="space-y-3">
-                      <p className="text-sm text-gray-400">No DTDC shipment created or AWB not synced.</p>
+                      <p className="text-sm text-gray-400">No DTDC shipment created yet.</p>
+                      <button
+                        onClick={() => doCourierAction("dtdc", "create")}
+                        disabled={delLoading === "create"}
+                        className="w-full text-sm bg-amber-600 hover:bg-amber-700 text-white px-4 py-2 rounded-lg font-medium transition-colors disabled:opacity-50"
+                      >
+                        {delLoading === "create" ? "Creating shipment…" : "Create DTDC Shipment"}
+                      </button>
                     </div>
+                  )}
+
+                  {delMsg && (
+                    <p className={`text-xs mt-2 ${delMsg.includes("Failed") || delMsg.includes("failed") ? "text-red-500" : "text-green-600"}`}>
+                      {delMsg}
+                    </p>
                   )}
                 </div>
               );

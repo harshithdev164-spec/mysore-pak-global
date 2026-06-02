@@ -1,23 +1,29 @@
 /**
- * DTDC India domestic shipping client.
+ * DTDC India domestic shipping client. Matches the official customer
+ * integration Postman collection.
  *
- * Auth model (from DTDC's standard customer integration docs):
- *   - Booking / label / cancel: `api-key` header (env: DTDC_API_KEY)
- *   - Tracking: `x-access-token` header (env: DTDC_X_ACCESS_TOKEN)
- *   - Account identity: `customer_code` in body (env: DTDC_CUSTOMER_CODE)
+ * Hosts:
+ *   Booking / label / cancel    Test: alphademodashboardapi.shipsy.io
+ *                               Live: pxapi.dtdc.in
+ *   Tracking (different stack)  Test: dtdcstagingapi.dtdc.com
+ *                               Live: blktracksvc.dtdc.com
  *
- * NOTE: The exact JSON field names / endpoint paths below are based on DTDC's
- * standard customer integration API. Verify against the actual docs at:
- *   https://drive.google.com/file/d/1jhNe7esBoiWDxrtogwGp6teTdUA7dDsG  (booking)
- *   https://drive.google.com/file/d/1b6hywYQ7K9-IjOBsocq3eojhSUhF_AmB  (tracking)
- *   https://drive.google.com/file/d/1OHeNRDmNSxxMVBygwzcdIWleXHRBBV-Y  (label)
+ * Auth headers:
+ *   `api-key`        — booking, label, cancel
+ *   `x-access-token` — tracking
  *
- * If real DTDC responses differ, use /api/admin/dtdc/debug to surface the raw
- * exchange and adjust the field names here.
+ * Account identity: `customer_code` (booking) / `customerCode` (cancel) in body.
  */
 
+// Booking/label/cancel base. Default to staging.
 const BASE_URL =
-  process.env.DTDC_API_BASE_URL ?? "https://apis.dtdc.in/dtdc-api/api/customer/integration";
+  process.env.DTDC_API_BASE_URL ??
+  "https://alphademodashboardapi.shipsy.io/api/customer/integration";
+
+// Tracking lives on a different host. Default to staging.
+const TRACKING_BASE_URL =
+  process.env.DTDC_TRACKING_BASE_URL ??
+  "https://dtdcstagingapi.dtdc.com/dtdc-tracking-api/dtdc-api";
 
 function apiKey(): string { return process.env.DTDC_API_KEY ?? ""; }
 function accessToken(): string { return process.env.DTDC_X_ACCESS_TOKEN ?? ""; }
@@ -25,9 +31,38 @@ function customerCode(): string { return process.env.DTDC_CUSTOMER_CODE ?? ""; }
 function serviceTypeId(): string {
   return process.env.DTDC_SERVICE_TYPE_ID ?? "GROUND EXPRESS";
 }
+// commodity_id maps to DTDC's commodity master sheet; numeric string per account.
+// Default "Other" works for many accounts; override with the correct numeric id
+// from your DTDC commodity master if booking is rejected.
+function commodityId(): string {
+  return process.env.DTDC_COMMODITY_ID ?? "Other";
+}
 
 export function isDtdcConfigured(): boolean {
   return Boolean(apiKey()) && Boolean(customerCode());
+}
+
+// DTDC expects 10-digit Indian mobile (no '+', no country code, no spaces).
+// Strip non-digits, drop leading 91/0, then truncate/pad checks.
+function normalizeIndianPhone(raw: string): string {
+  const digits = String(raw ?? "").replace(/\D/g, "");
+  let p = digits;
+  if (p.length === 12 && p.startsWith("91")) p = p.slice(2);
+  else if (p.length === 11 && p.startsWith("0")) p = p.slice(1);
+  return p;
+}
+
+// Catch obvious placeholder values left over from .env.example so the
+// admin sees a clear error instead of a silent DTDC rejection.
+function looksLikePlaceholder(v: string): boolean {
+  const s = String(v ?? "").trim().toLowerCase();
+  if (!s) return true;
+  return (
+    s.includes("your address") ||
+    s.includes("your name") ||
+    s.includes("placeholder") ||
+    /^\+?9?1?0{6,}$/.test(s.replace(/\D/g, ""))
+  );
 }
 
 // ──────────────────────────────────────────────
@@ -106,6 +141,46 @@ export async function createDtdcOrder(
     throw new Error("DTDC credentials not set (DTDC_API_KEY + DTDC_CUSTOMER_CODE)");
   }
 
+  // ── Pickup (origin) config — DTDC-specific env vars only.
+  // Fails loudly on placeholders since DTDC silently rejects bookings
+  // with garbage origin data. ──
+  const pickupName    = process.env.DTDC_PICKUP_NAME ?? "";
+  const pickupPhone   = normalizeIndianPhone(process.env.DTDC_PICKUP_PHONE ?? "");
+  const pickupAddress = process.env.DTDC_PICKUP_ADDRESS_LINE1 ?? "";
+  const pickupAddress2 = process.env.DTDC_PICKUP_ADDRESS_LINE2 ?? "";
+  const pickupPincode = process.env.DTDC_PICKUP_PINCODE ?? "";
+  const pickupCity    = process.env.DTDC_PICKUP_CITY ?? "";
+  const pickupState   = process.env.DTDC_PICKUP_STATE ?? "";
+
+  if (!pickupName.trim()) {
+    throw new Error("DTDC pickup name missing. Set DTDC_PICKUP_NAME in .env.local.");
+  }
+  if (looksLikePlaceholder(pickupAddress)) {
+    throw new Error(
+      "DTDC pickup address is missing or placeholder. Set DTDC_PICKUP_ADDRESS_LINE1 to your real warehouse address."
+    );
+  }
+  if (pickupPhone.length !== 10) {
+    throw new Error(
+      `DTDC pickup phone is invalid (got "${process.env.DTDC_PICKUP_PHONE}"). Set DTDC_PICKUP_PHONE to a 10-digit Indian mobile.`
+    );
+  }
+  if (!/^\d{6}$/.test(pickupPincode)) {
+    throw new Error("DTDC pickup pincode invalid. Set DTDC_PICKUP_PINCODE to a 6-digit value.");
+  }
+  if (!pickupCity.trim() || !pickupState.trim()) {
+    throw new Error("DTDC pickup city/state missing. Set DTDC_PICKUP_CITY and DTDC_PICKUP_STATE.");
+  }
+
+  // ── Destination validation ──
+  const destPhone = normalizeIndianPhone(p.customer_phone);
+  if (destPhone.length !== 10) {
+    throw new Error(`Customer phone invalid for DTDC (got "${p.customer_phone}"). Must be 10 digits.`);
+  }
+  if (!/^\d{6}$/.test(p.pincode)) {
+    throw new Error(`Destination pincode "${p.pincode}" is not a 6-digit Indian pincode.`);
+  }
+
   const wKg = Math.max(0.5, p.weight_kg);
   const totalAmount = (p.subtotal + p.shipping_charges).toFixed(2);
   const productsDesc = p.items
@@ -130,18 +205,18 @@ export async function createDtdcOrder(
         declared_value: String(Math.round(p.subtotal)),
         num_pieces: "1",
         origin_details: {
-          name: process.env.DHL_PICKUP_NAME ?? "World of Mysore Pak",
-          phone: process.env.DHL_PICKUP_PHONE ?? "",
+          name: pickupName,
+          phone: pickupPhone,
           alternate_phone: "",
-          address_line_1: process.env.DHL_PICKUP_ADDRESS_LINE1 ?? "",
-          address_line_2: "",
-          pincode: process.env.DELHIVERY_PICKUP_PINCODE ?? "570011",
-          city: process.env.DHL_PICKUP_CITY ?? "Mysuru",
-          state: process.env.DHL_PICKUP_STATE_NAME ?? "Karnataka",
+          address_line_1: pickupAddress,
+          address_line_2: pickupAddress2,
+          pincode: pickupPincode,
+          city: pickupCity,
+          state: pickupState,
         },
         destination_details: {
           name: p.customer_name,
-          phone: p.customer_phone,
+          phone: destPhone,
           alternate_phone: "",
           address_line_1: p.address,
           address_line_2: "",
@@ -150,11 +225,11 @@ export async function createDtdcOrder(
           state: p.state,
         },
         customer_reference_number: p.order_number,
-        cod_collection_mode: isCod ? "Cash" : "",
+        cod_collection_mode: isCod ? "cash" : "",
         cod_amount: isCod ? totalAmount : "",
-        commodity_id: "Other",
+        commodity_id: commodityId(),
         description: productsDesc,
-        return_details: undefined,
+        reference_number: "",
       },
     ],
   };
@@ -211,7 +286,7 @@ export async function createDtdcOrder(
 }
 
 // ──────────────────────────────────────────────
-// 2) Tracking — POST /tracking/getRoutingDetails (or similar)
+// 2) Tracking — POST {TRACKING_BASE}/rest/JSONCnTrk/getTrackDetails
 // ──────────────────────────────────────────────
 
 export interface DtdcTrackingResult {
@@ -222,7 +297,7 @@ export interface DtdcTrackingResult {
 export async function getDtdcTracking(
   reference_number: string
 ): Promise<DtdcTrackingResult | null> {
-  if (!accessToken() && !isDtdcConfigured()) return null;
+  if (!accessToken()) return null;
 
   const body = {
     trkType: "cnno",
@@ -232,7 +307,7 @@ export async function getDtdcTracking(
 
   try {
     const res = await fetch(
-      `${BASE_URL.replace("/customer/integration", "")}/tracking/api/v1/track-by-cnno`,
+      `${TRACKING_BASE_URL}/rest/JSONCnTrk/getTrackDetails`,
       {
         method: "POST",
         headers: {
@@ -266,4 +341,63 @@ export async function getDtdcTracking(
     console.error("[dtdc] tracking threw:", err);
     return null;
   }
+}
+
+// ──────────────────────────────────────────────
+// 3) Cancellation — POST /consignment/cancel
+// ──────────────────────────────────────────────
+
+export async function cancelDtdcConsignment(
+  reference_number: string
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+): Promise<{ ok: boolean; status: number; body: any }> {
+  if (!isDtdcConfigured()) {
+    throw new Error("DTDC credentials not set (DTDC_API_KEY + DTDC_CUSTOMER_CODE)");
+  }
+  const body = { AWBNo: [reference_number], customerCode: customerCode() };
+
+  const res = await fetch(`${BASE_URL}/consignment/cancel`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "api-key": apiKey(),
+    },
+    body: JSON.stringify(body),
+  });
+  const text = await res.text();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  let parsed: any = null;
+  try { parsed = JSON.parse(text); } catch { /* non-JSON */ }
+  lastExchange = { request: body, status: res.status, response: text, parsed };
+  return { ok: res.ok, status: res.status, body: parsed ?? text };
+}
+
+// ──────────────────────────────────────────────
+// 4) Shipping label — GET /consignment/shippinglabel/stream (returns PDF)
+// ──────────────────────────────────────────────
+
+export async function getDtdcShippingLabel(
+  reference_number: string,
+  opts: { label_code?: string; label_format?: "pdf" | "html" } = {}
+): Promise<{ ok: boolean; status: number; pdf?: Buffer; error?: string }> {
+  if (!isDtdcConfigured()) {
+    throw new Error("DTDC credentials not set (DTDC_API_KEY + DTDC_CUSTOMER_CODE)");
+  }
+  const url = new URL(`${BASE_URL}/consignment/shippinglabel/stream`);
+  url.searchParams.set("reference_number", reference_number);
+  url.searchParams.set("label_code", opts.label_code ?? "SHIP_LABEL_4X6");
+  url.searchParams.set("label_format", opts.label_format ?? "pdf");
+
+  const res = await fetch(url.toString(), {
+    method: "GET",
+    headers: {
+      "Content-Type": "application/json",
+      "api-key": apiKey(),
+    },
+  });
+  if (!res.ok) {
+    return { ok: false, status: res.status, error: (await res.text()).slice(0, 600) };
+  }
+  const buf = Buffer.from(await res.arrayBuffer());
+  return { ok: true, status: res.status, pdf: buf };
 }
