@@ -5,6 +5,7 @@ import {
   createDelhiveryOrder,
   parseWeightKg,
 } from "@/lib/delhivery";
+import { sendOrderShippedTemplate, trackingUrlFor } from "@/lib/whatsapp-templates";
 
 // POST /api/admin/delhivery/[orderId]?action=create
 export async function POST(
@@ -100,6 +101,17 @@ export async function POST(
       }
 
       await supabase.from("orders").update(update).eq("id", orderId);
+
+      if (delResult.waybill && order.customer_phone) {
+        await sendOrderShippedTemplate({
+          to: order.customer_phone,
+          customer_name: (order.customer_name ?? "").split(" ")[0] || "there",
+          order_number: order.order_number,
+          courier: "Delhivery",
+          awb: delResult.waybill,
+          tracking_url: trackingUrlFor("Delhivery", delResult.waybill),
+        });
+      }
 
       return NextResponse.json({ success: true, data: delResult });
     }

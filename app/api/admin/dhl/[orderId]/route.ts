@@ -4,6 +4,7 @@ import { createAdminClient } from "@/lib/supabase";
 import { createDhlShipment, isDhlConfigured } from "@/lib/dhl";
 import { parseWeightKg } from "@/lib/delhivery";
 import { HS_CODE_SWEETS } from "@/lib/countries";
+import { sendOrderShippedTemplate, trackingUrlFor } from "@/lib/whatsapp-templates";
 
 // POST /api/admin/dhl/[orderId]?action=create
 // Manually create or recreate the DHL Express shipment for an order.
@@ -99,6 +100,17 @@ export async function POST(
       }
 
       await supabase.from("orders").update(update).eq("id", orderId);
+
+      if (dhlResult.tracking_number && order.customer_phone) {
+        await sendOrderShippedTemplate({
+          to: order.customer_phone,
+          customer_name: (order.customer_name ?? "").split(" ")[0] || "there",
+          order_number: order.order_number,
+          courier: "DHL Express",
+          awb: dhlResult.tracking_number,
+          tracking_url: trackingUrlFor("DHL Express", dhlResult.tracking_number),
+        });
+      }
 
       return NextResponse.json({ success: true, data: dhlResult });
     }

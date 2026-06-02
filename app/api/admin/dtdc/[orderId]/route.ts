@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createAdminClient } from "@/lib/supabase";
 import { createDtdcOrder, isDtdcConfigured } from "@/lib/dtdc";
 import { parseWeightKg } from "@/lib/delhivery";
+import { sendOrderShippedTemplate, trackingUrlFor } from "@/lib/whatsapp-templates";
 
 // POST /api/admin/dtdc/[orderId]?action=create
 //
@@ -91,6 +92,18 @@ export async function POST(
       update.status = "pickup";
     }
     await supabase.from("orders").update(update).eq("id", orderId);
+
+    // Proactive WhatsApp shipped notification (best-effort — never blocks)
+    if (result.reference_number && order.customer_phone) {
+      await sendOrderShippedTemplate({
+        to: order.customer_phone,
+        customer_name: (order.customer_name ?? "").split(" ")[0] || "there",
+        order_number: order.order_number,
+        courier: "DTDC Express",
+        awb: result.reference_number,
+        tracking_url: trackingUrlFor("DTDC Express", result.reference_number),
+      });
+    }
 
     return NextResponse.json({
       success: true,

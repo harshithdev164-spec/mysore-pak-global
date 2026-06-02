@@ -5,6 +5,11 @@ import crypto from "crypto";
 import { createDelhiveryOrder, parseWeightKg } from "@/lib/delhivery";
 import { createDhlShipment, isDhlConfigured } from "@/lib/dhl";
 import { HS_CODE_SWEETS } from "@/lib/countries";
+import {
+  sendOrderConfirmedTemplate,
+  sendOrderShippedTemplate,
+  trackingUrlFor,
+} from "@/lib/whatsapp-templates";
 
 export async function POST(request: Request) {
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -92,6 +97,26 @@ export async function POST(request: Request) {
 
   if (error || !data) {
     return NextResponse.json({ error: "Failed to update order" }, { status: 500 });
+  }
+
+  // ── Proactive WhatsApp: order confirmed ───────────────────────────
+  // Best-effort; never blocks the payment response. Fires once per payment.
+  try {
+    const { data: customer } = await supabase
+      .from("orders")
+      .select("customer_name, customer_phone, total")
+      .eq("id", db_order_id)
+      .maybeSingle();
+    if (customer?.customer_phone) {
+      await sendOrderConfirmedTemplate({
+        to: customer.customer_phone,
+        customer_name: (customer.customer_name ?? "").split(" ")[0] || "there",
+        order_number: data.order_number,
+        total: Math.round(Number(customer.total ?? 0)),
+      });
+    }
+  } catch (err) {
+    console.error("[verify] order_confirmed whatsapp failed:", err);
   }
 
   // Auto-create courier shipment (best-effort — payment is already confirmed above).
@@ -214,6 +239,17 @@ export async function POST(request: Request) {
         }
 
         await supabase.from("orders").update(dbUpdate).eq("id", db_order_id);
+
+        if (delResult.waybill) {
+          await sendOrderShippedTemplate({
+            to: fullOrder.customer_phone,
+            customer_name: (fullOrder.customer_name ?? "").split(" ")[0] || "there",
+            order_number: fullOrder.order_number,
+            courier: "Delhivery",
+            awb: delResult.waybill,
+            tracking_url: trackingUrlFor("Delhivery", delResult.waybill),
+          });
+        }
       } else if (useDhl) {
         // ── DHL Express (only when customer explicitly picked it) ──
         const dhlResult = await createDhlShipment({
@@ -253,6 +289,17 @@ export async function POST(request: Request) {
         }
 
         await supabase.from("orders").update(dbUpdate).eq("id", db_order_id);
+
+        if (dhlResult.tracking_number) {
+          await sendOrderShippedTemplate({
+            to: fullOrder.customer_phone,
+            customer_name: (fullOrder.customer_name ?? "").split(" ")[0] || "there",
+            order_number: fullOrder.order_number,
+            courier: "DHL Express",
+            awb: dhlResult.tracking_number,
+            tracking_url: trackingUrlFor("DHL Express", dhlResult.tracking_number),
+          });
+        }
       }
     }
   } catch (err) {
