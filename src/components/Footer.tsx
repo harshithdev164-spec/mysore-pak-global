@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { MapPin, Mail, Phone, Instagram, Facebook, Twitter, ArrowUpRight } from "lucide-react";
+import { MapPin, Mail, Phone, MessageCircle, Instagram, Facebook, Twitter, ArrowUpRight } from "lucide-react";
 
 const Footer = () => (
   <footer className="relative overflow-hidden">
@@ -136,6 +136,19 @@ const Footer = () => (
                 </div>
                 <a href="tel:+916364895255" className="text-[#FBF7F0]/45 text-sm font-body hover:text-[#FBF7F0] transition-colors">
                   +91 63648 95255 / 63648 95254
+                </a>
+              </li>
+              <li className="flex items-center gap-3">
+                <div className="w-7 h-7 rounded-lg bg-[#25D366]/10 flex items-center justify-center flex-shrink-0">
+                  <MessageCircle className="w-3.5 h-3.5 text-[#25D366]" />
+                </div>
+                <a
+                  href="https://wa.me/916364895293?text=Hi"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-[#FBF7F0]/45 text-sm font-body hover:text-[#FBF7F0] transition-colors"
+                >
+                  WhatsApp: +91 63648 95293
                 </a>
               </li>
             </ul>
