@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { ReactNode } from "react";
 
 const navItems = [
@@ -16,6 +16,21 @@ const navItems = [
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
   const pathname = usePathname();
+  const router = useRouter();
+
+  // Login page renders standalone (no sidebar) so it's reachable when signed out.
+  if (pathname === "/admin/login") {
+    return <>{children}</>;
+  }
+
+  async function signOut() {
+    try {
+      await fetch("/api/admin/auth/logout", { method: "POST" });
+    } finally {
+      router.replace("/admin/login");
+      router.refresh();
+    }
+  }
 
   return (
     <div className="flex min-h-screen bg-gray-50">
@@ -47,13 +62,19 @@ export default function AdminLayout({ children }: { children: ReactNode }) {
           })}
         </nav>
 
-        <div className="p-3 border-t border-gray-200">
+        <div className="p-3 border-t border-gray-200 space-y-1">
           <Link
             href="/"
             className="flex items-center gap-2 px-3 py-2 rounded-lg text-gray-400 hover:text-gray-600 text-xs transition-colors"
           >
             ← Back to Store
           </Link>
+          <button
+            onClick={signOut}
+            className="w-full flex items-center gap-2 px-3 py-2 rounded-lg text-gray-500 hover:bg-red-50 hover:text-red-600 text-xs transition-colors"
+          >
+            ⎋ Sign out
+          </button>
         </div>
       </aside>
 
