@@ -15,17 +15,37 @@ import { parseWeightKg } from "@/lib/delhivery";
 // the shipment. Use this when the checkout flow fails silently with DTDC.
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
-  const orderId = searchParams.get("order_id");
+  // Accept either `order_id` (uuid), `order_number` (WMP-A12345), or `phone` (last 10 digits).
+  let orderId = searchParams.get("order_id") ?? "";
+  const orderNumber = searchParams.get("order_number") ?? "";
+  const phoneQuery = (searchParams.get("phone") ?? "").replace(/\D/g, "");
 
-  if (!orderId) {
+  if (!orderId && !orderNumber && !phoneQuery) {
     return NextResponse.json(
-      { error: "Pass ?order_id=<uuid>" },
+      { error: "Provide one of ?order_id=<uuid> | ?order_number=<order_number> | ?phone=<10-digit>" },
       { status: 400 }
     );
   }
 
+  // The literal env var value (so we can spot stale Vercel settings)
+  // AND a separate `effective_base_url` field showing what the lib will
+  // actually use after broken-URL fallback.
+  const rawBaseUrl = (process.env.DTDC_API_BASE_URL ?? "").trim();
+  const useLive = process.env.DTDC_USE_LIVE === "true";
+  const effectiveBaseUrl = (() => {
+    const STALE = new Set([
+      "https://apis.dtdc.in/dtdc-api/api/customer/integration",
+      "https://api.dtdc.in/dtdc-api/api/customer/integration",
+    ]);
+    if (rawBaseUrl && !STALE.has(rawBaseUrl)) return rawBaseUrl;
+    return useLive
+      ? "https://pxapi.dtdc.in/api/customer/integration"
+      : "https://alphademodashboardapi.shipsy.io/api/customer/integration";
+  })();
   const env = {
-    DTDC_API_BASE_URL: process.env.DTDC_API_BASE_URL ?? "https://apis.dtdc.in/dtdc-api/api/customer/integration",
+    DTDC_API_BASE_URL: rawBaseUrl || "(not set)",
+    effective_base_url: effectiveBaseUrl,
+    environment_mode: useLive ? "LIVE (pxapi.dtdc.in)" : "STAGING (shipsy demo)",
     DTDC_API_KEY: process.env.DTDC_API_KEY ? "set" : "MISSING",
     DTDC_X_ACCESS_TOKEN: process.env.DTDC_X_ACCESS_TOKEN ? "set" : "MISSING",
     DTDC_CUSTOMER_CODE: process.env.DTDC_CUSTOMER_CODE ? "set" : "MISSING",
@@ -45,15 +65,56 @@ export async function GET(request: Request) {
   };
 
   const supabase = createAdminClient();
-  const { data: order, error: orderErr } = await supabase
-    .from("orders")
-    .select(`
-      id, order_number, customer_name, customer_email, customer_phone,
-      subtotal, shipping_cost, payment_method, shipping_address, created_at,
-      items:order_items(product_name, weight_label, quantity, unit_price)
-    `)
-    .eq("id", orderId)
-    .single();
+  let order: any = null;
+  let orderErr: any = null;
+
+  // If an explicit UUID-like orderId was provided, try that first.
+  const isUuid = /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(orderId);
+  if (isUuid) {
+    const res = await supabase
+      .from("orders")
+      .select(`
+        id, order_number, customer_name, customer_email, customer_phone,
+        subtotal, shipping_cost, payment_method, shipping_address, created_at,
+        items:order_items(product_name, weight_label, quantity, unit_price)
+      `)
+      .eq("id", orderId)
+      .single();
+    order = res.data;
+    orderErr = res.error;
+  }
+
+  // If not found by UUID or not provided, try order_number
+  if (!order && orderNumber) {
+    const res = await supabase
+      .from("orders")
+      .select(`
+        id, order_number, customer_name, customer_email, customer_phone,
+        subtotal, shipping_cost, payment_method, shipping_address, created_at,
+        items:order_items(product_name, weight_label, quantity, unit_price)
+      `)
+      .eq("order_number", orderNumber)
+      .limit(1);
+    order = (res.data && res.data[0]) ?? null;
+    orderErr = res.error;
+  }
+
+  // If still not found, try phone lookup (match last 10 digits)
+  if (!order && phoneQuery) {
+    const last10 = phoneQuery.slice(-10);
+    const res = await supabase
+      .from("orders")
+      .select(`
+        id, order_number, customer_name, customer_email, customer_phone,
+        subtotal, shipping_cost, payment_method, shipping_address, created_at,
+        items:order_items(product_name, weight_label, quantity, unit_price)
+      `)
+      .ilike("customer_phone", `%${last10}%`)
+      .order("created_at", { ascending: false })
+      .limit(1);
+    order = (res.data && res.data[0]) ?? null;
+    orderErr = res.error;
+  }
 
   if (orderErr || !order) {
     return NextResponse.json(

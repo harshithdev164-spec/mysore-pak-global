@@ -90,6 +90,9 @@ export async function POST(
     if (result.reference_number) {
       update.awb_code = result.reference_number;
       update.status = "pickup";
+      // Clear any prior "DTDC shipment creation failed: ..." note now
+      // that the retry succeeded — keeps the admin order view clean.
+      update.notes = `DTDC booking succeeded via retry. AWB: ${result.reference_number}`;
     }
     await supabase.from("orders").update(update).eq("id", orderId);
 

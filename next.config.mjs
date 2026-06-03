@@ -30,6 +30,13 @@ const nextConfig = {
     ];
   },
 
+  async rewrites() {
+    return [
+      // Keep a stable /sitemap.xml URL while serving from app/sitemap
+      { source: '/sitemap.xml', destination: '/sitemap' },
+    ];
+  },
+
   async headers() {
     return [
       {

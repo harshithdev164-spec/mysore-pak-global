@@ -16,14 +16,51 @@
  */
 
 // Booking/label/cancel base. Default to staging.
-const BASE_URL =
-  process.env.DTDC_API_BASE_URL ??
-  "https://alphademodashboardapi.shipsy.io/api/customer/integration";
+// Some deployments still have an old/wrong base URL set from before this
+// integration was fixed. Treat any of these legacy values as effectively
+// unset and fall through to the working default. Otherwise a stale
+// Vercel env var silently breaks every booking with "fetch failed".
+const BROKEN_BASE_URLS = new Set<string>([
+  "https://apis.dtdc.in/dtdc-api/api/customer/integration",
+  "https://apis.dtdc.in/dtdc-api/api",
+  "https://api.dtdc.in/dtdc-api/api/customer/integration",
+]);
+
+function pickBaseUrl(): string {
+  const fromEnv = (process.env.DTDC_API_BASE_URL ?? "").trim().replace(/\/+$/, "");
+  if (fromEnv && !BROKEN_BASE_URLS.has(fromEnv)) return fromEnv;
+  if (fromEnv && BROKEN_BASE_URLS.has(fromEnv)) {
+    console.warn(
+      `[dtdc] Ignoring stale DTDC_API_BASE_URL=${fromEnv} — falling back to default.`
+    );
+  }
+  // Explicit opt-in for the live host: set DTDC_USE_LIVE=true AND swap to
+  // your LIVE customer code / api-key / x-access-token. Sandbox creds will
+  // 401 against pxapi.dtdc.in, so we don't auto-route there based on env.
+  if (process.env.DTDC_USE_LIVE === "true") {
+    return "https://pxapi.dtdc.in/api/customer/integration";
+  }
+  return "https://alphademodashboardapi.shipsy.io/api/customer/integration";
+}
+
+const BASE_URL = pickBaseUrl();
 
 // Tracking lives on a different host. Default to staging.
-const TRACKING_BASE_URL =
-  process.env.DTDC_TRACKING_BASE_URL ??
-  "https://dtdcstagingapi.dtdc.com/dtdc-tracking-api/dtdc-api";
+const BROKEN_TRACKING_URLS = new Set<string>([
+  "https://apis.dtdc.in/dtdc-api",
+  "https://api.dtdc.in/dtdc-api",
+]);
+
+function pickTrackingBaseUrl(): string {
+  const fromEnv = (process.env.DTDC_TRACKING_BASE_URL ?? "").trim().replace(/\/+$/, "");
+  if (fromEnv && !BROKEN_TRACKING_URLS.has(fromEnv)) return fromEnv;
+  if (process.env.DTDC_USE_LIVE === "true") {
+    return "https://blktracksvc.dtdc.com/dtdc-api";
+  }
+  return "https://dtdcstagingapi.dtdc.com/dtdc-tracking-api/dtdc-api";
+}
+
+const TRACKING_BASE_URL = pickTrackingBaseUrl();
 
 function apiKey(): string { return process.env.DTDC_API_KEY ?? ""; }
 function accessToken(): string { return process.env.DTDC_X_ACCESS_TOKEN ?? ""; }
@@ -196,11 +233,11 @@ export async function createDtdcOrder(
         service_type_id: serviceTypeId(),
         load_type: "NON-DOCUMENT",
         consignment_type: "Forward",
-        dimension_unit: "cm",
+        dimension_unit: "CM",
         length: "20",
         width: "15",
         height: "10",
-        weight_unit: "kg",
+        weight_unit: "KG",
         weight: wKg.toFixed(2),
         declared_value: String(Math.round(p.subtotal)),
         num_pieces: "1",
@@ -225,23 +262,45 @@ export async function createDtdcOrder(
           state: p.state,
         },
         customer_reference_number: p.order_number,
-        cod_collection_mode: isCod ? "cash" : "",
+        cod_collection_mode: isCod ? "CASH" : "",
         cod_amount: isCod ? totalAmount : "",
         commodity_id: commodityId(),
         description: productsDesc,
+        is_risk_surcharge_applicable: false,
+        eway_bill: "",
+        invoice_number: "",
+        invoice_date: "",
         reference_number: "",
       },
     ],
   };
 
-  const res = await fetch(`${BASE_URL}/consignment/softdata`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "api-key": apiKey(),
-    },
-    body: JSON.stringify(body),
-  });
+  const fullUrl = `${BASE_URL}/consignment/softdata`;
+  let res: Response;
+  try {
+    res = await fetch(fullUrl, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "api-key": apiKey(),
+      },
+      body: JSON.stringify(body),
+    });
+  } catch (err) {
+    // Network-level failure — DNS, timeout, TLS, etc. Surface the URL so
+    // a stale env var doesn't masquerade as a generic "fetch failed".
+    const cause = err instanceof Error ? (err as Error & { cause?: { code?: string; message?: string } }).cause : null;
+    const causeMsg = cause?.code ?? cause?.message ?? "(no cause)";
+    lastExchange = {
+      request: body,
+      status: 0,
+      response: `Network error: ${err instanceof Error ? err.message : String(err)} [${causeMsg}] URL=${fullUrl}`,
+    };
+    throw new Error(
+      `DTDC network error reaching ${fullUrl}: ${causeMsg}. ` +
+        `Check DTDC_API_BASE_URL in env (must be a host that resolves).`
+    );
+  }
 
   const text = await res.text();
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
