@@ -438,6 +438,148 @@ export const FAQ_ENTRIES: FaqEntry[] = [
     answer:
       "Vacuum-sealed inner pouch + cushioned outer box + same-day-of-dispatch courier pickup. Sweets reach you within 2–5 days of being made. The vacuum seal locks in flavour.",
   },
+
+  // ─────────────────────────────────────────────
+  // Discounts / coupons / first-order
+  // ─────────────────────────────────────────────
+  {
+    category: "discounts",
+    question: "Do you have any discount or coupon code?",
+    answer:
+      "Active offers are pinned at the top of https://www.worldofmysorepak.com — usually a first-order code and a festival drop. Sign up to our newsletter (footer) to get codes by email before anyone else.",
+  },
+  {
+    category: "discounts",
+    question: "Any first-order discount?",
+    answer:
+      "Yes — check the homepage banner for the current first-order coupon. Apply it at checkout.",
+  },
+  {
+    category: "discounts",
+    question: "Is there free shipping or free gift on bulk orders?",
+    answer:
+      "Free shipping on India orders above ₹1,500. Bulk orders (10+ boxes) get tiered discounts AND complimentary upgraded packaging — reply *bulk* or email corporate@worldofmysorepak.com for a quote.",
+  },
+
+  // ─────────────────────────────────────────────
+  // GST / invoicing / B2B
+  // ─────────────────────────────────────────────
+  {
+    category: "invoicing",
+    question: "Do you provide a GST invoice?",
+    answer:
+      "Yes — a GST tax invoice is auto-generated with every order and emailed to you. For B2B / company billing with your GSTIN on the invoice, add the GSTIN in the *Order notes* field at checkout (or reply here with your order number + GSTIN and we'll re-issue).",
+  },
+  {
+    category: "invoicing",
+    question: "How do I get a B2B invoice with my company GSTIN?",
+    answer:
+      "Mention your company name + GSTIN in the *Order notes* field at checkout, OR reply here with order number + GSTIN after placing the order and we'll re-issue within a few hours.",
+  },
+
+  // ─────────────────────────────────────────────
+  // Delivery edge cases
+  // ─────────────────────────────────────────────
+  {
+    category: "shipping",
+    question: "Do you deliver on Sundays and holidays?",
+    answer:
+      "Courier delivery happens Monday–Saturday across India. On Sundays and bank holidays, deliveries pause and resume the next working day. We dispatch all 7 days though, so weekend orders still leave our kitchen on time.",
+  },
+  {
+    category: "shipping",
+    question: "Can I get express / 1-day delivery?",
+    answer:
+      "Same-day delivery is available within Mysuru city for orders placed before 2 PM. Outside Mysuru, fastest is 2-3 days via DTDC B2C Priority — already our default. We don't currently offer overnight intercity.",
+  },
+  {
+    category: "shipping",
+    question: "Why is delivery taking so long?",
+    answer:
+      "Sorry about the delay! Reply with your order number and I'll fetch the live tracking. If the courier shows no movement for 48+ hours, we escalate with the courier hub immediately — usually resolves the next day.",
+  },
+
+  // ─────────────────────────────────────────────
+  // Payment edge cases
+  // ─────────────────────────────────────────────
+  {
+    category: "payment",
+    question: "Can I pay by QR code or scan?",
+    answer:
+      "Yes — the checkout page shows a Razorpay UPI QR option. Scan with any UPI app (GPay, PhonePe, Paytm, BHIM) → confirm → you're back on the order page in seconds.",
+  },
+  {
+    category: "payment",
+    question: "Can I pay by bank transfer / NEFT?",
+    answer:
+      "Not directly at checkout, but for orders above ₹5,000 we can share bank details on request. Reply here with the order amount and we'll set it up.",
+  },
+
+  // ─────────────────────────────────────────────
+  // Multi-language / common Hindi/Kannada queries
+  // ─────────────────────────────────────────────
+  {
+    category: "shipping",
+    question: "Kab milega mera order? (When will I get my order?)",
+    answer:
+      "Aapke order ko deliver hone mein 2-5 din lagte hain (India ke andar). Apna order number bhej dijiye aur main turant live status bata dunga.",
+  },
+  {
+    category: "shipping",
+    question: "Mumbai / Delhi / Bangalore — do you deliver here?",
+    answer:
+      "Haan ji 🙏 We deliver to 25,000+ pincodes across India including Mumbai, Delhi, Bangalore, Chennai, Hyderabad, Kolkata, Pune. Pincode check at checkout shows live rate + ETA.",
+  },
+  {
+    category: "payment",
+    question: "Kitna paisa lagta hai shipping ka?",
+    answer:
+      "₹1,500 se upar ke order pe shipping FREE hai India ke andar. Usse kam pe ₹99 flat. International orders ke liye live courier rate hai.",
+  },
+
+  // ─────────────────────────────────────────────
+  // Festival / seasonal
+  // ─────────────────────────────────────────────
+  {
+    category: "gifting",
+    question: "Diwali / festival gift hampers?",
+    answer:
+      "Yes — limited-edition festival hampers drop 3-4 weeks before each major festival (Diwali, Raksha Bandhan, Christmas, New Year). Browse: https://www.worldofmysorepak.com/shop?category=gift-boxes",
+  },
+  {
+    category: "gifting",
+    question: "Wedding / corporate gifting options?",
+    answer:
+      "For weddings, anniversaries, corporate Diwali — minimum 10 boxes with custom branding, custom message cards, choice of packaging. Email corporate@worldofmysorepak.com with date + quantity for a quote within 24h.",
+  },
+
+  // ─────────────────────────────────────────────
+  // Product specifics that customers ask about often
+  // ─────────────────────────────────────────────
+  {
+    category: "products",
+    question: "Which is your bestseller?",
+    answer:
+      "Our most loved: *Traditional Mysore Pak*, *Kaju Mysore Pak*, and *Chocolate Bites*. For first-time buyers, try our *Mix Mysore Pak* — three classic flavours in one box.",
+  },
+  {
+    category: "products",
+    question: "Difference between regular Mysore Pak and Kaju Mysore Pak?",
+    answer:
+      "Traditional Mysore Pak uses besan (gram flour), pure cow ghee, sugar. Kaju Mysore Pak adds finely ground cashews to the same recipe — richer, slightly nuttier, premium. Both melt in the mouth.",
+  },
+  {
+    category: "products",
+    question: "Tell me about your jaggery / millet variants",
+    answer:
+      "We make three jaggery-based options: *Jaggery Mysore Pak*, *Jaggery Millet Mysore Pak* (organic foxtail millet + jaggery), and *Anjeer Mysore Pak* (sweetened with figs). All lower-glycemic than regular sugar variants.",
+  },
+  {
+    category: "products",
+    question: "Do you have anything for someone with allergies?",
+    answer:
+      "Tell me the allergy and I'll suggest. Nut-free: Traditional, Mango, Milk, Carrot Mysore Pak. Gluten-free: most besan-based items (check ingredient list). Dairy-free is harder — most use ghee — but Chakkuli, Mixture, Khakhras work.",
+  },
 ];
 
 export function getFaqsForCategory(categoryId: string): FaqEntry[] {

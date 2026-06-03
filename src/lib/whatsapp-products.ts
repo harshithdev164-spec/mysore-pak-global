@@ -62,6 +62,40 @@ function tokenize(text: string): string[] {
     .filter((w) => w.length >= 3 && !STOPWORDS.has(w));
 }
 
+// Tiny Levenshtein for typo-tolerance ("msore" → "mysore", "kaaju" → "kaju").
+// Capped at maxDist for early exit.
+function levenshtein(a: string, b: string, maxDist = 2): number {
+  if (Math.abs(a.length - b.length) > maxDist) return maxDist + 1;
+  const m = a.length, n = b.length;
+  if (m === 0) return n;
+  if (n === 0) return m;
+  let prev = new Array(n + 1);
+  let cur = new Array(n + 1);
+  for (let j = 0; j <= n; j++) prev[j] = j;
+  for (let i = 1; i <= m; i++) {
+    cur[0] = i;
+    let rowMin = cur[0];
+    for (let j = 1; j <= n; j++) {
+      const cost = a[i - 1] === b[j - 1] ? 0 : 1;
+      cur[j] = Math.min(cur[j - 1] + 1, prev[j] + 1, prev[j - 1] + cost);
+      if (cur[j] < rowMin) rowMin = cur[j];
+    }
+    if (rowMin > maxDist) return maxDist + 1; // early exit
+    [prev, cur] = [cur, prev];
+  }
+  return prev[n];
+}
+
+// Fuzzy match: are two short tokens "close enough"? More tolerant for
+// longer words. "msore" ≈ "mysore", "anjir" ≈ "anjeer", "muruku" ≈ "muruk".
+function fuzzyEq(a: string, b: string): boolean {
+  if (a === b) return true;
+  if (a.length < 4 || b.length < 4) return false; // avoid tiny-word collisions
+  const maxLen = Math.max(a.length, b.length);
+  const allowed = maxLen >= 8 ? 2 : 1;
+  return levenshtein(a, b, allowed) <= allowed;
+}
+
 // Extract a weight like "500g", "1 kg", "250 gm" → normalized label.
 export function extractWeight(text: string): string | null {
   const t = text.toLowerCase().replace(/\s+/g, " ");
@@ -105,8 +139,12 @@ export async function matchProducts(text: string, max = 3): Promise<ProductMatch
         // Exact name-token match — strongest signal
         score += 3;
         matched.push(t);
+      } else if (nameTokens.some((n) => fuzzyEq(n, t))) {
+        // Typo / near-match — "msore" ≈ "mysore", "anjir" ≈ "anjeer"
+        score += 2;
+        matched.push(t);
       } else if (nameTokens.some((n) => n.includes(t) || t.includes(n))) {
-        // Partial substring (handles "muruku" vs "muruk", "kaju" vs "cashew" — fuzzy)
+        // Partial substring fallback
         score += 1;
         matched.push(t);
       }

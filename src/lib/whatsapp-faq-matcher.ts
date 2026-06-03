@@ -112,6 +112,50 @@ const SYNONYMS: Record<string, string> = {
   // intent: brand
   story: "brand", history: "brand", founded: "brand", started: "brand", since: "brand",
   about: "brand", who: "brand", whats: "brand", "what's": "brand",
+
+  // ── Hindi/Kannada/slang/typo additions ──────────────────────────────
+  // Customers in India mix English with regional words and abbreviations.
+  // These map common forms to the canonical English token used by the FAQ.
+
+  // Hindi (romanized)
+  kab: "time", kabtak: "time", "kab-tak": "time", jaldi: "time",
+  kitna: "price", kitne: "price", kitni: "price",
+  paisa: "price", paise: "price", paisey: "price",
+  milega: "ship", milegi: "ship", milenge: "ship",
+  bhej: "ship", bhejo: "ship", bhejna: "ship",
+  karna: "order", krna: "order", krdo: "order",
+  chahiye: "order", chaahiye: "order", mangwana: "order", mangao: "order",
+  wapas: "refund", wapis: "refund", wapsi: "refund",
+  galat: "damaged", kharab: "damaged", toot: "damaged", tutaa: "damaged",
+  patachalna: "track",
+  asli: "quality", original: "quality", sahi: "quality",
+  meetha: "veg", meethai: "veg", mithai: "veg", mithaai: "veg",
+
+  // Kannada (romanized)
+  yelli: "location", yelliddira: "location",
+  eshtu: "price", eshtke: "price",
+  yavaga: "time", yawaaga: "time",
+  hege: "order",
+  bandide: "track", bandiyaa: "track",
+  kalisi: "ship", kalisli: "ship", kalisbeku: "ship",
+  beku: "order", bekagide: "order", madbeku: "order",
+
+  // Slang / abbreviations
+  thnx: "thanks", thx: "thanks",
+  asap: "time",
+  qr: "pay", scan: "pay",
+  free: "free", complimentary: "free", freebie: "free",
+  discount: "discount", coupon: "discount", offer: "discount",
+  promo: "discount", deal: "discount", offers: "discount", deals: "discount",
+  gst: "gst", invoice: "gst", bill: "gst", "b2b": "gst",
+
+  // Common typos
+  deliveri: "ship", deliveery: "ship", shippin: "ship",
+  paymet: "pay", payement: "pay", paymnt: "pay",
+  ordr: "order", oder: "order",
+  msore: "mysore", mysor: "mysore", mysoore: "mysore",
+  kaaju: "nut",
+  anjir: "anjeer", figs: "anjeer",
 };
 
 // ──────────────────────────────────────────────
@@ -249,6 +293,8 @@ const CATEGORY_HINTS: Record<string, string[]> = {
   brand: ["brand","location","fssai","quality"],
   contact: ["contact","phone","whatsapp","email","hours","location"],
   quality: ["quality","fresh","ghee","fssai"],
+  discounts: ["discount","free"],
+  invoicing: ["gst","tax"],
 };
 
 // ──────────────────────────────────────────────

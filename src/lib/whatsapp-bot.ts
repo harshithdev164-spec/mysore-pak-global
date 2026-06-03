@@ -304,15 +304,15 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
   }
 
   // 2) Order intent → product matcher (e.g. "I want kaju mysore pak", "send me 500g chocolate bites")
+  // CRITICAL: only short-circuit if we actually found a product. Otherwise
+  // fall through to FAQ — queries like "I want to order how many days to
+  // deliver to pune" contain "order" + "want" but are FAQ questions, not
+  // product searches. Dead-ending them as "couldn't pin that down" lost
+  // real customers in the logs.
   if (looksLikeOrderIntent(t)) {
     const matched = await replyProductMatches(from, t);
     if (matched) return;
-    // Intent detected but product not found — guide them
-    await sendWhatsAppText(
-      from,
-      `I couldn't pin that down. Try the product name (e.g. *Mysore Pak*, *Kaju Barfi*, *Chocolate Bites*) — or browse: ${SITE}/shop`
-    );
-    return;
+    // No product match — fall through to FAQ matcher silently.
   }
 
   // 3) FAQ smart match (synonyms + stemming + phrase boost + category boost)
