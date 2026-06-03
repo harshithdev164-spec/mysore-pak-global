@@ -135,11 +135,11 @@ async function handoffToHuman(from: string, originalText: string): Promise<void>
 async function replyGreeting(from: string): Promise<void> {
   await sendWhatsAppButtons(
     from,
-    `Namaste! 🙏 You've reached *World of Mysore Pak*. How can I help?`,
+    `Namaste! 🙏 You've reached *World of Mysore Pak*. How can I help?\n\n_(Type *human* anytime to talk to our team.)_`,
     [
-      { id: "shop", title: "Shop sweets" },
+      { id: "shop", title: "Show products" },
       { id: "track_order", title: "Track an order" },
-      { id: "human", title: "Talk to human" },
+      { id: "faq", title: "Common questions" },
     ]
   );
 }
@@ -227,7 +227,13 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
       await clearWaSession(from);
       await sendWhatsAppText(
         from,
-        "Ask anything: delivery time, ingredients, shipping, returns, payment. I'll do my best!"
+        `Sure — ask me anything! Most-asked topics:\n\n` +
+          `🚚 *Shipping & tracking*\n• How long does delivery take?\n• Do you ship to my city?\n• Sunday / express delivery\n\n` +
+          `💳 *Payment*\n• What payment methods do you accept?\n• EMI / QR / NEFT options\n• GST invoice\n\n` +
+          `🍬 *Products*\n• Vegetarian / nut-free / jaggery options\n• Shelf life & freshness\n• Bestsellers\n\n` +
+          `🎁 *Gifting*\n• Diwali / festival hampers\n• Wedding / corporate bulk orders\n\n` +
+          `↩️ *Returns*\n• Damaged or missing item\n• Cancel my order\n\n` +
+          `Just type your question naturally (English / Hindi / Kannada all work). Or type *human* to chat with our team.`
       );
       return;
     }
@@ -291,6 +297,13 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
   // Greetings → quick menu
   if (/^(hi+|hello+|hey+|namaste|namaskar|good (morning|afternoon|evening))\b/i.test(t)) {
     await replyGreeting(from);
+    return;
+  }
+
+  // Explicit "human" / "agent" / "support" keyword → handoff
+  if (/^(human|agent|support|representative|talk to (someone|human|agent|team)|customer (care|service))\b/i.test(t)) {
+    await clearWaSession(from);
+    await handoffToHuman(from, "(keyword: human)");
     return;
   }
 
