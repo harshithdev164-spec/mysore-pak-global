@@ -11,7 +11,6 @@
  */
 
 import { createAdminClient } from "@/lib/supabase";
-import { FAQ_ENTRIES } from "@/lib/chatbot-flows";
 import {
   sendWhatsAppText,
   sendWhatsAppButtons,
@@ -25,6 +24,7 @@ import {
   extractWeight,
   looksLikeOrderIntent,
 } from "@/lib/whatsapp-products";
+import { matchFaqSmart } from "@/lib/whatsapp-faq-matcher";
 
 const SITE = "https://www.worldofmysorepak.com";
 
@@ -65,31 +65,8 @@ function extractOrderNumber(text: string): string | null {
   return null;
 }
 
-// Crude keyword-based FAQ match — picks the entry with the most overlapping
-// non-trivial words. Returns null if best score is below threshold.
-function matchFaq(text: string): { question: string; answer: string } | null {
-  const STOPWORDS = new Set([
-    "the","a","an","is","are","do","does","i","you","my","your",
-    "to","for","of","and","or","in","on","at","with","can","could",
-    "would","should","what","how","when","where","why","please","pls",
-    "hi","hello","hey","there","ok","okay","thanks","thank",
-  ]);
-  const tokens = text
-    .toLowerCase()
-    .split(/[^a-z0-9]+/)
-    .filter((w) => w.length > 2 && !STOPWORDS.has(w));
-  if (tokens.length === 0) return null;
-
-  let best: { entry: { question: string; answer: string }; score: number } | null = null;
-  for (const entry of FAQ_ENTRIES) {
-    const haystack = (entry.question + " " + entry.answer).toLowerCase();
-    let score = 0;
-    for (const t of tokens) if (haystack.includes(t)) score++;
-    if (!best || score > best.score) best = { entry, score };
-  }
-  if (!best || best.score < 2) return null;
-  return best.entry;
-}
+// FAQ matching is now handled by matchFaqSmart (synonyms + stemming + phrases
+// + category boost). See src/lib/whatsapp-faq-matcher.ts.
 
 // ──────────────────────────────────────────────
 // Reply handlers
@@ -338,10 +315,10 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
     return;
   }
 
-  // 3) FAQ keyword match
-  const faq = matchFaq(t);
-  if (faq) {
-    await replyFaq(from, faq);
+  // 3) FAQ smart match (synonyms + stemming + phrase boost + category boost)
+  const faqMatch = matchFaqSmart(t);
+  if (faqMatch) {
+    await replyFaq(from, faqMatch.entry);
     return;
   }
 

@@ -412,6 +412,12 @@ export const FAQ_ENTRIES: FaqEntry[] = [
   },
   {
     category: "contact",
+    question: "What's your WhatsApp number?",
+    answer:
+      "You're already on it! Our WhatsApp Business number is *+91 63648 95293*. Save it so order updates land in this same chat.",
+  },
+  {
+    category: "contact",
     question: "Where can I follow you on social media?",
     answer:
       "Instagram: @worldofmysorepak, Facebook: /worldofmysorepak. Daily product reels, behind-the-scenes from our Mysuru kitchen, festival drops.",
