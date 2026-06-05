@@ -28,6 +28,9 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1,
   viewportFit: "cover",
+  // Brand green — Chrome's address bar, iOS Safari status bar, Android nav bar
+  // all pick this up. Also used by the PWA manifest.
+  themeColor: "#1B3A2D",
 };
 
 export const metadata: Metadata = {
@@ -35,6 +38,21 @@ export const metadata: Metadata = {
   description:
     "Traditional Mysore Pak made with pure ghee and traditional recipes. Shop online and get authentic Mysuru sweets delivered to your door.",
   keywords: ["Mysore Pak", "Indian sweets", "ghee sweets", "online sweet shop"],
+  // Next App Router auto-emits <link> tags from app/icon.png, app/apple-icon.png
+  // and app/favicon.ico — no manual `icons:` block needed. The manifest below
+  // points Android/Edge/Firefox PWAs at the full multi-size set.
+  manifest: "/manifest.webmanifest",
+  // iOS-specific PWA hints — make the home-screen icon look native
+  appleWebApp: {
+    title: "WOMP",
+    capable: true,
+    statusBarStyle: "default",
+  },
+  other: {
+    // Windows Pinned Site / Edge legacy tile colour
+    "msapplication-TileColor": "#1B3A2D",
+    "msapplication-TileImage": "/icon-192.png",
+  },
 };
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

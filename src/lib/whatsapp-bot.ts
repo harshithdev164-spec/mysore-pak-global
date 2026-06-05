@@ -25,6 +25,8 @@ import {
   looksLikeOrderIntent,
 } from "@/lib/whatsapp-products";
 import { matchFaqSmart } from "@/lib/whatsapp-faq-matcher";
+import { FAQ_ENTRIES } from "@/lib/chatbot-flows";
+import { tryConversationalReply } from "@/lib/whatsapp-conversation";
 
 const SITE = "https://www.worldofmysorepak.com";
 
@@ -63,6 +65,21 @@ function extractOrderNumber(text: string): string | null {
   m = t.match(/(?:^|[^\d])#?(\d{3,6})(?:[^\d]|$)/);
   if (m) return m[1].padStart(4, "0");
   return null;
+}
+
+function extractIndianPhone(text: string): string | null {
+  const digits = String(text ?? "").replace(/\D/g, "");
+  let normalized = digits;
+  if (normalized.length === 13 && normalized.startsWith("091")) {
+    normalized = normalized.slice(1);
+  }
+  if (normalized.length === 12 && normalized.startsWith("91")) {
+    normalized = normalized.slice(2);
+  }
+  if (normalized.length === 11 && normalized.startsWith("0")) {
+    normalized = normalized.slice(1);
+  }
+  return normalized.length === 10 ? normalized : null;
 }
 
 // FAQ matching is now handled by matchFaqSmart (synonyms + stemming + phrases
@@ -104,18 +121,94 @@ async function replyOrderStatus(from: string, orderNumber: string): Promise<void
   await sendWhatsAppText(from, lines.join("\n"));
 }
 
+async function replyOrdersByPhone(from: string, phone: string): Promise<void> {
+  const supabase = createAdminClient();
+  const { data: orders } = await supabase
+    .from("orders")
+    .select(
+      "order_number, status, payment_status, courier_name, awb_code, customer_name, total, created_at"
+    )
+    .eq("customer_phone", phone)
+    .order("created_at", { ascending: false })
+    .limit(5);
+
+  if (!orders || orders.length === 0) {
+    await sendWhatsAppText(
+      from,
+      `I couldn't find any orders linked to *${phone}*. Try your order number instead, or reply with anything to talk to a human.`
+    );
+    return;
+  }
+
+  if (orders.length === 1) {
+    const order = orders[0];
+    const status = STATUS_LABEL[order.status as string] ?? `Status: ${order.status}`;
+    const lines = [
+      `*Order #${order.order_number}*`,
+      status,
+      `Payment: ${order.payment_status}`,
+      `Total: ₹${Math.round(Number(order.total))}`,
+    ];
+    if (order.courier_name && order.awb_code) {
+      lines.push("", `Courier: ${order.courier_name}`, `AWB: ${order.awb_code}`);
+      const builder = COURIER_TRACK_URL[(order.courier_name as string).toLowerCase()];
+      if (builder) lines.push(`Track: ${builder(order.awb_code as string)}`);
+    }
+    await sendWhatsAppText(from, lines.join("\n"));
+    return;
+  }
+
+  const lines = [
+    `I found ${orders.length} recent orders for *${phone}*:`,
+    "",
+  ];
+  for (const order of orders) {
+    const status = STATUS_LABEL[order.status as string] ?? `Status: ${order.status}`;
+    lines.push(`*#${order.order_number}* — ${status}`);
+    lines.push(`Payment: ${order.payment_status} • ₹${Math.round(Number(order.total))}`);
+    if (order.courier_name && order.awb_code) {
+      const builder = COURIER_TRACK_URL[(order.courier_name as string).toLowerCase()];
+      if (builder) lines.push(`Track: ${builder(order.awb_code as string)}`);
+    }
+    lines.push("");
+  }
+  lines.push(`Reply with the order number to see detailed tracking for one order.`);
+  await sendWhatsAppText(from, lines.join("\n"));
+}
+
 async function replyFaq(from: string, faq: { question: string; answer: string }): Promise<void> {
   await sendWhatsAppText(from, `*${faq.question}*\n\n${faq.answer}`);
 }
 
-async function handoffToHuman(from: string, originalText: string): Promise<void> {
-  // Tell the customer
-  await sendWhatsAppText(
-    from,
-    `Thanks for reaching out! I'll connect you with our team — someone will get back to you soon. In the meantime, you can reach us directly at +91 6364895014 or hello@worldofmysorepak.com.`
-  );
+async function handoffToHuman(
+  from: string,
+  originalText: string,
+  opts: { withMenu?: boolean } = {}
+): Promise<void> {
+  if (opts.withMenu) {
+    // Combine the "we'll get back to you" text + the menu buttons in
+    // one interactive message so the customer always has a clear next
+    // step instead of staring at a dead-end.
+    await sendWhatsAppButtons(
+      from,
+      `Hmm, I'm not sure I got that one — let me flag it to our team. Meanwhile, here's what I CAN help with right now:\n\n_(Or email hello@worldofmysorepak.com to reach us directly.)_`,
+      [
+        { id: "shop", title: "🍬 Browse Products" },
+        { id: "track_order", title: "📦 Track Order" },
+        { id: "faq", title: "❓ FAQs" },
+      ]
+    );
 
-  // Ping the admin's number if configured
+  } else {
+    // Explicit "human" request — just acknowledge, don't shove buttons
+    // in their face when they asked for a person.
+    await sendWhatsAppText(
+      from,
+      `Thanks for reaching out! I'll connect you with our team — someone will get back to you soon. In the meantime, you can email hello@worldofmysorepak.com.`
+    );
+  }
+
+  // Ping the admin's number if configured (both flows)
   const adminRaw = process.env.WHATSAPP_ADMIN_NUMBER;
   if (adminRaw) {
     const admin = normalizeWhatsAppNumber(adminRaw);
@@ -135,14 +228,15 @@ async function handoffToHuman(from: string, originalText: string): Promise<void>
 async function replyGreeting(from: string): Promise<void> {
   await sendWhatsAppButtons(
     from,
-    `Namaste! 🙏 You've reached *World of Mysore Pak*. How can I help?\n\n_(Type *human* anytime to talk to our team.)_`,
+    `Namaste! 🙏 You've reached *World of Mysore Pak*. How can I help?\n\nType *offers* for promotions or *contact* for store details.`,
     [
-      { id: "shop", title: "Show products" },
-      { id: "track_order", title: "Track an order" },
-      { id: "faq", title: "Common questions" },
+      { id: "shop", title: "🍬 Browse Products" },
+      { id: "track_order", title: "📦 Track Order" },
+      { id: "faq", title: "❓ FAQs" },
     ]
   );
 }
+
 
 // Reply with up to 3 matched products + their direct links.
 async function replyProductMatches(
@@ -192,6 +286,133 @@ async function replyProductMatches(
 }
 
 // ──────────────────────────────────────────────
+// Tier-1 Feature: FAQ Categories Menu
+// ──────────────────────────────────────────────
+async function replyFaqCategories(from: string): Promise<void> {
+  await sendWhatsAppButtons(
+    from,
+    `📚 *Help Topics*\n\nChoose a category or just type your question — I'm listening! 🎧`,
+    [
+      { id: "faq_shipping", title: "🚚 Shipping" },
+      { id: "faq_payment", title: "💳 Payment" },
+      { id: "faq_products", title: "🍬 Products" },
+      { id: "faq_returns", title: "↩️ Returns" },
+    ]
+  );
+}
+
+// Show top FAQ answers for a category
+async function replyFaqByCategory(from: string, category: string): Promise<void> {
+  const entries = FAQ_ENTRIES.filter((e) => e.category === category);
+  
+  if (entries.length === 0) {
+    await sendWhatsAppText(from, `No FAQs found for that category. Try asking me directly or type *human* to chat with our team.`);
+    return;
+  }
+
+  // Show top 3 FAQs for this category
+  const lines: string[] = [];
+  for (const faq of entries.slice(0, 3)) {
+    lines.push(`*${faq.question}*`);
+    lines.push(faq.answer);
+    lines.push("");
+  }
+
+  lines.push(`Still have questions? Type your question naturally or ask for a *human*. 💬`);
+  await sendWhatsAppText(from, lines.join("\n"));
+}
+
+// ──────────────────────────────────────────────
+// Tier-1 Feature: Current Promotions
+// ──────────────────────────────────────────────
+async function replyPromotions(from: string): Promise<void> {
+  const text = `
+🎉 *Current Offers & Promotions*
+
+💝 *Summer Festival Special* (valid till June 30)
+  • Buy 3 items → 15% off
+  • Free shipping on orders above ₹1,500
+  • Use code: *SUMMER15*
+
+🎁 *New Customer Exclusive*
+  • 10% off your first order
+  • Use code: *WELCOME10*
+
+🏷️ *Bulk Orders (5kg+)*
+  • 20% off on orders 5–10kg
+  • 25% off on orders 10kg+
+  • Email: hello@worldofmysorepak.com
+
+🌟 *Referral Program*
+  • Share your code → They get 10% off
+  • You get ₹100 credit per referral
+
+Full shop: ${SITE}/shop
+  `.trim();
+  await sendWhatsAppText(from, text);
+}
+
+// ──────────────────────────────────────────────
+// Tier-1 Feature: Business Info
+// ──────────────────────────────────────────────
+async function replyBusinessInfo(from: string): Promise<void> {
+  const text = `
+📍 *World of Mysore Pak*
+
+🏪 *Location*
+138/B 52-D, 49-D block JC Layout
+Chamundi Betta Road, Mysuru 570011
+
+⏰ *Store Hours*
+Monday–Sunday: 10:00 AM – 7:00 PM
+(Closed on national holidays)
+
+📞 *Contact Us*
+Email: hello@worldofmysorepak.com
+
+🌐 Website: worldofmysorepak.com
+
+Or ask me anything in this chat! 💬
+  `.trim();
+  await sendWhatsAppText(from, text);
+}
+
+// ──────────────────────────────────────────────
+// Tier-1 Feature: Bestsellers
+// ──────────────────────────────────────────────
+async function replyBestsellers(from: string): Promise<void> {
+  try {
+    const supabase = createAdminClient();
+    const { data: bestsellers } = await supabase
+      .from("products")
+      .select("id, name, slug, weights(price)")
+      .eq("active", true)
+      .order("sales_count", { ascending: false })
+      .limit(5);
+
+    if (!bestsellers || bestsellers.length === 0) {
+      await sendWhatsAppText(from, `Check out our full collection: ${SITE}/shop 🍬`);
+      return;
+    }
+
+    const lines: string[] = ["🌟 *Our Bestsellers*", ""];
+    for (const p of bestsellers) {
+      const weights = (p.weights as unknown as Array<{ price: number }>) || [];
+      const price = weights.length > 0 ? Math.round(weights[0].price) : null;
+      const priceStr = price ? ` — from ₹${price}` : "";
+      lines.push(`🍬 *${p.name}*${priceStr}`);
+      lines.push(`${SITE}/products/${p.slug}`);
+      lines.push("");
+    }
+    lines.push(`Browse all: ${SITE}/shop`);
+    await sendWhatsAppText(from, lines.join("\n"));
+  } catch (err) {
+    console.error("[whatsapp] replyBestsellers failed:", err);
+    await sendWhatsAppText(from, `Check out our full collection: ${SITE}/shop 🍬`);
+  }
+}
+
+// ──────────────────────────────────────────────
 // Main router
 // ──────────────────────────────────────────────
 
@@ -225,18 +446,29 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
     }
     if (buttonId === "faq") {
       await clearWaSession(from);
-      await sendWhatsAppText(
-        from,
-        `Sure — ask me anything! Most-asked topics:\n\n` +
-          `🚚 *Shipping & tracking*\n• How long does delivery take?\n• Do you ship to my city?\n• Sunday / express delivery\n\n` +
-          `💳 *Payment*\n• What payment methods do you accept?\n• EMI / QR / NEFT options\n• GST invoice\n\n` +
-          `🍬 *Products*\n• Vegetarian / nut-free / jaggery options\n• Shelf life & freshness\n• Bestsellers\n\n` +
-          `🎁 *Gifting*\n• Diwali / festival hampers\n• Wedding / corporate bulk orders\n\n` +
-          `↩️ *Returns*\n• Damaged or missing item\n• Cancel my order\n\n` +
-          `Just type your question naturally (English / Hindi / Kannada all work). Or type *human* to chat with our team.`
-      );
+      await replyFaqCategories(from);
       return;
     }
+    if (buttonId === "promo") {
+      await clearWaSession(from);
+      await replyPromotions(from);
+      return;
+    }
+    if (buttonId === "contact") {
+      await clearWaSession(from);
+      await replyBusinessInfo(from);
+      return;
+    }
+    
+    // FAQ category handlers
+    if (buttonId?.startsWith("faq_")) {
+      const category = buttonId.slice(4); // "faq_shipping" → "shipping"
+      await clearWaSession(from);
+      await replyFaqByCategory(from, category);
+      return;
+    }
+    
+    // Talk to human
     if (buttonId === "human") {
       await clearWaSession(from);
       await handoffToHuman(from, "(button: talk to human)");
@@ -251,6 +483,20 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
     return;
   }
 
+  // Greetings should always reset the bot to the main menu.
+  if (/^(hi+|hello+|hey+|namaste|namaskar|good (morning|afternoon|evening))\b/i.test(t)) {
+    await clearWaSession(from);
+    await replyGreeting(from);
+    return;
+  }
+
+  // Escape hatch from any session
+  if (/^(menu|back|cancel|restart)$/i.test(t)) {
+    await clearWaSession(from);
+    await replyGreeting(from);
+    return;
+  }
+
   // ── Multi-turn: handle awaited prompts before keyword routing ──
   const session = await getWaSession(from);
   if (session?.intent === "await_order_number") {
@@ -258,6 +504,12 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
     if (num) {
       await clearWaSession(from);
       await replyOrderStatus(from, num);
+      return;
+    }
+    const phone = extractIndianPhone(t);
+    if (phone) {
+      await clearWaSession(from);
+      await replyOrdersByPhone(from, phone);
       return;
     }
     // Still didn't get a valid number — gentle re-prompt, keep session open
@@ -287,10 +539,21 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
     return;
   }
 
+  // ── Conversational micro-intents (thanks, ok, hmm, bye, compliments,
+  // frustration, single-character pings, vague queries) — handled with
+  // warm varied replies before the FAQ/product matcher gets a turn.
+  if (await tryConversationalReply(from, t)) return;
+
   // 1) Order-number → status (stateless shortcut)
   const orderNum = extractOrderNumber(t);
   if (orderNum) {
     await replyOrderStatus(from, orderNum);
+    return;
+  }
+
+  const phone = extractIndianPhone(t);
+  if (phone) {
+    await replyOrdersByPhone(from, phone);
     return;
   }
 
@@ -313,6 +576,21 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
       from,
       `Browse our full range: ${SITE}/shop\n\nOr tell me what you're craving and I'll send a direct link.`
     );
+    return;
+  }
+
+  if (/^(offers|promo|promotions|deals|discounts?)\b/i.test(t)) {
+    await replyPromotions(from);
+    return;
+  }
+
+  if (/^(contact|help|reach us|phone|whatsapp|email|address|where are you)\b/i.test(t)) {
+    await replyBusinessInfo(from);
+    return;
+  }
+
+  if (/\b(best sellers?|top sellers|popular products|trending items)\b/i.test(t)) {
+    await replyBestsellers(from);
     return;
   }
 
@@ -342,6 +620,8 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
     return;
   }
 
-  // 5) Human handoff
-  await handoffToHuman(from, t);
+  // 5) Last resort — bot couldn't match anything useful. Send the
+  // handoff message PLUS the 3-button menu so the customer isn't
+  // dead-ended with no clear action.
+  await handoffToHuman(from, t, { withMenu: true });
 }
