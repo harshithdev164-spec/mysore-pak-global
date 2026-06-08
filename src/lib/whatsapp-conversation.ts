@@ -36,22 +36,22 @@ const REPLIES = {
     "Thank you so much! 💛 That really means a lot. Is there anything else I can help with?",
     "Aww, thank you! 😊 We work hard to keep it that way. Anything else I can do for you?",
     "You just made our day! 🥰 Let me know if there's anything else.",
-    "🙏 Means a lot — we'll pass it on to the kitchen team! Anything else?",
+    "🙏 Means a lot, we'll pass it on to the kitchen team! Anything else?",
   ],
   goodbye: [
     "Thank you for visiting World of Mysore Pak! Have a sweet day 👋💛",
     "Take care! We're here whenever you need us. 🙏",
-    "Goodbye for now! Visit anytime — and enjoy your sweets 🍬",
+    "Goodbye for now! Visit anytime, and enjoy your sweets 🍬",
     "Phir milte hain! 👋 Have a wonderful day.",
   ],
   ack: [
     "Got it 😊. Let me know if you need help with an order, our products, or anything else.",
     "Sure thing! I'm here whenever you need me.",
-    "👍 Happy to help with anything else — products, orders, delivery, payment, all of it.",
+    "👍 Happy to help with anything else, products, orders, delivery, payment, all of it.",
     "Okay! Feel free to ask anytime.",
   ],
   hmm: [
-    "No worries 😊. Take your time — I'm here whenever you're ready to ask.",
+    "No worries 😊. Take your time, I'm here whenever you're ready to ask.",
     "All good! Let me know when you'd like to continue.",
     "Take your time 🙂. Ready to help whenever you are.",
   ],
@@ -62,25 +62,25 @@ const REPLIES = {
   ],
   no: [
     "Alright 😊. If you change your mind, I'm right here.",
-    "No problem! Reach out anytime — we're always happy to help.",
+    "No problem! Reach out anytime, we're always happy to help.",
     "Got it 🙏. I'm here if you need anything later.",
   ],
   confused_again: [
     "Of course! Could you tell me which part you'd like me to share again?",
-    "Happy to repeat 😊 — which info would you like one more time?",
+    "Happy to repeat 😊, which info would you like one more time?",
     "Sure thing! What would you like me to go over again?",
   ],
   frustration: [
-    "I'm really sorry you're facing this 🙏 — let me flag it to our team straight away. Could you share your order number so I can pull it up immediately?",
-    "So sorry about the trouble 💛. I want to fix this for you — please share your order number (e.g. *0363*) or describe what went wrong and I'll get our team on it right now.",
+    "I'm really sorry you're facing this 🙏, let me flag it to our team straight away. Could you share your order number so I can pull it up immediately?",
+    "So sorry about the trouble 💛. I want to fix this for you, please share your order number (e.g. *0363*) or describe what went wrong and I'll get our team on it right now.",
     "I hear you 🙏 and I'm sorry. Drop your order number here and I'll personally make sure our team looks into it today.",
   ],
   vague_order: [
     "I'd be happy to check that for you! Could you share your *order number* (e.g. *0363*) or the registered mobile number?",
-    "Sure — please share your order number from the confirmation email/SMS, and I'll pull up the live status.",
+    "Sure, please share your order number from the confirmation email/SMS, and I'll pull up the live status.",
   ],
   vague_product: [
-    "I'd love to help! Could you tell me which product you have in mind — Mysore Pak, Chocolate Bites, Kaju Barfi…? Or browse all: https://www.worldofmysorepak.com/shop",
+    "I'd love to help! Could you tell me which product you have in mind, Mysore Pak, Chocolate Bites, Kaju Barfi…? Or browse all: https://www.worldofmysorepak.com/shop",
     "Happy to help with pricing 😊. Which product caught your eye?",
   ],
   vague_dot: [
@@ -88,11 +88,11 @@ const REPLIES = {
     "Hi there 👋! Did you mean to send a question?",
   ],
   vague_q: [
-    "I'd be glad to help! Could you tell me what you're looking for? (Track an order, browse products, ingredients, delivery — anything!)",
-    "Sure 😊 — could you share a little more about what you'd like to know?",
+    "I'd be glad to help! Could you tell me what you're looking for? (Track an order, browse products, ingredients, delivery, anything!)",
+    "Sure 😊, could you share a little more about what you'd like to know?",
   ],
   bulk_intent: [
-    "That's a wonderful idea! 😊 We do plenty of corporate and bulk gifting. Roughly how many boxes do you need, and by when? Reply here or email corporate@worldofmysorepak.com — we'll send a quote within 24 hours.",
+    "That's a wonderful idea! 😊 We do plenty of corporate and bulk gifting. Roughly how many boxes do you need, and by when? Reply here or email corporate@worldofmysorepak.com, we'll send a quote within 24 hours.",
   ],
 };
 

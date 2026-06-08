@@ -38,7 +38,7 @@ function mapApiProduct(p: any): Product {
 
 const INSTAGRAM_POSTS = [
   { src: "/A bite that begins with a crunch and ends in nostalgia.Golden samosa perfection folded with slo.jpg",   caption: "A bite that begins with a crunch and ends in nostalgia. Golden samosa perfection folded with love." },
-  { src: "/A royal crunch of tradition in every bite — our Avarekal Mixture is your perfect festive snack .jpg",   caption: "A royal crunch of tradition in every bite — our Avarekal Mixture is your perfect festive snack." },
+  { src: "/A royal crunch of tradition in every bite — our Avarekal Mixture is your perfect festive snack .jpg",   caption: "A royal crunch of tradition in every bite. Our Avarekal Mixture is your perfect festive snack." },
   { src: "/Golden, soft, and irresistibly rich, our Motichur Laddoos are crafted to turn every moment into.jpg",   caption: "Golden, soft, and irresistibly rich, our Motichur Laddoos are crafted to turn every moment into magic." },
   { src: "/One for you, one for me Because happiness is sweeter when shared.[Premium Indian sweets, Tradit.jpg",   caption: "One for you, one for me. Because happiness is sweeter when shared. Premium Indian sweets, tradition." },
 ];
@@ -302,69 +302,6 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
         </div>
       </section>
 
-
-      {/* ══ VIRTUAL TOUR ══ */}
-      <section className="py-10 sm:py-20 bg-[#1B3A2D] relative overflow-hidden section-lazy section-gpu">
-        <div className="relative max-w-5xl mx-auto px-3 sm:px-6 lg:px-8">
-          {/* Heading */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7 }}
-            className="text-center mb-6 sm:mb-10"
-          >
-            <span className="font-body text-[10px] sm:text-xs uppercase tracking-[0.3em] text-[#C9972D] mb-2 block font-semibold">Immersive Experience</span>
-            <h2 className="font-heading text-2xl sm:text-4xl lg:text-5xl font-bold text-[#FBF7F0] mb-2 sm:mb-4">
-              Step Inside Our <span className="text-[#C9972D]">Sweet Shop</span>
-            </h2>
-            <p className="font-body text-[#FBF7F0]/50 text-xs sm:text-base max-w-sm sm:max-w-md mx-auto leading-relaxed">
-              Take a virtual walk through our store — explore every corner of World of Mysore Pak.
-            </p>
-          </motion.div>
-
-          {/* Tour embed frame — tall on mobile, 16:9 on desktop */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.97 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true, margin: "-40px" }}
-            transition={{ duration: 0.75, ease: [0.22, 1, 0.36, 1] }}
-            className="relative rounded-xl sm:rounded-2xl overflow-hidden border border-[#C9972D]/25 shadow-2xl shadow-black/40"
-          >
-            {/* Mobile: fixed tall height. Desktop: 16:9 */}
-            <div className="h-[70vh] sm:h-auto sm:aspect-video">
-              <iframe
-                src="/World of Mysore Pak_HTML_Package/index.html"
-                className="w-full h-full border-0"
-                allow="fullscreen; gyroscope; accelerometer"
-                loading="lazy"
-                title="360° Virtual Tour — World of Mysore Pak"
-              />
-            </div>
-            <div className="absolute inset-0 rounded-xl sm:rounded-2xl pointer-events-none" style={{ boxShadow: "inset 0 0 0 1px rgba(201,151,45,0.15)" }} />
-          </motion.div>
-
-          {/* Caption row — hidden on mobile to reduce clutter */}
-          <div className="hidden sm:flex items-center justify-between gap-4 mt-5 px-1">
-            <div className="flex items-center gap-2 text-[#FBF7F0]/40">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <circle cx="7" cy="7" r="6" stroke="currentColor" strokeWidth="1.2" />
-                <path d="M7 3 C4.2 3 2 5.2 2 8 C2 10.8 4.2 13 7 13 C9.8 13 12 10.8 12 8 C12 5.2 9.8 3 7 3Z" stroke="currentColor" strokeWidth="0.8" strokeDasharray="2 2" />
-                <path d="M2 7 Q5 6 7 7 Q9 8 12 7" stroke="currentColor" strokeWidth="0.8" />
-              </svg>
-              <span className="font-body text-xs">360° Immersive View</span>
-            </div>
-            <span className="font-body text-[11px] text-[#FBF7F0]/25 uppercase tracking-[0.25em]">Mysuru · Karnataka · India</span>
-            <div className="flex items-center gap-2 text-[#FBF7F0]/40">
-              <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <rect x="2" y="3" width="10" height="8" rx="1.5" stroke="currentColor" strokeWidth="1.2" />
-                <path d="M9 7 L12 5 L12 9 Z" fill="currentColor" opacity="0.6" />
-              </svg>
-              <span className="font-body text-xs">HD Quality</span>
-            </div>
-          </div>
-        </div>
-      </section>
 
       {/* ══ HOW IT'S MADE — PROCESS VIDEOS ══ */}
       <section className="py-20 sm:py-28 bg-[#FBF7F0] relative overflow-hidden section-lazy section-gpu">

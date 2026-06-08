@@ -44,7 +44,7 @@ const TIMELINE = [
   },
   {
     era: "The King of Sweets",
-    text: "Little did he know, that day in the royal kitchen, this simple trio of besan, sugar and ghee would create a timeless treasure — an extraordinary sweet that would go on to become the pride of Mysore and earn its title as \u201cThe King of Sweets\u201d.",
+    text: "Little did he know, that day in the royal kitchen, this simple trio of besan, sugar and ghee would create a timeless treasure. An extraordinary sweet that would go on to become the pride of Mysore and earn its title as \u201cThe King of Sweets\u201d.",
     image: "/story image 3.jpeg",
     accent: "#C9972D",
   },
@@ -62,37 +62,36 @@ const TIMELINE = [
   },
 ];
 
+// Editorial-style numbered medallions — feels like the chapter marks of a
+// hand-set book rather than generic icons. Brand gold serif numerals
+// inside a thin gold circle, with a small ornament dot above.
+function PillarMark({ numeral }: { numeral: string }) {
+  return (
+    <div className="relative inline-flex items-center justify-center w-12 h-12">
+      <span className="absolute top-0 text-[#C9972D] text-[10px] leading-none">✦</span>
+      <span className="absolute inset-x-0 bottom-0 mx-auto h-10 w-10 rounded-full border border-[#C9972D]/40" />
+      <span className="font-heading italic text-[#C9972D] text-xl leading-none mt-1">
+        {numeral}
+      </span>
+    </div>
+  );
+}
+
 const PILLARS = [
   {
-    icon: (
-      <svg viewBox="0 0 40 40" fill="none" className="w-10 h-10">
-        <circle cx="20" cy="20" r="17" stroke="#C9972D" strokeWidth="1.5" />
-        <path d="M20 8 L22 14 L28 14 L23.5 18 L25.5 24 L20 20.5 L14.5 24 L16.5 18 L12 14 L18 14 Z" fill="#C9972D" opacity="0.85" />
-      </svg>
-    ),
+    icon: <PillarMark numeral="I" />,
     title: "Heritage First",
     text: "Every recipe traces back to the royal kitchens of Mysuru. We guard these traditions with reverence and pass them on with pride.",
   },
   {
-    icon: (
-      <svg viewBox="0 0 40 40" fill="none" className="w-10 h-10">
-        <path d="M20 4 C20 4 10 12 10 22 C10 28 14.5 32 20 32 C25.5 32 30 28 30 22 C30 12 20 4 20 4Z" stroke="#C9972D" strokeWidth="1.5" />
-        <path d="M20 12 C20 12 14 17 14 22 C14 25.3 16.7 28 20 28 C23.3 28 26 25.3 26 22 C26 17 20 12 20 12Z" fill="#C9972D" opacity="0.22" />
-        <circle cx="20" cy="22" r="3" fill="#C9972D" opacity="0.65" />
-      </svg>
-    ),
+    icon: <PillarMark numeral="II" />,
     title: "Uncompromised Purity",
     text: "100% pure ghee, zero shortcuts. Our ingredients are meticulously selected for their premium quality, ensuring the same royal richness that has defined our heritage for over a century.",
   },
   {
-    icon: (
-      <svg viewBox="0 0 40 40" fill="none" className="w-10 h-10">
-        <path d="M20 34 C20 34 6 26 6 17 C6 12 9.6 8 14 8 C16.5 8 18.8 9.3 20 11.2 C21.2 9.3 23.5 8 26 8 C30.4 8 34 12 34 17 C34 26 20 34 20 34Z" stroke="#C9972D" strokeWidth="1.5" />
-        <path d="M20 30 C20 30 9 23.5 9 17 C9 13.7 11.4 11 14 11 C16 11 17.8 12.2 19 14 L20 15.5 L21 14 C22.2 12.2 24 11 26 11 C28.6 11 31 13.7 31 17 C31 23.5 20 30 20 30Z" fill="#C9972D" opacity="0.18" />
-      </svg>
-    ),
+    icon: <PillarMark numeral="III" />,
     title: "Made with Love",
-    text: "Every batch is traditionally crafted by artisans who have spent decades perfecting their craft. This isn't just production — it's devotion.",
+    text: "Every batch is traditionally crafted by artisans who have spent decades perfecting their craft. This isn't just production. It's devotion.",
   },
 ];
 
@@ -187,7 +186,7 @@ const OurStory = () => {
             transition={{ duration: 0.8, delay: 0.55 }}
             className="font-body text-[#FBF7F0]/60 text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed mb-10"
           >
-            From the royal kitchens of Mysuru to every corner of the world — this is the story of tradition, devotion, and the perfect piece of Mysore Pak.
+            From the royal kitchens of Mysuru to every corner of the world. This is the story of tradition, devotion, and the perfect piece of Mysore Pak.
           </motion.p>
 
           <motion.div
@@ -219,7 +218,7 @@ const OurStory = () => {
             <div className="relative w-full h-80 sm:h-[480px] rounded-3xl overflow-hidden shadow-2xl">
               <Image
                 src="/story 5.webp"
-                alt="Mysore Pak — The Soul of Mysuru"
+                alt="Mysore Pak. The Soul of Mysuru"
                 fill
                 sizes="(max-width: 1024px) 100vw, 50vw"
                 className="object-cover"
@@ -254,10 +253,10 @@ const OurStory = () => {
             </div>
             <GoldDivider />
             <p className="font-body text-[#1B3A2D]/70 leading-relaxed text-base sm:text-lg">
-              Mysore Pak was first crafted in the royal kitchen of the Mysore Palace over a century ago. A happy accident — a confectioner experimenting with sugar, besan and ghee — and a legend was born.
+              Mysore Pak was first crafted in the royal kitchen of the Mysore Palace over a century ago. A happy accident. A confectioner experimenting with sugar, besan and ghee, and a legend was born.
             </p>
             <p className="font-body text-[#1B3A2D]/55 leading-relaxed text-sm sm:text-base">
-              At World of Mysore Pak, we carry that same spirit. Every batch is made with the reverence of a craft passed down through generations, using the same three core ingredients — and nothing more.
+              At World of Mysore Pak, we carry that same spirit. Every batch is made with the reverence of a craft passed down through generations, using the same three core ingredients, and nothing more.
             </p>
             <div className="border-l-2 border-[#C9972D] pl-5 py-1 mt-2">
               <p className="font-heading text-lg sm:text-xl font-bold text-[#1B3A2D] italic leading-snug">
@@ -444,7 +443,7 @@ const OurStory = () => {
               Heritage meets precision. We&apos;ve evolved from manual batches to state-of-the-art machinery, ensuring that our royal recipe hits that elusive, golden melt-in-mouth consistency with surgical accuracy.
             </p>
             <p className="font-body text-[#1B3A2D]/55 leading-relaxed text-sm">
-              Technology now honors the legacy. By combining modern engineering with traditional secrets, we achieve perfection in every single piece — making the extraordinary taste of Mysore a consistent reality for the world.
+              Technology now honors the legacy. By combining modern engineering with traditional secrets, we achieve perfection in every single piece, making the extraordinary taste of Mysore a consistent reality for the world.
             </p>
             <div className="grid grid-cols-3 gap-3 mt-2">
               {[{ num: "100%", label: "Pure Ghee" }, { num: "3", label: "Ingredients" }, { num: "∞", label: "Generations" }].map((s, i) => (
@@ -623,7 +622,7 @@ const OurStory = () => {
               &ldquo;
             </div>
             <p className="font-heading text-xl sm:text-2xl lg:text-3xl font-bold text-[#FBF7F0] leading-relaxed">
-              To build a global sweet experience brand that celebrates the rich culinary heritage of Mysuru — while innovating with modern flavors and unwavering devotion. Every piece of Mysore Pak carries the warmth, tradition, and love of our city.
+              To build a global sweet experience brand that celebrates the rich culinary heritage of Mysuru, while innovating with modern flavors and unwavering devotion. Every piece of Mysore Pak carries the warmth, tradition, and love of our city.
             </p>
             <div className="flex items-center justify-center gap-3 mt-10">
               <div className="h-px w-16" style={{ background: "linear-gradient(90deg, transparent, #C9972D)" }} />
@@ -650,7 +649,7 @@ const OurStory = () => {
               Ready to Taste <span className="text-[#C9972D]">History?</span>
             </h2>
             <p className="font-body text-[#1B3A2D]/60 mb-10 text-base leading-relaxed max-w-md mx-auto">
-              Experience the authentic taste of Mysuru&apos;s finest — delivered fresh to your doorstep.
+              Experience the authentic taste of Mysuru&apos;s finest, delivered fresh to your doorstep.
             </p>
             <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
               <motion.div whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}>

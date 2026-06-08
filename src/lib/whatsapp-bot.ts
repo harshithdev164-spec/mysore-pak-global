@@ -31,13 +31,13 @@ import { tryConversationalReply } from "@/lib/whatsapp-conversation";
 const SITE = "https://www.worldofmysorepak.com";
 
 const STATUS_LABEL: Record<string, string> = {
-  pending: "⏳ Pending — awaiting payment confirmation",
-  confirmed: "✅ Confirmed — we're preparing your sweets",
-  pickup: "📦 Pickup scheduled — courier on the way",
+  pending: "⏳ Pending, awaiting payment confirmation",
+  confirmed: "✅ Confirmed, we're preparing your sweets",
+  pickup: "📦 Pickup scheduled, courier on the way",
   processing: "🔄 Processing at the courier hub",
-  shipped: "🚚 Shipped — on its way to you",
-  delivered: "🎉 Delivered — enjoy your Mysore Pak!",
-  cancelled: "❌ Cancelled — please reach out if this is wrong",
+  shipped: "🚚 Shipped, on its way to you",
+  delivered: "🎉 Delivered, enjoy your Mysore Pak!",
+  cancelled: "❌ Cancelled, please reach out if this is wrong",
 };
 
 const COURIER_TRACK_URL: Record<string, (awb: string) => string> = {
@@ -164,7 +164,7 @@ async function replyOrdersByPhone(from: string, phone: string): Promise<void> {
   ];
   for (const order of orders) {
     const status = STATUS_LABEL[order.status as string] ?? `Status: ${order.status}`;
-    lines.push(`*#${order.order_number}* — ${status}`);
+    lines.push(`*#${order.order_number}*, ${status}`);
     lines.push(`Payment: ${order.payment_status} • ₹${Math.round(Number(order.total))}`);
     if (order.courier_name && order.awb_code) {
       const builder = COURIER_TRACK_URL[(order.courier_name as string).toLowerCase()];
@@ -191,7 +191,7 @@ async function handoffToHuman(
     // step instead of staring at a dead-end.
     await sendWhatsAppButtons(
       from,
-      `Hmm, I'm not sure I got that one — let me flag it to our team. Meanwhile, here's what I CAN help with right now:\n\n_(Or email hello@worldofmysorepak.com to reach us directly.)_`,
+      `Hmm, I'm not sure I got that one, let me flag it to our team. Meanwhile, here's what I CAN help with right now:\n\n_(Or email hello@worldofmysorepak.com to reach us directly.)_`,
       [
         { id: "shop", title: "🍬 Browse Products" },
         { id: "track_order", title: "📦 Track Order" },
@@ -204,7 +204,7 @@ async function handoffToHuman(
     // in their face when they asked for a person.
     await sendWhatsAppText(
       from,
-      `Thanks for reaching out! I'll connect you with our team — someone will get back to you soon. In the meantime, you can email hello@worldofmysorepak.com.`
+      `Thanks for reaching out! I'll connect you with our team, someone will get back to you soon. In the meantime, you can email hello@worldofmysorepak.com.`
     );
   }
 
@@ -251,7 +251,7 @@ async function replyProductMatches(
   if (matches.length === 1) {
     const p = matches[0].product;
     const weightLine = weight
-      ? `Weight requested: *${weight}* — pick it on the product page.`
+      ? `Weight requested: *${weight}*, pick it on the product page.`
       : "Pick your weight and check out:";
     lines.push(`Found it! ✨`);
     lines.push("");
@@ -259,7 +259,7 @@ async function replyProductMatches(
     if (p.weights?.length) {
       lines.push(
         p.weights
-          .map((w) => `• ${w.label} — ₹${Math.round(Number(w.price))}`)
+          .map((w) => `• ${w.label}, ₹${Math.round(Number(w.price))}`)
           .join("\n")
       );
     }
@@ -291,7 +291,7 @@ async function replyProductMatches(
 async function replyFaqCategories(from: string): Promise<void> {
   await sendWhatsAppButtons(
     from,
-    `📚 *Help Topics*\n\nChoose a category or just type your question — I'm listening! 🎧`,
+    `📚 *Help Topics*\n\nChoose a category or just type your question, I'm listening! 🎧`,
     [
       { id: "faq_shipping", title: "🚚 Shipping" },
       { id: "faq_payment", title: "💳 Payment" },
@@ -399,7 +399,7 @@ async function replyBestsellers(from: string): Promise<void> {
     for (const p of bestsellers) {
       const weights = (p.weights as unknown as Array<{ price: number }>) || [];
       const price = weights.length > 0 ? Math.round(weights[0].price) : null;
-      const priceStr = price ? ` — from ₹${price}` : "";
+      const priceStr = price ? `, from ₹${price}` : "";
       lines.push(`🍬 *${p.name}*${priceStr}`);
       lines.push(`${SITE}/products/${p.slug}`);
       lines.push("");
@@ -432,7 +432,7 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
       await setWaSession(from, "await_order_number");
       await sendWhatsAppText(
         from,
-        "Sure — please reply with your order number (e.g. *0363* or *WMP-0363*)."
+        "Sure, please reply with your order number (e.g. *0363* or *WMP-0363*)."
       );
       return;
     }
@@ -440,7 +440,7 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
       await setWaSession(from, "await_product_name");
       await sendWhatsAppText(
         from,
-        `Browse our full range: ${SITE}/shop\n\nOr tell me what you're craving — e.g. *Kaju Mysore Pak*, *Chocolate Bites*, *Anjeer Mysore Pak* — and I'll send a direct link. 🍬`
+        `Browse our full range: ${SITE}/shop\n\nOr tell me what you're craving, e.g. *Kaju Mysore Pak*, *Chocolate Bites*, *Anjeer Mysore Pak*, and I'll send a direct link. 🍬`
       );
       return;
     }
@@ -527,7 +527,7 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
     }
     await sendWhatsAppText(
       from,
-      `Hmm, I couldn't find that. Try a different name — e.g. *Mysore Pak*, *Chocolate Bites*, *Kaju Barfi*, *Chakkuli*. Or browse: ${SITE}/shop`
+      `Hmm, I couldn't find that. Try a different name, e.g. *Mysore Pak*, *Chocolate Bites*, *Kaju Barfi*, *Chakkuli*. Or browse: ${SITE}/shop`
     );
     return;
   }
