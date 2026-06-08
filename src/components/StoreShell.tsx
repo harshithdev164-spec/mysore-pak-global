@@ -4,7 +4,9 @@ import { usePathname } from "next/navigation";
 import Navbar from "./Navbar";
 import Footer from "./Footer";
 import VideoPopup from "./VideoPopup";
-import ChatBot from "./ChatBot";
+// In-website ChatBot replaced by the FloatingWhatsApp button (rendered
+// globally in app/layout.tsx) which links straight to our WhatsApp Business
+// bot at +91 63648 95293.
 
 const ANNOUNCEMENT_ITEMS = [
   "For Orders Within Mysore · Order via Swiggy & Zomato",
@@ -47,7 +49,6 @@ export default function StoreShell({ children }: { children: React.ReactNode }) 
       <main className="min-h-screen pt-8">{children}</main>
       <Footer />
       <VideoPopup />
-      <ChatBot />
     </>
   );
 }
