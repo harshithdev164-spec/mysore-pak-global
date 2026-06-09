@@ -44,10 +44,25 @@ export async function GET(request: Request) {
     if (rawBaseUrl && !STALE.has(rawBaseUrl)) return rawBaseUrl;
     return "https://alphademodashboardapi.shipsy.io/api/customer/integration";
   })();
+  // Safe fingerprints — show enough to recognise which key/token is loaded
+  // without exposing the secret. Live creds start with "c9679", sandbox
+  // start with "f4ae6" — the fingerprint alone tells us which env Vercel has.
+  const fp = (v: string | undefined): string => {
+    if (!v) return "MISSING";
+    if (v.length <= 10) return v;
+    return v.slice(0, 6) + "...." + v.slice(-4) + ` (len=${v.length})`;
+  };
+
   const env = {
     DTDC_API_BASE_URL: rawBaseUrl || "(not set)",
     effective_base_url: effectiveBaseUrl,
     environment_mode: useLive ? "LIVE (pxapi.dtdc.in)" : "STAGING (shipsy demo)",
+    DTDC_API_KEY_fingerprint: fp(process.env.DTDC_API_KEY),
+    DTDC_X_ACCESS_TOKEN_fingerprint: fp(process.env.DTDC_X_ACCESS_TOKEN),
+    expected_live_api_key_fp: "c9679d...6e1 (len=30)",
+    expected_sandbox_api_key_fp: "f4ae60...5f0 (len=30)",
+    expected_live_customer_code: "BO12814",
+    expected_sandbox_customer_code: "GL018",
     DTDC_API_KEY: process.env.DTDC_API_KEY ? "set" : "MISSING",
     DTDC_X_ACCESS_TOKEN: process.env.DTDC_X_ACCESS_TOKEN ? "set" : "MISSING",
     DTDC_CUSTOMER_CODE: process.env.DTDC_CUSTOMER_CODE ? "set" : "MISSING",
