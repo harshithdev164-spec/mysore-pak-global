@@ -32,15 +32,17 @@ export async function GET(request: Request) {
   // actually use after broken-URL fallback.
   const rawBaseUrl = (process.env.DTDC_API_BASE_URL ?? "").trim();
   const useLive = process.env.DTDC_USE_LIVE === "true";
+  // Mirrors src/lib/dtdc.ts pickBaseUrl: DTDC_USE_LIVE=true wins
+  // unconditionally so a stale staging DTDC_API_BASE_URL in Vercel
+  // never silently routes real orders to sandbox.
   const effectiveBaseUrl = (() => {
+    if (useLive) return "https://pxapi.dtdc.in/api/customer/integration";
     const STALE = new Set([
       "https://apis.dtdc.in/dtdc-api/api/customer/integration",
       "https://api.dtdc.in/dtdc-api/api/customer/integration",
     ]);
     if (rawBaseUrl && !STALE.has(rawBaseUrl)) return rawBaseUrl;
-    return useLive
-      ? "https://pxapi.dtdc.in/api/customer/integration"
-      : "https://alphademodashboardapi.shipsy.io/api/customer/integration";
+    return "https://alphademodashboardapi.shipsy.io/api/customer/integration";
   })();
   const env = {
     DTDC_API_BASE_URL: rawBaseUrl || "(not set)",

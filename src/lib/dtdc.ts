@@ -26,21 +26,31 @@ const BROKEN_BASE_URLS = new Set<string>([
   "https://api.dtdc.in/dtdc-api/api/customer/integration",
 ]);
 
+const LIVE_BASE = "https://pxapi.dtdc.in/api/customer/integration";
+const STAGING_BASE = "https://alphademodashboardapi.shipsy.io/api/customer/integration";
+
 function pickBaseUrl(): string {
+  // DTDC_USE_LIVE=true wins UNCONDITIONALLY — a stale DTDC_API_BASE_URL still
+  // set to the staging host in Vercel was silently routing real customer
+  // orders to sandbox (D-prefix AWBs that never reach the real DTDC network).
+  // The flag is the only honest signal of intent.
+  if (process.env.DTDC_USE_LIVE === "true") {
+    const fromEnv = (process.env.DTDC_API_BASE_URL ?? "").trim().replace(/\/+$/, "");
+    if (fromEnv && fromEnv !== LIVE_BASE) {
+      console.warn(
+        `[dtdc] DTDC_USE_LIVE=true overrides DTDC_API_BASE_URL=${fromEnv}. Using ${LIVE_BASE}.`
+      );
+    }
+    return LIVE_BASE;
+  }
   const fromEnv = (process.env.DTDC_API_BASE_URL ?? "").trim().replace(/\/+$/, "");
   if (fromEnv && !BROKEN_BASE_URLS.has(fromEnv)) return fromEnv;
   if (fromEnv && BROKEN_BASE_URLS.has(fromEnv)) {
     console.warn(
-      `[dtdc] Ignoring stale DTDC_API_BASE_URL=${fromEnv} — falling back to default.`
+      `[dtdc] Ignoring stale DTDC_API_BASE_URL=${fromEnv}, falling back to staging default.`
     );
   }
-  // Explicit opt-in for the live host: set DTDC_USE_LIVE=true AND swap to
-  // your LIVE customer code / api-key / x-access-token. Sandbox creds will
-  // 401 against pxapi.dtdc.in, so we don't auto-route there based on env.
-  if (process.env.DTDC_USE_LIVE === "true") {
-    return "https://pxapi.dtdc.in/api/customer/integration";
-  }
-  return "https://alphademodashboardapi.shipsy.io/api/customer/integration";
+  return STAGING_BASE;
 }
 
 const BASE_URL = pickBaseUrl();
@@ -51,13 +61,16 @@ const BROKEN_TRACKING_URLS = new Set<string>([
   "https://api.dtdc.in/dtdc-api",
 ]);
 
+const LIVE_TRACKING = "https://blktracksvc.dtdc.com/dtdc-api";
+const STAGING_TRACKING = "https://dtdcstagingapi.dtdc.com/dtdc-tracking-api/dtdc-api";
+
 function pickTrackingBaseUrl(): string {
+  if (process.env.DTDC_USE_LIVE === "true") {
+    return LIVE_TRACKING;
+  }
   const fromEnv = (process.env.DTDC_TRACKING_BASE_URL ?? "").trim().replace(/\/+$/, "");
   if (fromEnv && !BROKEN_TRACKING_URLS.has(fromEnv)) return fromEnv;
-  if (process.env.DTDC_USE_LIVE === "true") {
-    return "https://blktracksvc.dtdc.com/dtdc-api";
-  }
-  return "https://dtdcstagingapi.dtdc.com/dtdc-tracking-api/dtdc-api";
+  return STAGING_TRACKING;
 }
 
 const TRACKING_BASE_URL = pickTrackingBaseUrl();
@@ -276,6 +289,12 @@ export async function createDtdcOrder(
   };
 
   const fullUrl = `${BASE_URL}/consignment/softdata`;
+  // Tiny one-line log so Vercel function logs make it obvious which env
+  // every real booking landed on. Helps spot sandbox-vs-live mismatches
+  // immediately instead of after 20 stuck orders.
+  console.log(
+    `[dtdc] booking order=${p.order_number} via ${BASE_URL.includes("pxapi.dtdc.in") ? "LIVE" : "STAGING"} customer_code=${customerCode().slice(0, 3)}** weight=${wKg.toFixed(2)}kg`
+  );
   let res: Response;
   try {
     res = await fetch(fullUrl, {

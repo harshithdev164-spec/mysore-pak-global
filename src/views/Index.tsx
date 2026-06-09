@@ -6,7 +6,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Star, StarHalf, Gift, ChefHat, Flame, Truck, CheckCircle2, Package, Award, Sparkles, Heart, Instagram } from "lucide-react";
 import ProductCard from "@/components/ProductCard";
-import { testimonials } from "@/data/products";
+import GoogleReviewsSection from "@/components/GoogleReviewsSection";
 import type { Product } from "@/data/products";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -427,131 +427,8 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
         </div>
       </section>
 
-      {/* ══ GOOGLE REVIEWS ══ */}
-      <section className="py-24 sm:py-32 overflow-hidden relative section-lazy section-gpu" style={{ background: "linear-gradient(160deg, #0F2318 0%, #1B3A2D 40%, #152B21 100%)" }}>
-        {/* Gold top border line */}
-        <div className="absolute top-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #C9972D 30%, #E8B84B 50%, #C9972D 70%, transparent)" }} />
-        {/* Gold bottom border line */}
-        <div className="absolute bottom-0 left-0 right-0 h-px" style={{ background: "linear-gradient(90deg, transparent, #C9972D 30%, #E8B84B 50%, #C9972D 70%, transparent)" }} />
-
-        {/* Header */}
-        <div className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 mb-14 text-center">
-          <motion.div
-            initial={{ opacity: 0 }}
-            whileInView={{ opacity: 1 }}
-            viewport={{ once: true, margin: "-80px" }}
-            transition={{ duration: 0.7 }}
-          >
-            {/* Ornament */}
-            <div className="flex items-center justify-center gap-3 mb-5">
-              <div className="h-px w-12 sm:w-20" style={{ background: "linear-gradient(90deg, transparent, #C9972D)" }} />
-              <div className="flex items-center gap-2 px-4 py-1.5 rounded-full border border-[#C9972D]/30" style={{ background: "rgba(201,151,45,0.08)" }}>
-                <svg width="16" height="16" viewBox="0 0 48 48" className="flex-shrink-0">
-                  <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                  <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                  <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                  <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                </svg>
-                <span className="font-body text-[11px] uppercase tracking-[0.3em] text-[#C9972D] font-semibold">Verified Google Reviews</span>
-              </div>
-              <div className="h-px w-12 sm:w-20" style={{ background: "linear-gradient(90deg, #C9972D, transparent)" }} />
-            </div>
-
-            <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-[#FBF7F0]">
-              Loved by <span style={{ background: "linear-gradient(90deg, #C9972D, #E8B84B, #C9972D)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", backgroundClip: "text" }}>Sweet Lovers</span>
-            </h2>
-
-            {/* Rating display */}
-            <div className="flex items-center justify-center gap-3 mt-6">
-              <span className="font-heading text-5xl font-bold" style={{ color: "#E8B84B" }}>4.5</span>
-              <div className="flex flex-col items-start gap-1">
-                <div className="flex gap-1">
-                  {[...Array(4)].map((_, i) => (
-                    <Star key={i} className="w-5 h-5 fill-[#FBBC05] text-[#FBBC05]" />
-                  ))}
-                  <StarHalf className="w-5 h-5 fill-[#FBBC05] text-[#FBBC05]" />
-                </div>
-                <span className="font-body text-xs text-[#FBF7F0]/50 tracking-wide">Based on 3.5k+ Google reviews</span>
-              </div>
-            </div>
-          </motion.div>
-        </div>
-
-        {/* Single review strip */}
-        <div className="relative scroll-strip-wrap">
-          <div className="absolute left-0 top-0 bottom-0 w-24 sm:w-40 z-10 pointer-events-none" style={{ background: "linear-gradient(90deg, #1B3A2D, transparent)" }} />
-          <div className="absolute right-0 top-0 bottom-0 w-24 sm:w-40 z-10 pointer-events-none" style={{ background: "linear-gradient(270deg, #1B3A2D, transparent)" }} />
-          <div className="flex gap-5 animate-photo-scroll" style={{ width: "max-content" }}>
-            {[...testimonials, ...testimonials].map((t, i) => (
-              <div
-                key={i}
-                className="w-80 sm:w-96 flex-shrink-0 rounded-2xl p-6 flex flex-col gap-4"
-                style={{
-                  background: "rgba(251,247,240,0.06)",
-                  border: "1px solid rgba(201,151,45,0.2)",
-                  boxShadow: "0 4px 24px rgba(0,0,0,0.2), inset 0 1px 0 rgba(201,151,45,0.1)",
-                }}
-              >
-                {/* Card header */}
-                <div className="flex items-start justify-between">
-                  <div className="flex items-center gap-3">
-                    <div
-                      className="w-11 h-11 rounded-full flex items-center justify-center text-white font-bold text-base flex-shrink-0 shadow-md"
-                      style={{ backgroundColor: t.avatarBg }}
-                    >
-                      {t.name.charAt(0)}
-                    </div>
-                    <div>
-                      <p className="font-body text-sm font-semibold text-[#FBF7F0] leading-tight">{t.name}</p>
-                      <p className="font-body text-[11px] text-[#FBF7F0]/40 leading-tight mt-0.5">{t.time}</p>
-                    </div>
-                  </div>
-                  <svg width="20" height="20" viewBox="0 0 48 48" className="flex-shrink-0 opacity-90">
-                    <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-                    <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-                    <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-                    <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-                  </svg>
-                </div>
-
-                {/* Stars */}
-                <div className="flex gap-0.5">
-                  {Array.from({ length: t.rating }).map((_, s) => (
-                    <Star key={s} className="w-4 h-4 text-[#FBBC05] fill-[#FBBC05]" />
-                  ))}
-                </div>
-
-                {/* Divider */}
-                <div className="h-px w-full" style={{ background: "linear-gradient(90deg, rgba(201,151,45,0.3), transparent)" }} />
-
-                {/* Review text */}
-                <p className="font-body text-sm text-[#FBF7F0]/75 leading-relaxed line-clamp-3">{t.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* View on Google CTA */}
-        <div className="text-center mt-12">
-          <motion.a
-            href="https://share.google/WJfPSrgZKS7MyEJ5v"
-            target="_blank"
-            rel="noopener noreferrer"
-            whileHover={{ scale: 1.04 }}
-            whileTap={{ scale: 0.97 }}
-            className="inline-flex items-center gap-2.5 font-body text-sm font-semibold text-[#1B3A2D] px-7 py-3 rounded-full transition-all duration-300"
-            style={{ background: "linear-gradient(135deg, #C9972D, #E8B84B)", boxShadow: "0 4px 20px rgba(201,151,45,0.35)" }}
-          >
-            <svg width="16" height="16" viewBox="0 0 48 48">
-              <path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/>
-              <path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/>
-              <path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/>
-              <path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.18 1.48-4.97 2.31-8.16 2.31-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/>
-            </svg>
-            View all reviews on Google
-          </motion.a>
-        </div>
-      </section>
+      {/* ══ GOOGLE REVIEWS — live from Places API ══ */}
+      <GoogleReviewsSection />
 
       {/* ══ INSTAGRAM — EVERY PIXEL TELLS A STORY ══ */}
       <motion.section
