@@ -109,14 +109,23 @@ async function replyOrderStatus(from: string, orderNumber: string): Promise<void
 
   const status = STATUS_LABEL[order.status as string] ?? `Status: ${order.status}`;
   const lines = [
-    `*Order #${order.order_number}*`,
+    `📋 *Order #${order.order_number}*`,
+    "",
     status,
-    `Payment: ${order.payment_status}`,
+    `💳 Payment: ${order.payment_status}`,
   ];
   if (order.courier_name && order.awb_code) {
-    lines.push("", `Courier: ${order.courier_name}`, `AWB: ${order.awb_code}`);
+    lines.push("");
+    lines.push(`🚚 Courier: *${order.courier_name}*`);
+    lines.push(`🔢 AWB: *${order.awb_code}*`);
     const builder = COURIER_TRACK_URL[(order.courier_name as string).toLowerCase()];
-    if (builder) lines.push(`Track: ${builder(order.awb_code as string)}`);
+    if (builder) {
+      lines.push("");
+      lines.push(`👉 Live tracking: ${builder(order.awb_code as string)}`);
+    }
+  } else if (order.status === "confirmed") {
+    lines.push("");
+    lines.push(`📦 Your sweets are being prepared, the courier AWB usually generates within 24-48 hours of payment. I'll WhatsApp you the tracking link the moment it ships.`);
   }
   await sendWhatsAppText(from, lines.join("\n"));
 }
@@ -144,15 +153,21 @@ async function replyOrdersByPhone(from: string, phone: string): Promise<void> {
     const order = orders[0];
     const status = STATUS_LABEL[order.status as string] ?? `Status: ${order.status}`;
     const lines = [
-      `*Order #${order.order_number}*`,
+      `📋 *Order #${order.order_number}*`,
+      "",
       status,
-      `Payment: ${order.payment_status}`,
-      `Total: ₹${Math.round(Number(order.total))}`,
+      `💳 Payment: ${order.payment_status}`,
+      `💰 Total: ₹${Math.round(Number(order.total))}`,
     ];
     if (order.courier_name && order.awb_code) {
-      lines.push("", `Courier: ${order.courier_name}`, `AWB: ${order.awb_code}`);
+      lines.push("");
+      lines.push(`🚚 Courier: *${order.courier_name}*`);
+      lines.push(`🔢 AWB: *${order.awb_code}*`);
       const builder = COURIER_TRACK_URL[(order.courier_name as string).toLowerCase()];
-      if (builder) lines.push(`Track: ${builder(order.awb_code as string)}`);
+      if (builder) {
+        lines.push("");
+        lines.push(`👉 Live tracking: ${builder(order.awb_code as string)}`);
+      }
     }
     await sendWhatsAppText(from, lines.join("\n"));
     return;
@@ -432,7 +447,7 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
       await setWaSession(from, "await_order_number");
       await sendWhatsAppText(
         from,
-        "Sure, please reply with your order number (e.g. *0363* or *WMP-0363*)."
+        `Sure! Please enter your *order number* (e.g. *0363* or *WMP-0363*) or your *registered mobile number* and I'll pull up your live tracking — courier, AWB, status, and a direct DTDC tracking link.`
       );
       return;
     }

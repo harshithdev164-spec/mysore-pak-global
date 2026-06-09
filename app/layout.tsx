@@ -101,6 +101,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             <StoreShell>{children}</StoreShell>
           </ErrorBoundary>
         </Providers>
+        {/* Floating WhatsApp button — global, always visible on every page
+            (including admin and tour-guide). Imported but unrendered until
+            this fix; that's why customers were seeing no chat button at all. */}
+        <FloatingWhatsApp />
       </body>
     </html>
   );

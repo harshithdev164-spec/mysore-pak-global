@@ -70,13 +70,13 @@ export const FAQ_ENTRIES: FaqEntry[] = [
     category: "shipping",
     question: "How long does delivery take?",
     answer:
-      "Within India: 2–5 business days (Delhivery Express). International: 3–10 business days depending on destination. Use the Track my order option in this chat to see live status once your order is shipped.",
+      "Within India: 2–5 business days via *DTDC Express* (B2C Priority). International: 3–10 business days depending on destination. Use the Track an order option in this chat to see live status once shipped, you'll get the DTDC AWB and a live tracking link.",
   },
   {
     category: "shipping",
     question: "Do you ship internationally?",
     answer:
-      "Yes! We ship to USA, UK, UAE, Saudi Arabia, Qatar, Singapore, Canada, Australia, Germany, Malaysia, Oman, and Kuwait via DHL Express or Delhivery International. Customs duties are paid by the recipient on delivery.",
+      "Yes! We ship to USA, UK, UAE, Saudi Arabia, Qatar, Singapore, Canada, Australia, Germany, Malaysia, Oman, and Kuwait via DHL Express. Customs duties are paid by the recipient on delivery.",
   },
   {
     category: "shipping",
@@ -188,7 +188,7 @@ export const FAQ_ENTRIES: FaqEntry[] = [
     category: "shipping",
     question: "Which courier do you use?",
     answer:
-      "We use DTDC Express, Delhivery, and (for international) DHL Express. The courier is chosen automatically based on serviceability and cost. You'll see the courier name on your shipping confirmation message.",
+      "For all domestic India orders we ship with *DTDC Express* (B2C Priority service). For international orders we use *DHL Express*. You'll see the courier name + AWB + a tracking link on your shipping confirmation.",
   },
   {
     category: "shipping",
@@ -594,7 +594,7 @@ export const CONTACT_INFO = {
   address: "Mysuru, Karnataka, India 570011",
 };
 
-export const SHIPPING_BLURB = `We ship across India via Delhivery Express (2–5 days) and internationally via DHL Express or Delhivery International (3–10 days).
+export const SHIPPING_BLURB = `We ship across India via *DTDC Express* B2C Priority (2-5 days) and internationally via DHL Express (3-10 days).
 
 • Free shipping on India orders above ₹1,500
 • Real-time tracking once shipped, use **Track my order** in this chat anytime
