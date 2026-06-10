@@ -86,11 +86,16 @@ export async function sendOrderDeliveredTemplate(opts: {
   }
 }
 
-// Build a courier-specific public tracking URL from name + awb.
+// Build a courier-specific public tracking URL from name + awb. Always
+// the courier's OFFICIAL tracking page so customers don't bounce through
+// a third party.
 export function trackingUrlFor(courier: string | null, awb: string): string {
   const c = (courier ?? "").toLowerCase();
-  if (c.includes("dtdc")) return `https://trackcourier.io/track-and-trace/dtdc/${awb}`;
-  if (c.includes("dhl")) return `https://www.dhl.com/global-en/home/tracking/tracking-express.html?submit=1&tracking-id=${awb}`;
+  if (c.includes("dtdc"))
+    return `https://www.dtdc.com/track-your-shipment/?strCnno=${awb}`;
+  if (c.includes("dhl"))
+    return `https://www.dhl.com/global-en/home/tracking/tracking-express.html?submit=1&tracking-id=${awb}`;
   if (c.includes("delhivery")) return `https://www.delhivery.com/tracking?id=${awb}`;
-  return `https://trackcourier.io/?awb=${awb}`;
+  // Generic fallback — DTDC's page accepts any AWB shape.
+  return `https://www.dtdc.com/track-your-shipment/?strCnno=${awb}`;
 }

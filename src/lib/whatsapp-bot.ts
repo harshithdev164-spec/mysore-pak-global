@@ -40,10 +40,14 @@ const STATUS_LABEL: Record<string, string> = {
   cancelled: "❌ Cancelled, please reach out if this is wrong",
 };
 
+// Official courier tracking URLs. DTDC's tracking page is the canonical
+// source of truth — the AWB is sent prominently in the same WhatsApp
+// message so the customer can paste it on the official site.
 const COURIER_TRACK_URL: Record<string, (awb: string) => string> = {
   delhivery: (a) => `https://www.delhivery.com/tracking?id=${a}`,
-  "dtdc express": (a) => `https://trackcourier.io/track-and-trace/dtdc/${a}`,
-  dtdc: (a) => `https://trackcourier.io/track-and-trace/dtdc/${a}`,
+  "dtdc express": (a) =>
+    `https://www.dtdc.com/track-your-shipment/?strCnno=${a}`,
+  dtdc: (a) => `https://www.dtdc.com/track-your-shipment/?strCnno=${a}`,
   "dhl express": (a) =>
     `https://www.dhl.com/global-en/home/tracking/tracking-express.html?submit=1&tracking-id=${a}`,
   dhl: (a) =>
