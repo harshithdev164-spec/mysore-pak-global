@@ -210,7 +210,7 @@ async function handoffToHuman(
     // step instead of staring at a dead-end.
     await sendWhatsAppButtons(
       from,
-      `Hmm, I'm not sure I got that one, let me flag it to our team. Meanwhile, here's what I CAN help with right now:\n\n_(Or email hello@worldofmysorepak.com to reach us directly.)_`,
+      `Hmm, I'm not sure I got that one, let me flag it to our team. Meanwhile, here's what I CAN help with right now:\n\n_(Or email support@worldofmysorepak.com to reach us directly.)_`,
       [
         { id: "shop", title: "🍬 Browse Products" },
         { id: "track_order", title: "📦 Track Order" },
@@ -223,7 +223,7 @@ async function handoffToHuman(
     // in their face when they asked for a person.
     await sendWhatsAppText(
       from,
-      `Thanks for reaching out! I'll connect you with our team, someone will get back to you soon. In the meantime, you can email hello@worldofmysorepak.com.`
+      `Thanks for reaching out! I'll connect you with our team, someone will get back to you soon. In the meantime, you can email support@worldofmysorepak.com.`
     );
   }
 
@@ -360,7 +360,7 @@ async function replyPromotions(from: string): Promise<void> {
 🏷️ *Bulk Orders (5kg+)*
   • 20% off on orders 5–10kg
   • 25% off on orders 10kg+
-  • Email: hello@worldofmysorepak.com
+  • Email: support@worldofmysorepak.com
 
 🌟 *Referral Program*
   • Share your code → They get 10% off
@@ -387,7 +387,7 @@ Monday–Sunday: 10:00 AM – 7:00 PM
 (Closed on national holidays)
 
 📞 *Contact Us*
-Email: hello@worldofmysorepak.com
+Email: support@worldofmysorepak.com
 
 🌐 Website: worldofmysorepak.com
 

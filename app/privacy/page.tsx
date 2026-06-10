@@ -71,8 +71,8 @@ export default function PrivacyPolicyPage() {
             <ul className="list-disc pl-6 space-y-1">
               <li>You can opt out of proactive WhatsApp notifications at any time by replying <strong>STOP</strong> to our business number.</li>
               <li>You can request deletion of your WhatsApp conversation history with us by emailing{" "}
-                <a href="mailto:hello@worldofmysorepak.com" className="text-[#C9972D] underline">
-                  hello@worldofmysorepak.com
+                <a href="mailto:support@worldofmysorepak.com" className="text-[#C9972D] underline">
+                  support@worldofmysorepak.com
                 </a>.</li>
               <li>Conversations are retained for up to 24 months for customer service purposes, then automatically purged unless tied to an active order dispute.</li>
             </ul>
@@ -92,8 +92,8 @@ export default function PrivacyPolicyPage() {
             <p>
               You can ask us to access, correct, or delete your personal data, or opt out of
               marketing communications, by emailing{" "}
-              <a href="mailto:hello@worldofmysorepak.com" className="text-[#C9972D] underline">
-                hello@worldofmysorepak.com
+              <a href="mailto:support@worldofmysorepak.com" className="text-[#C9972D] underline">
+                support@worldofmysorepak.com
               </a>{" "}
               or messaging us on WhatsApp at <strong>+91 63648 95293</strong>. We respond within
               30 days.
@@ -106,8 +106,8 @@ export default function PrivacyPolicyPage() {
               World of Mysore Pak<br />
               138/B 52-D, 49-D block, JC Layout, Chamundi Betta Road,<br />
               Nazarbad Mohalla, Mysuru 570011, Karnataka, India<br />
-              <a href="mailto:hello@worldofmysorepak.com" className="text-[#C9972D] underline">
-                hello@worldofmysorepak.com
+              <a href="mailto:support@worldofmysorepak.com" className="text-[#C9972D] underline">
+                support@worldofmysorepak.com
               </a>{" "}
               · +91 63648 95293
             </p>
