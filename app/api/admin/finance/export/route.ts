@@ -10,13 +10,19 @@ import {
   type RangePreset,
 } from "@/lib/finance";
 
-// GET /api/admin/finance/export?preset=30d  → multi-sheet .xlsx workbook
+// GET /api/admin/finance/export
+//   ?format=xlsx (default) → multi-sheet .xlsx workbook
+//   ?format=csv&report=<name> → single-sheet CSV
+//      report: summary | gst | product | payment | state | daily | invoices
+// Shared query params: preset, from, to, status
 export async function GET(request: Request) {
   const { searchParams } = new URL(request.url);
   const preset = (searchParams.get("preset") ?? "30d") as RangePreset;
   const from = searchParams.get("from") ?? undefined;
   const to = searchParams.get("to") ?? undefined;
   const statusFilter = (searchParams.get("status") ?? "all").toLowerCase();
+  const format = (searchParams.get("format") ?? "xlsx").toLowerCase();
+  const report = (searchParams.get("report") ?? "invoices").toLowerCase();
 
   const range = presetRange(preset, { from, to });
   const { fromUtc, toUtc } = istDayToUtcRange(range.from, range.to);
@@ -150,6 +156,38 @@ export async function GET(request: Request) {
     ]);
   }
   XLSX.utils.book_append_sheet(wb, XLSX.utils.aoa_to_sheet(invoiceSheet), "7. Invoices");
+
+  // ──────────────────────────────────────────────
+  // CSV branch — pick the requested report and stream as text/csv.
+  // SheetJS handles the quoting/escaping so commas, quotes, and Unicode
+  // in customer names or addresses don't break Excel/Google Sheets parsers.
+  // ──────────────────────────────────────────────
+  if (format === "csv") {
+    const REPORT_MAP: Record<string, { rows: (string | number)[][]; slug: string }> = {
+      summary:  { rows: salesSummary, slug: "sales-summary" },
+      gst:      { rows: gstSheet, slug: "gst-summary" },
+      product:  { rows: productSheet, slug: "product-sales" },
+      payment:  { rows: paymentSheet, slug: "payment-report" },
+      state:    { rows: stateSheet, slug: "state-report" },
+      daily:    { rows: dailySheet, slug: "daily-trend" },
+      invoices: { rows: invoiceSheet, slug: "invoices" },
+    };
+    const picked = REPORT_MAP[report] ?? REPORT_MAP.invoices;
+    const sheet = XLSX.utils.aoa_to_sheet(picked.rows);
+    const csv = XLSX.utils.sheet_to_csv(sheet, { forceQuotes: false });
+    const filename = `WoMP_${picked.slug}_${range.from}_to_${range.to}.csv`;
+    // Prepend a UTF-8 BOM so Excel opens it with the right encoding when
+    // double-clicked on Windows (otherwise customer names with accents or
+    // ₹ symbol render as garbage). Other tools ignore the BOM.
+    const body = "﻿" + csv;
+    return new Response(body, {
+      status: 200,
+      headers: {
+        "Content-Type": "text/csv; charset=utf-8",
+        "Content-Disposition": `attachment; filename="${filename}"`,
+      },
+    });
+  }
 
   const buf = XLSX.write(wb, { type: "buffer", bookType: "xlsx" });
   const filename = `WoMP_finance_${range.from}_to_${range.to}.xlsx`;

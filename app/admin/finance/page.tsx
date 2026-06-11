@@ -121,12 +121,15 @@ export default function FinancePage() {
             )}
           </p>
         </div>
-        <a
-          href={`/api/admin/finance/export?${query}`}
-          className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors"
-        >
-          📥 Download Excel
-        </a>
+        <div className="flex flex-col items-end gap-2">
+          <a
+            href={`/api/admin/finance/export?${query}`}
+            className="inline-flex items-center gap-2 px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-sm font-medium rounded-lg transition-colors"
+          >
+            📥 Download Excel (.xlsx)
+          </a>
+          <CsvMenu query={query} />
+        </div>
       </div>
 
       {/* Filters */}
@@ -352,6 +355,47 @@ export default function FinancePage() {
 // ──────────────────────────────────────────────
 // Presentational components
 // ──────────────────────────────────────────────
+
+const CSV_REPORTS: { id: string; label: string }[] = [
+  { id: "invoices", label: "Invoices (line items)" },
+  { id: "gst", label: "GST Summary" },
+  { id: "state", label: "State-wise Sales" },
+  { id: "product", label: "Product-wise Sales" },
+  { id: "payment", label: "Payment Methods" },
+  { id: "daily", label: "Daily Trend" },
+  { id: "summary", label: "Sales Summary (KPIs)" },
+];
+
+function CsvMenu({ query }: { query: string }) {
+  const [open, setOpen] = useState(false);
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setOpen((s) => !s)}
+        className="inline-flex items-center gap-2 px-4 py-2 bg-white hover:bg-gray-50 text-gray-700 text-sm font-medium rounded-lg border border-gray-300 transition-colors"
+      >
+        📄 Download CSV ▾
+      </button>
+      {open && (
+        <div
+          className="absolute right-0 mt-1 z-30 w-60 bg-white border border-gray-200 rounded-lg shadow-lg overflow-hidden"
+          onMouseLeave={() => setOpen(false)}
+        >
+          {CSV_REPORTS.map((r) => (
+            <a
+              key={r.id}
+              href={`/api/admin/finance/export?${query}&format=csv&report=${r.id}`}
+              onClick={() => setOpen(false)}
+              className="block px-4 py-2 text-sm text-gray-700 hover:bg-emerald-50 hover:text-emerald-700 border-b border-gray-100 last:border-b-0"
+            >
+              {r.label}
+            </a>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
 
 function Kpi({
   label, value, sub, loading, accent,
