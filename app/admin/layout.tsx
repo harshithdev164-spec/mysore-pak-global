@@ -13,6 +13,7 @@ const navItems = [
   { href: "/admin/categories", label: "Categories", icon: "◉", exact: false },
   { href: "/admin/explore", label: "Manage Discovery", icon: "🗺", exact: false },
   { href: "/admin/whatsapp", label: "WhatsApp", icon: "💬", exact: false },
+  { href: "/admin/finance", label: "Finance & GST", icon: "📊", exact: false },
 ];
 
 export default function AdminLayout({ children }: { children: ReactNode }) {
