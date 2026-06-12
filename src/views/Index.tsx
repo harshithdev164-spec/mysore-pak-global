@@ -222,10 +222,10 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
             {[
               { name: "Mysore Pak",  slug: "mysore-pak",  img: "/mysoree paak.png",   accent: "#C9972D" },
               { name: "Gift Boxes",  slug: "gift-boxes",  img: "/Gift Boxes.webp",   accent: "#C4512A" },
-              { name: "Ghee Sweets", slug: "ghee-sweets", img: "/Ghee sweets.webp",  accent: "#1B3A2D" },
+              { name: "Ghee Sweets", slug: "ghee-sweets", img: "/Ghee Sweets.webp",  accent: "#1B3A2D" },
               { name: "Namkeens",    slug: "namkeens",    img: "/Namkeen.webp",       accent: "#1B3A2D" },
               { name: "Chocolates",  slug: "chocolates",  img: "/chocolates.webp",     accent: "#C9972D" },
-              { name: "Specials",    slug: "specials",    img: "/specials.webp",      accent: "#C4512A" },
+              { name: "Specials",    slug: "specials",    img: "/Specials.webp",      accent: "#C4512A" },
             ].map((cat) => (
               <motion.div
                 key={cat.slug}
@@ -399,7 +399,7 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
             {[
               { img: "/mysoree paak.png",  name: "Classic Mysore Pak",    sub: "The original, perfected"     },
               { img: "/Gift Boxes.webp",  name: "Premium Gift Hampers",  sub: "For every celebration"       },
-              { img: "/specials.webp",    name: "Artisan Specials",      sub: "Limited seasonal drops"      },
+              { img: "/Specials.webp",    name: "Artisan Specials",      sub: "Limited seasonal drops"      },
               { img: "/chocolates.webp",   name: "Flavored Collection",   sub: "Bold new combinations"       },
             ].map((col, i) => (
               <motion.div

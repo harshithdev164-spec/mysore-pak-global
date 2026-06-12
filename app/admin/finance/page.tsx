@@ -9,7 +9,12 @@ import {
 export const dynamic = "force-dynamic";
 
 type Preset = "today" | "yesterday" | "7d" | "30d" | "this_month" | "last_month" | "custom";
-type Status = "all" | "paid" | "pending" | "refunded";
+// Finance only ever counts orders that customers have actually paid for.
+// "paid"          → strictly paid + not cancelled (default)
+// "with_refunded" → paid + refunded (for end-of-month reconciliation view)
+// "refunded"     → refunded only (audit)
+// Pending and cancelled orders are NEVER included.
+type Status = "paid" | "with_refunded" | "refunded";
 
 interface ApiResponse {
   range: { from: string; to: string };
@@ -51,10 +56,9 @@ const PRESETS: { id: Preset; label: string }[] = [
 ];
 
 const STATUSES: { id: Status; label: string }[] = [
-  { id: "all", label: "All orders" },
-  { id: "paid", label: "Paid only" },
-  { id: "pending", label: "Pending" },
-  { id: "refunded", label: "Refunded" },
+  { id: "paid", label: "Paid (confirmed)" },
+  { id: "with_refunded", label: "Paid + Refunded" },
+  { id: "refunded", label: "Refunded only" },
 ];
 
 export default function FinancePage() {
@@ -114,7 +118,9 @@ export default function FinancePage() {
         <div>
           <h1 className="text-2xl font-bold text-gray-900">Finance & GST</h1>
           <p className="text-sm text-gray-500 mt-1">
-            Live sales + GST reporting from your orders. GST rate applied:{" "}
+            Live sales + GST reporting from confirmed paid orders.{" "}
+            <span className="text-gray-400">(Pending and cancelled orders are excluded.)</span>{" "}
+            GST rate applied:{" "}
             <span className="font-semibold text-emerald-700">{data?.gst_rate_pct ?? 18}%</span>{" "}
             {data && (
               <>· Range: <span className="font-mono">{data.range.from}</span> → <span className="font-mono">{data.range.to}</span> (IST)</>

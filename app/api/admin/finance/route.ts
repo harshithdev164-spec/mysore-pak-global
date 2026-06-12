@@ -16,7 +16,10 @@ export async function GET(request: Request) {
   const preset = (searchParams.get("preset") ?? "30d") as RangePreset;
   const from = searchParams.get("from") ?? undefined;
   const to = searchParams.get("to") ?? undefined;
-  const statusFilter = (searchParams.get("status") ?? "all").toLowerCase();
+  // Finance reporting MUST ignore unpaid/cancelled orders entirely, no
+  // matter what the UI sends. The dashboard's "status" filter only
+  // toggles whether refunded orders are folded in alongside paid.
+  const statusFilter = (searchParams.get("status") ?? "paid").toLowerCase();
 
   const range = presetRange(preset, { from, to });
   const { fromUtc, toUtc } = istDayToUtcRange(range.from, range.to);
@@ -34,11 +37,22 @@ export async function GET(request: Request) {
     `)
     .gte("created_at", fromUtc)
     .lte("created_at", toUtc)
+    // Cancelled orders are never finance revenue — drop them at the DB level
+    // regardless of payment_status (a customer can have cancelled-but-paid
+    // which is a refund-in-progress case, handled separately).
+    .neq("status", "cancelled")
     .order("created_at", { ascending: false });
 
-  if (statusFilter === "paid") query = query.eq("payment_status", "paid");
-  else if (statusFilter === "pending") query = query.eq("payment_status", "pending");
-  else if (statusFilter === "refunded") query = query.eq("payment_status", "refunded");
+  if (statusFilter === "refunded") {
+    // Refunded-only audit view
+    query = query.eq("payment_status", "refunded");
+  } else if (statusFilter === "with_refunded") {
+    // Paid + refunded — useful for end-of-month reconciliation
+    query = query.in("payment_status", ["paid", "refunded"]);
+  } else {
+    // Default & "paid" → strictly paid orders. Pending/failed never counted.
+    query = query.eq("payment_status", "paid");
+  }
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });

@@ -20,7 +20,9 @@ export async function GET(request: Request) {
   const preset = (searchParams.get("preset") ?? "30d") as RangePreset;
   const from = searchParams.get("from") ?? undefined;
   const to = searchParams.get("to") ?? undefined;
-  const statusFilter = (searchParams.get("status") ?? "all").toLowerCase();
+  // Finance exports must never include pending/cancelled orders. Same
+  // discipline as /api/admin/finance — see comment there.
+  const statusFilter = (searchParams.get("status") ?? "paid").toLowerCase();
   const format = (searchParams.get("format") ?? "xlsx").toLowerCase();
   const report = (searchParams.get("report") ?? "invoices").toLowerCase();
 
@@ -40,11 +42,16 @@ export async function GET(request: Request) {
     `)
     .gte("created_at", fromUtc)
     .lte("created_at", toUtc)
+    .neq("status", "cancelled")
     .order("created_at", { ascending: true });
 
-  if (statusFilter === "paid") query = query.eq("payment_status", "paid");
-  else if (statusFilter === "pending") query = query.eq("payment_status", "pending");
-  else if (statusFilter === "refunded") query = query.eq("payment_status", "refunded");
+  if (statusFilter === "refunded") {
+    query = query.eq("payment_status", "refunded");
+  } else if (statusFilter === "with_refunded") {
+    query = query.in("payment_status", ["paid", "refunded"]);
+  } else {
+    query = query.eq("payment_status", "paid");
+  }
 
   const { data, error } = await query;
   if (error) return NextResponse.json({ error: error.message }, { status: 500 });
