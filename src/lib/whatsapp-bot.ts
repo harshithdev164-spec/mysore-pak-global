@@ -247,7 +247,7 @@ async function handoffToHuman(
 async function replyGreeting(from: string): Promise<void> {
   await sendWhatsAppButtons(
     from,
-    `Namaste! 🙏 You've reached *World of Mysore Pak*. How can I help?\n\nType *offers* for promotions or *contact* for store details.`,
+    `Namaste! 🙏 You've reached *World of Mysore Pak*. How can I help?\n\nType *contact* for store details or *human* to talk to our team.`,
     [
       { id: "shop", title: "🍬 Browse Products" },
       { id: "track_order", title: "📦 Track Order" },
@@ -339,36 +339,6 @@ async function replyFaqByCategory(from: string, category: string): Promise<void>
 
   lines.push(`Still have questions? Type your question naturally or ask for a *human*. 💬`);
   await sendWhatsAppText(from, lines.join("\n"));
-}
-
-// ──────────────────────────────────────────────
-// Tier-1 Feature: Current Promotions
-// ──────────────────────────────────────────────
-async function replyPromotions(from: string): Promise<void> {
-  const text = `
-🎉 *Current Offers & Promotions*
-
-💝 *Summer Festival Special* (valid till June 30)
-  • Buy 3 items → 15% off
-  • Free shipping on orders above ₹1,500
-  • Use code: *SUMMER15*
-
-🎁 *New Customer Exclusive*
-  • 10% off your first order
-  • Use code: *WELCOME10*
-
-🏷️ *Bulk Orders (5kg+)*
-  • 20% off on orders 5–10kg
-  • 25% off on orders 10kg+
-  • Email: support@worldofmysorepak.com
-
-🌟 *Referral Program*
-  • Share your code → They get 10% off
-  • You get ₹100 credit per referral
-
-Full shop: ${SITE}/shop
-  `.trim();
-  await sendWhatsAppText(from, text);
 }
 
 // ──────────────────────────────────────────────
@@ -466,11 +436,6 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
     if (buttonId === "faq") {
       await clearWaSession(from);
       await replyFaqCategories(from);
-      return;
-    }
-    if (buttonId === "promo") {
-      await clearWaSession(from);
-      await replyPromotions(from);
       return;
     }
     if (buttonId === "contact") {
@@ -595,11 +560,6 @@ export async function routeIncomingMessage(msg: IncomingMessage): Promise<void> 
       from,
       `Browse our full range: ${SITE}/shop\n\nOr tell me what you're craving and I'll send a direct link.`
     );
-    return;
-  }
-
-  if (/^(offers|promo|promotions|deals|discounts?)\b/i.test(t)) {
-    await replyPromotions(from);
     return;
   }
 

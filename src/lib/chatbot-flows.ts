@@ -440,22 +440,11 @@ export const FAQ_ENTRIES: FaqEntry[] = [
   },
 
   // ─────────────────────────────────────────────
-  // Discounts / coupons / first-order
+  // Free shipping + bulk orders (no fake coupon codes — those answers
+  // were misleading and have been removed)
   // ─────────────────────────────────────────────
   {
-    category: "discounts",
-    question: "Do you have any discount or coupon code?",
-    answer:
-      "Active offers are pinned at the top of https://www.worldofmysorepak.com, usually a first-order code and a festival drop. Sign up to our newsletter (footer) to get codes by email before anyone else.",
-  },
-  {
-    category: "discounts",
-    question: "Any first-order discount?",
-    answer:
-      "Yes, check the homepage banner for the current first-order coupon. Apply it at checkout.",
-  },
-  {
-    category: "discounts",
+    category: "shipping",
     question: "Is there free shipping or free gift on bulk orders?",
     answer:
       "Free shipping on India orders above ₹1,500. Bulk orders (10+ boxes) get tiered discounts AND complimentary upgraded packaging, reply *bulk* or email corporate@worldofmysorepak.com for a quote.",

@@ -293,7 +293,6 @@ const CATEGORY_HINTS: Record<string, string[]> = {
   brand: ["brand","location","fssai","quality"],
   contact: ["contact","phone","whatsapp","email","hours","location"],
   quality: ["quality","fresh","ghee","fssai"],
-  discounts: ["discount","free"],
   invoicing: ["gst","tax"],
 };
 
