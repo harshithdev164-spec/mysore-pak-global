@@ -17,7 +17,19 @@ export async function GET(request: Request) {
       .order("created_at", { ascending: true })
       .limit(500);
     if (error) return NextResponse.json({ error: error.message }, { status: 500 });
-    return NextResponse.json({ data: data ?? [] });
+
+    // Locate the most recent inbound message so the UI can show the
+    // 24-hour service-window status. Outside that window, only pre-
+    // approved templates deliver as free-text — Meta will 400 us.
+    let last_inbound_at: string | null = null;
+    for (let i = (data?.length ?? 0) - 1; i >= 0; i--) {
+      const m = data![i] as { direction: string; created_at: string };
+      if (m.direction === "inbound") {
+        last_inbound_at = m.created_at;
+        break;
+      }
+    }
+    return NextResponse.json({ data: data ?? [], last_inbound_at });
   }
 
   // Conversation list — most recent message per wa_id with the body preview.
