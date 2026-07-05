@@ -25,6 +25,9 @@ export default function StoreShell({ children }: { children: React.ReactNode }) 
   const pathname = usePathname();
   const isTourGuide = pathname?.startsWith("/tour-guide");
   const isAdmin = pathname?.startsWith("/admin");
+  // "Watch Our Story" auto-popup is for first-time landings on the homepage
+  // only — everywhere else it's noise that interrupts the page goal.
+  const isHome = pathname === "/";
 
   if (isAdmin || isTourGuide) return <>{children}</>;
 
@@ -48,7 +51,7 @@ export default function StoreShell({ children }: { children: React.ReactNode }) 
       <Navbar />
       <main className="min-h-screen pt-8">{children}</main>
       <Footer />
-      <VideoPopup />
+      {isHome && <VideoPopup />}
     </>
   );
 }

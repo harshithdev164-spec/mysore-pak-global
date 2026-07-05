@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import ProductCard from "@/components/ProductCard";
@@ -38,11 +39,10 @@ function mapApiProduct(p: any): Product {
 // ── Hardcoded sidebar categories — same images as homepage, independent of DB ──
 const SIDEBAR_CATEGORIES = [
   { slug: "mysore-pak",  name: "Mysore Pak",  image: "/mysoree paak.png" },
-  { slug: "ghee-sweets", name: "Ghee Sweets", image: "/Ghee sweets.webp" },
+  { slug: "ghee-sweets", name: "Ghee Sweets", image: "/ghee-sweets.webp" },
   { slug: "gift-boxes",  name: "Gift Boxes",  image: "/Gift Boxes.webp" },
   { slug: "namkeens",    name: "Namkeens",    image: "/Namkeen.webp" },
   { slug: "chocolates",  name: "Chocolates",  image: "/chocolates.webp" },
-  { slug: "specials",    name: "Specials",    image: "/specials.webp" },
 ] as const;
 
 const SORT_OPTIONS = [
@@ -51,6 +51,47 @@ const SORT_OPTIONS = [
   { value: "price-high", label: "Price: High to Low" },
   { value: "rating",     label: "Top Rated" },
 ];
+
+/* ── Horizontal pill used in the mobile top strip ── */
+function MobileCatPill({
+  name, image, selected, onClick,
+}: {
+  name: string; image: string | null;
+  selected: boolean; onClick: () => void;
+}) {
+  return (
+    <button
+      onClick={onClick}
+      className="flex flex-col items-center gap-1.5 shrink-0 snap-start w-[68px]"
+    >
+      <div
+        className={`w-14 h-14 rounded-full overflow-hidden border-2 transition-all duration-200 ${
+          selected
+            ? "border-[#C9972D] shadow-md shadow-[#C9972D]/30"
+            : "border-[#1B3A2D]/10"
+        }`}
+      >
+        {image ? (
+          // eslint-disable-next-line @next/next/no-img-element
+          <img src={image} alt={name} className="w-full h-full object-cover" loading="lazy" />
+        ) : (
+          <div className={`w-full h-full flex items-center justify-center ${selected ? "bg-[#1B3A2D]" : "bg-[#1B3A2D]/10"}`}>
+            <span className={`font-heading font-bold text-base ${selected ? "text-[#C9972D]" : "text-[#1B3A2D]/60"}`}>
+              {name[0]}
+            </span>
+          </div>
+        )}
+      </div>
+      <span
+        className={`font-body text-[10px] font-semibold text-center leading-tight w-full truncate transition-colors duration-200 ${
+          selected ? "text-[#C9972D]" : "text-[#1B3A2D]/55"
+        }`}
+      >
+        {name}
+      </span>
+    </button>
+  );
+}
 
 /* ── Sidebar category button ── */
 function CatItem({
@@ -172,6 +213,26 @@ const Shop = ({ initialProducts }: Props) => {
       {/* ── Shop Header — fixed, never scrolls ── */}
       <div className="bg-[#1B3A2D] py-5 sm:py-7 px-4 shrink-0 relative overflow-hidden">
         <div className="relative max-w-7xl mx-auto">
+          {/* Visible breadcrumb — small inverted text inside the dark header */}
+          <nav aria-label="Breadcrumb" className="mb-2">
+            <ol className="flex flex-wrap items-center gap-1.5 font-body text-[10px] sm:text-[11px] tracking-wider uppercase text-[#FBF7F0]/45">
+              <li>
+                <Link href="/" className="hover:text-[#C9972D] transition-colors">Home</Link>
+              </li>
+              <li aria-hidden className="text-[#FBF7F0]/25">/</li>
+              <li>
+                <Link href="/shop" className="hover:text-[#C9972D] transition-colors">Shop</Link>
+              </li>
+              {urlCategory && urlCategory !== "mysore-pak" && (
+                <>
+                  <li aria-hidden className="text-[#FBF7F0]/25">/</li>
+                  <li aria-current="page" className="text-[#C9972D] font-semibold">
+                    {selectedLabel}
+                  </li>
+                </>
+              )}
+            </ol>
+          </nav>
           <motion.div
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
@@ -187,11 +248,33 @@ const Shop = ({ initialProducts }: Props) => {
         </div>
       </div>
 
+      {/* ── Mobile-only horizontal category strip — sits below the dark header,
+              snap-scrolls horizontally so all categories are reachable with a thumb. */}
+      <div className="sm:hidden shrink-0 bg-[#FBF7F0] border-b border-[#1B3A2D]/8">
+        <div
+          className="
+            flex gap-4 px-4 py-3
+            overflow-x-auto snap-x snap-mandatory
+            [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden
+          "
+        >
+          {SIDEBAR_CATEGORIES.map((cat) => (
+            <MobileCatPill
+              key={cat.slug}
+              name={cat.name}
+              image={cat.image}
+              selected={urlCategory === cat.slug}
+              onClick={() => selectCategory(cat.slug)}
+            />
+          ))}
+        </div>
+      </div>
+
       {/* ── Main layout — fills remaining viewport height ── */}
       <div className="flex flex-1 min-h-0 max-w-7xl mx-auto w-full">
 
-        {/* ── Left sidebar — does not scroll with products ── */}
-        <aside className="flex flex-col w-[68px] sm:w-[88px] lg:w-[100px] shrink-0 overflow-y-auto scrollbar-hide border-r border-[#1B3A2D]/8 bg-[#FBF7F0] py-2 sm:py-4">
+        {/* ── Left sidebar — desktop / tablet only; mobile uses the strip above ── */}
+        <aside className="hidden sm:flex flex-col w-[88px] lg:w-[100px] shrink-0 overflow-y-auto scrollbar-hide border-r border-[#1B3A2D]/8 bg-[#FBF7F0] py-2 sm:py-4">
           {SIDEBAR_CATEGORIES.map((cat) => (
             <CatItem
               key={cat.slug}

@@ -1,11 +1,18 @@
 import { notFound } from "next/navigation";
-import Link from "next/link";
 import Image from "next/image";
-import { ArrowLeft } from "lucide-react";
 import { createServerClient } from "@/lib/supabase";
 import ProductActions from "@/components/ProductActions";
+import SpecialMysorePakDetail from "@/components/SpecialMysorePakDetail";
+import Breadcrumbs from "@/components/Breadcrumbs";
+import ProductReviews from "@/components/ProductReviews";
 import { products, type Product } from "@/data/products";
 import type { Metadata } from "next";
+
+// Slugs that opt in to the long-form Anand-style PDP layout. Start with one
+// SKU as a trial — if customers convert better here, lift it to all products.
+const RICH_PDP_SLUGS = new Set<string>([
+  "buy-special-mysore-pak-online",
+]);
 
 export const revalidate = 60;
 
@@ -79,18 +86,60 @@ export default async function ProductDetailPage({ params }: PageProps) {
     reviews: p.review_count ?? 0,
   };
 
-  return (
-    <div className="min-h-screen bg-[#FBF7F0] pt-28 sm:pt-36">
-      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 pb-16">
-        {/* Back link */}
-        <Link
-          href="/shop"
-          className="inline-flex items-center gap-2 font-body text-xs font-semibold tracking-wider uppercase text-[#1B3A2D]/50 hover:text-[#1B3A2D] transition-colors mb-8"
-        >
-          <ArrowLeft className="h-3.5 w-3.5" />
-          Back to Shop
-        </Link>
+  // Rich Anand-style PDP for opted-in slugs. We fetch up to 4 other Mysore
+  // Pak siblings for the "you may also like" rail; if the category lookup
+  // returns nothing we just hide the rail rather than fail the page.
+  if (RICH_PDP_SLUGS.has(product.slug)) {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const categoryId = (p.category as any)?.id as string | undefined;
+    let related: Product[] = [];
+    if (categoryId) {
+      const { data: siblings } = await supabase
+        .from("products")
+        .select(`
+          id, name, slug, base_price, image, badge,
+          weights:product_weights(id, label, price, stock_quantity)
+        `)
+        .eq("category_id", categoryId)
+        .eq("is_active", true)
+        .neq("slug", product.slug)
+        .limit(4);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      related = ((siblings ?? []) as any[]).map((s) => ({
+        id: s.id,
+        name: s.name,
+        slug: s.slug,
+        price: s.base_price,
+        category: product.category,
+        description: "",
+        ingredients: "",
+        storage: "",
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
+        weights: ((s.weights ?? []) as any[]).map((w) => ({
+          id: w.id,
+          label: w.label,
+          price: w.price,
+          stock_quantity: w.stock_quantity ?? 100,
+        })),
+        image: s.image ?? "",
+        badge: s.badge ?? undefined,
+        rating: 0,
+        reviews: 0,
+      }));
+    }
+    return <SpecialMysorePakDetail product={product} related={related} />;
+  }
 
+  return (
+    <div className="min-h-screen bg-[#FBF7F0]">
+      <Breadcrumbs
+        items={[
+          { label: "Home", href: "/" },
+          { label: "Shop", href: "/shop" },
+          { label: product.name },
+        ]}
+      />
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-6 pb-16">
         <div className="grid lg:grid-cols-2 gap-10 lg:gap-16 items-start">
           {/* Product image */}
           <div className="relative aspect-square rounded-3xl overflow-hidden bg-white shadow-xl shadow-[#1B3A2D]/8 border border-[#1B3A2D]/6">
@@ -114,6 +163,8 @@ export default async function ProductDetailPage({ params }: PageProps) {
           <ProductActions product={product} />
         </div>
       </div>
+
+      <ProductReviews productName={product.name} />
     </div>
   );
 }

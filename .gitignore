@@ -15,10 +15,19 @@ dist-ssr
 .next
 out
 
-# Environment variables
+# Environment variables — every file whose name ends in .env is treated as
+# secret. The .env.example template is the only whitelisted file.
 .env
 .env.*
+*.env
 !.env.example
+
+# Local dev credentials / cookies / one-off scratch files that keep showing up
+cookies.txt
+temp_*.txt
+temp_*.json
+hf_*.webp
+tsconfig.tsbuildinfo
 
 # Editor directories and files
 .vscode/*

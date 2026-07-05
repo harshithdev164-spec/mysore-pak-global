@@ -3,6 +3,7 @@ import { NextResponse } from "next/server";
 import { createServerClient } from "@/lib/supabase";
 import { z } from "zod";
 import { createDelhiveryOrder, parseWeightKg } from "@/lib/delhivery";
+import { isDtdcConfigured } from "@/lib/dtdc";
 import { generateOrderNumber } from "@/lib/order-utils";
 
 const OrderItemSchema = z.object({
@@ -85,7 +86,9 @@ export async function POST(request: Request) {
     shipping_address,
     notes: notes ?? null,
   };
-  if (courier_id !== undefined) insertPayload.courier_id = courier_id;
+  // If courier not provided and this is a COD order, prefer DTDC when configured
+  const finalCourierId = courier_id !== undefined ? courier_id : isCod && isDtdcConfigured() ? 200 : undefined;
+  if (finalCourierId !== undefined) insertPayload.courier_id = finalCourierId;
 
   const { data: order, error: orderError } = await supabase
     .from("orders")
@@ -158,7 +161,7 @@ export async function POST(request: Request) {
         .replace("T", " ")
         .slice(0, 16);
 
-      if (courier_id === 200) {
+      if (finalCourierId === 200) {
         // ── DTDC Express ──
         try {
           const { createDtdcOrder } = await import("@/lib/dtdc");

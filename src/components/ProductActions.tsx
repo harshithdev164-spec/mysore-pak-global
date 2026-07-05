@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
 import { useCart } from "@/context/CartContext";
 import { useStockUpdates } from "@/lib/useStockUpdates";
@@ -17,6 +18,7 @@ export default function ProductActions({ product }: Props) {
   const [stockError, setStockError] = useState("");
   const { addItem } = useCart();
   const stocks = useStockUpdates(product.id);
+  const router = useRouter();
 
   const currentWeight = product.weights[selectedWeight];
   const price = currentWeight?.price ?? product.price;
@@ -31,6 +33,18 @@ export default function ProductActions({ product }: Props) {
       return;
     }
     addItem(product, currentWeight?.label ?? "", price);
+  };
+
+  // Buy Now: skip the cart drawer entirely — add this variant and jump
+  // straight to /checkout. Customers asked for one-tap purchase.
+  const handleBuyNow = () => {
+    if (outOfStock) {
+      setStockError("This variant is out of stock");
+      setTimeout(() => setStockError(""), 3000);
+      return;
+    }
+    addItem(product, currentWeight?.label ?? "", price);
+    router.push("/checkout");
   };
 
   return (
@@ -154,7 +168,7 @@ export default function ProductActions({ product }: Props) {
         </motion.button>
         <motion.div whileHover={!outOfStock ? { scale: 1.02 } : {}} whileTap={!outOfStock ? { scale: 0.97 } : {}} className="flex-1">
           <button
-            onClick={handleAddToCart}
+            onClick={handleBuyNow}
             disabled={outOfStock}
             className={`flex items-center justify-center w-full font-body text-sm font-bold uppercase tracking-wider py-4 rounded-2xl transition-colors shadow-lg ${
               outOfStock

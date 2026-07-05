@@ -83,6 +83,28 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           'https://www.googletagmanager.com/gtm.js?id='+i+dl;f.parentNode.insertBefore(j,f);
           })(window,document,'script','dataLayer','GTM-PLN4TZZR');`}
         </Script>
+        {/* Organization schema markup (JSON-LD) */}
+        <script
+          type="application/ld+json"
+          // eslint-disable-next-line react/no-danger
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "Organization",
+              name: "World Of Mysore Pak",
+              url: "https://www.worldofmysorepak.com/",
+              logo: "https://www.worldofmysorepak.com/logo.svg",
+              sameAs: [
+                "https://www.facebook.com/profile.php?id=61568545833768&mibextid=ZbWKwL",
+                "https://www.instagram.com/worldofmysorepakofficial?igsh=MWQ2ejRyYmtxdW02aw==",
+                "https://youtube.com/@worldofmysorepak?si=t6_hvr6a-hE7RgWm",
+                "https://www.linkedin.com/company/world-of-mysorepak/",
+              ],
+            }),
+          }}
+        />
+        {/* End Organization schema markup (JSON-LD) */}
+
         {/* End Google Tag Manager */}
       </head>
       <body>

@@ -16,23 +16,33 @@ export async function GET(request: Request) {
   try {
     const rates = [];
 
-    if (process.env.DELHIVERY_TOKEN) {
+    // For domestic checkout we only offer DTDC by default.
+    // If DTDC isn't configured, fall back to Delhivery when available.
+    const dtdcRate = calculateDtdcStaticRate(weight);
+    if (isDtdcConfigured()) {
+      rates.push({
+        courier_company_id: 200,
+        courier_name: "DTDC Express",
+        rate: dtdcRate.rate_inr,
+        etd: dtdcRate.etd_days,
+      });
+    } else if (process.env.DELHIVERY_TOKEN) {
       try {
         const delhiveryRates = await checkServiceability(pincode, weight);
         rates.push(...delhiveryRates);
       } catch (err) {
         console.error("[Delhivery] rates error:", err);
       }
+      // Also show DTDC static rate even if not configured so admins can see option
+      rates.push({
+        courier_company_id: 200,
+        courier_name: "DTDC Express",
+        rate: dtdcRate.rate_inr,
+        etd: dtdcRate.etd_days,
+      });
+    } else {
+      // No shipping providers configured
     }
-
-    // Always show DTDC as an option using static rates (since no live rate API is provided)
-    const dtdcRate = calculateDtdcStaticRate(weight);
-    rates.push({
-      courier_company_id: 200,
-      courier_name: "DTDC Express",
-      rate: dtdcRate.rate_inr,
-      etd: dtdcRate.etd_days,
-    });
 
     if (rates.length === 0) {
       return NextResponse.json({ error: "Shipping service not configured" }, { status: 503 });

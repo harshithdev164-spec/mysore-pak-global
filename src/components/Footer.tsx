@@ -2,7 +2,23 @@
 
 import Link from "next/link";
 import { motion } from "framer-motion";
-import { MapPin, Mail, Phone, MessageCircle, Instagram, Facebook, Twitter, ArrowUpRight } from "lucide-react";
+import { MapPin, Mail, Phone, MessageCircle, Instagram, Facebook, ArrowUpRight } from "lucide-react";
+
+// Public social URLs — same Instagram handle as the "Follow us" strip on the
+// homepage and the Organization JSON-LD in app/layout.tsx. Keep these three
+// in sync if any handle changes.
+const SOCIAL_LINKS: { Icon: typeof Instagram; href: string; label: string }[] = [
+  {
+    Icon: Instagram,
+    href: "https://www.instagram.com/worldofmysorepakofficial?igsh=MThheDhvMXUyazhrYw==",
+    label: "Instagram",
+  },
+  {
+    Icon: Facebook,
+    href: "https://www.facebook.com/profile.php?id=61568545833768&mibextid=ZbWKwL",
+    label: "Facebook",
+  },
+];
 
 const Footer = () => (
   <footer className="relative overflow-hidden">
@@ -46,10 +62,13 @@ const Footer = () => (
               traditional recipes — bringing Mysuru&apos;s sweetness to the world.
             </p>
             <div className="flex gap-3">
-              {[Instagram, Facebook, Twitter].map((Icon, i) => (
+              {SOCIAL_LINKS.map(({ Icon, href, label }) => (
                 <motion.a
-                  key={i}
-                  href="#"
+                  key={label}
+                  href={href}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  aria-label={label}
                   whileHover={{ scale: 1.1, y: -2 }}
                   className="w-9 h-9 rounded-full bg-[#FBF7F0]/5 border border-[#FBF7F0]/10 flex items-center justify-center hover:bg-[#C9972D]/20 hover:border-[#C9972D]/40 transition-all duration-300"
                 >

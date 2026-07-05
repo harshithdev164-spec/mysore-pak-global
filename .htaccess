@@ -1,0 +1,27 @@
+# Cloudways / Apache — reverse-proxy every request to the Next.js standalone
+# server that PM2 keeps running on 127.0.0.1:3000 (see ecosystem.config.js).
+#
+# REQUIREMENT: mod_proxy must be enabled on the server. Cloudways disables it
+# by default — raise a support ticket asking them to enable mod_proxy and
+# mod_proxy_http on your Apache before this will work.
+#
+# Harmless on Vercel / dev environments (they ignore .htaccess entirely).
+
+DirectoryIndex disabled
+
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+
+  # Let Let's Encrypt / ACME renewals through untouched
+  RewriteRule ^\.well-known/ - [L]
+
+  # Proxy everything else to the Next.js process
+  RewriteRule ^(.*)$ http://127.0.0.1:3000/$1 [P,L]
+</IfModule>
+
+# Passthrough headers Next.js sets (cookies, cache-control, etc.)
+<IfModule mod_proxy.c>
+  ProxyPreserveHost On
+  ProxyPassReverse / http://127.0.0.1:3000/
+</IfModule>

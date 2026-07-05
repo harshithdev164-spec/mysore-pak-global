@@ -1,7 +1,7 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useState, useEffect, useMemo } from "react";
+import { useState, useEffect, useMemo, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { ArrowRight, Star, StarHalf, Gift, ChefHat, Flame, Truck, CheckCircle2, Package, Award, Sparkles, Heart, Instagram } from "lucide-react";
@@ -98,6 +98,8 @@ const stagger = {
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
   const [nearFooter, setNearFooter] = useState(false);
+  const mobileVideoRef = useRef<HTMLVideoElement>(null);
+  const desktopVideoRef = useRef<HTMLVideoElement>(null);
 
   useEffect(() => {
     function onScroll() {
@@ -108,6 +110,26 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
     }
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => window.removeEventListener("scroll", onScroll);
+  }, []);
+
+  // iOS Safari autoplay quirks:
+  //  - Muted must be set as a DOM property AND as an attribute (React only sets
+  //    the property, and iOS Safari checks the attribute before allowing autoplay).
+  //  - `webkit-playsinline` is required for iOS <10 and doesn't hurt on newer.
+  //  - The initial autoplay attribute alone is unreliable across the muted
+  //    property race — we explicitly call play() after mount and swallow the
+  //    NotAllowedError if it does fire (rare — usually Low Power Mode).
+  useEffect(() => {
+    [mobileVideoRef.current, desktopVideoRef.current].forEach((v) => {
+      if (!v) return;
+      v.muted = true;
+      v.defaultMuted = true;
+      v.setAttribute("muted", "");
+      v.setAttribute("playsinline", "");
+      v.setAttribute("webkit-playsinline", "");
+      const p = v.play();
+      if (p && typeof p.catch === "function") p.catch(() => { /* iOS Low Power Mode */ });
+    });
   }, []);
 
   // Order server-fetched products to match FEATURED_SLUGS order.
@@ -137,26 +159,43 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
       ══════════════════════════════════════════ */}
       {/* Mobile: fixed-height e-commerce banner | Desktop: full-screen hero */}
       <section className="relative h-[70vh] sm:h-screen min-h-[320px] sm:min-h-[640px] overflow-hidden select-none">
-        {/* Hero image — CSS-based responsive swap, no JS flash */}
+        {/* Hero video — CSS-based responsive swap, no JS flash.
+            Both videos autoplay muted + loop (browser requires muted for autoplay).
+            Posters use the previous still images so nothing pops in blank while
+            the .webm is downloading. */}
         <div className="absolute inset-x-0 bottom-0 top-[4rem] sm:top-[5.5rem]">
-          {/* Mobile image — hidden on sm+ */}
-          <Image
-            src="/mobile heroo.webp"
-            alt="World of Mysore Pak"
-            fill
-            priority
-            className="block sm:hidden object-contain object-center"
-            sizes="100vw"
-          />
-          {/* Desktop image — hidden below sm */}
-          <Image
-            src="/pc heroo.webp"
-            alt="World of Mysore Pak"
-            fill
-            priority
-            className="hidden sm:block object-cover object-center"
-            sizes="100vw"
-          />
+          {/* Mobile — vertical video, hidden on sm+ */}
+          <video
+            ref={mobileVideoRef}
+            poster="/mobile heroo.webp"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            disableRemotePlayback
+            aria-label="World of Mysore Pak"
+            className="block sm:hidden absolute inset-0 w-full h-full object-cover object-center"
+          >
+            {/* Source in a child <source> — iOS is happier fetching this way than
+                from a src attribute when combined with autoplay. */}
+            <source src="/WOMP%20VERTICAL.webm" type="video/webm" />
+          </video>
+          {/* Desktop — landscape video, hidden below sm */}
+          <video
+            ref={desktopVideoRef}
+            poster="/pc heroo.webp"
+            autoPlay
+            muted
+            loop
+            playsInline
+            preload="auto"
+            disableRemotePlayback
+            aria-label="World of Mysore Pak"
+            className="hidden sm:block absolute inset-0 w-full h-full object-cover object-center"
+          >
+            <source src="/WOMP%20HERO.webm" type="video/webm" />
+          </video>
         </div>
 
       </section>
@@ -194,7 +233,7 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
       </div>
 
       {/* ══ CATEGORIES ══ */}
-      <section className="pt-6 pb-8 sm:pt-8 sm:pb-10 bg-[#FBF7F0] relative overflow-hidden">
+      <section className="pt-10 pb-12 sm:pt-16 sm:pb-20 bg-[#FBF7F0] relative overflow-hidden">
         {/* Warm radial glow — same accent as products section */}
         <div className="absolute inset-0 pointer-events-none" style={{ background: "radial-gradient(ellipse 70% 60% at 50% 50%, #C9972D12 0%, transparent 70%)" }} />
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 lg:px-8">
@@ -203,17 +242,29 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
             whileInView={{ opacity: 1 }}
             viewport={{ once: true, margin: "-60px" }}
             transition={{ duration: 0.65 }}
-            className="text-center mb-4"
+            className="text-center mb-8 sm:mb-12"
           >
-            <span className="font-body text-xs uppercase tracking-[0.3em] text-[#C9972D] mb-2 block font-semibold">Explore</span>
+            <span className="font-body text-xs uppercase tracking-[0.3em] text-[#C9972D] mb-3 block font-semibold">Explore</span>
             <h2 className="font-heading text-3xl sm:text-4xl lg:text-5xl font-bold text-[#1B3A2D]">
               Shop by <span className="text-[#C9972D]">Category</span>
             </h2>
+            <p className="font-body text-sm text-[#1B3A2D]/55 mt-3 max-w-md mx-auto">
+              Hand-picked traditions, from the original Mysore Pak to festive gift boxes.
+            </p>
           </motion.div>
 
-          {/* Single whileInView on the container — staggerChildren handles the cascade */}
+          {/* Mobile: horizontal snap-scroll with 3.2 items visible (peek for discoverability)
+              Desktop: balanced 5-column grid centered with comfortable gutters */}
           <motion.div
-            className="grid grid-cols-3 sm:grid-cols-6 gap-x-4 gap-y-8 sm:gap-x-12 lg:gap-x-16 justify-items-center"
+            className="
+              flex sm:grid sm:grid-cols-5
+              overflow-x-auto sm:overflow-visible
+              snap-x snap-mandatory sm:snap-none
+              gap-5 sm:gap-6 lg:gap-8
+              -mx-4 sm:mx-0 px-4 sm:px-0
+              pb-4 sm:pb-0
+              [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden
+            "
             variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07 } } }}
             initial="hidden"
             whileInView="show"
@@ -225,38 +276,39 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
               { name: "Ghee Sweets", slug: "ghee-sweets", img: "/ghee-sweets.webp",  accent: "#1B3A2D" },
               { name: "Namkeens",    slug: "namkeens",    img: "/Namkeen.webp",       accent: "#1B3A2D" },
               { name: "Chocolates",  slug: "chocolates",  img: "/chocolates.webp",     accent: "#C9972D" },
-              { name: "Specials",    slug: "specials",    img: "/specials.webp",      accent: "#C4512A" },
             ].map((cat) => (
               <motion.div
                 key={cat.slug}
-                variants={{ hidden: { opacity: 0 }, show: { opacity: 1, transition: { duration: 0.4 } } }}
+                variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } }}
+                className="snap-start shrink-0 sm:shrink basis-[28%] sm:basis-auto min-w-[112px] sm:min-w-0"
               >
-                <Link href={`/shop?category=${cat.slug}`} className="group flex flex-col items-center gap-3">
+                <Link href={`/shop?category=${cat.slug}`} className="group flex flex-col items-center gap-3 sm:gap-4">
                   <motion.div
-                    whileHover={{ scale: 1.07, y: -4 }}
+                    whileHover={{ scale: 1.06, y: -4 }}
                     whileTap={{ scale: 0.96 }}
                     transition={{ type: "spring", stiffness: 320, damping: 20 }}
-                    className="relative w-20 h-20 sm:w-32 sm:h-32 rounded-full overflow-hidden shadow-lg group-hover:shadow-2xl transition-shadow duration-300"
-                    style={{ boxShadow: `0 0 0 3px ${cat.accent}28` }}
+                    className="relative w-24 h-24 sm:w-32 sm:h-32 lg:w-36 lg:h-36 rounded-full overflow-hidden bg-white shadow-md group-hover:shadow-xl transition-shadow duration-300"
+                    style={{ boxShadow: `0 0 0 2px ${cat.accent}33, 0 8px 22px -10px ${cat.accent}55` }}
                   >
                     <Image
                       src={cat.img}
                       alt={cat.name}
                       fill
-                      sizes="(max-width: 640px) 80px, 128px"
-                      className="object-cover transition-transform duration-300 group-hover:scale-110"
+                      sizes="(max-width: 640px) 96px, (max-width: 1024px) 128px, 144px"
+                      className="object-cover transition-transform duration-500 group-hover:scale-110"
                     />
+                    {/* Hover wash — subtle tint of the accent colour */}
                     <div
                       className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                      style={{ background: `${cat.accent}22` }}
+                      style={{ background: `${cat.accent}1f` }}
                     />
                   </motion.div>
-                  <div className="flex flex-col items-center gap-0.5">
-                    <span className="font-body text-[11px] sm:text-sm font-bold text-[#1B3A2D] tracking-wide group-hover:text-[#C9972D] transition-colors duration-300 text-center leading-tight">
+                  <div className="flex flex-col items-center gap-1.5">
+                    <span className="font-body text-[12px] sm:text-sm lg:text-[15px] font-bold text-[#1B3A2D] tracking-wide group-hover:text-[#C9972D] transition-colors duration-300 text-center leading-tight whitespace-nowrap">
                       {cat.name}
                     </span>
                     <span
-                      className="block h-0.5 w-0 group-hover:w-full rounded-full transition-all duration-300"
+                      className="block h-[2px] w-6 sm:w-8 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                       style={{ backgroundColor: cat.accent }}
                     />
                   </div>
@@ -264,6 +316,13 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
               </motion.div>
             ))}
           </motion.div>
+
+          {/* Mobile-only scroll hint — fades in then out, gives a visual cue you can swipe */}
+          <div className="sm:hidden mt-2 flex justify-center gap-1 text-[#1B3A2D]/30">
+            <span className="w-1 h-1 rounded-full bg-current" />
+            <span className="w-1 h-1 rounded-full bg-current" />
+            <span className="w-1 h-1 rounded-full bg-current" />
+          </div>
         </div>
       </section>
 
@@ -399,7 +458,7 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
             {[
               { img: "/mysoree paak.png",  name: "Classic Mysore Pak",    sub: "The original, perfected"     },
               { img: "/Gift Boxes.webp",  name: "Premium Gift Hampers",  sub: "For every celebration"       },
-              { img: "/specials.webp",    name: "Artisan Specials",      sub: "Limited seasonal drops"      },
+              { img: "/ghee-sweets.webp", name: "Ghee Sweet Selection",  sub: "Hand-stirred in copper"      },
               { img: "/chocolates.webp",   name: "Flavored Collection",   sub: "Bold new combinations"       },
             ].map((col, i) => (
               <motion.div

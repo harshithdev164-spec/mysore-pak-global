@@ -1,0 +1,4 @@
+# Force LF line endings on shell scripts so they run on Linux even if committed
+# from Windows (Cloudways / DigitalOcean droplet is Linux — CRLF breaks bash).
+*.sh text eol=lf
+*.mjs text eol=lf

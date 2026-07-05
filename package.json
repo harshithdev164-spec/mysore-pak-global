@@ -5,8 +5,13 @@
   "scripts": {
     "dev": "cross-env NEXT_DISABLE_LOCKFILE_PATCH=1 next dev",
     "build": "next build",
+    "postbuild": "node scripts/copy-standalone-assets.mjs",
     "start": "next start",
+    "start:prod": "node .next/standalone/server.js",
     "lint": "next lint"
+  },
+  "engines": {
+    "node": ">=18.17.0"
   },
   "dependencies": {
     "@hookform/resolvers": "^3.10.0",
@@ -57,6 +62,7 @@
     "react-resizable-panels": "^2.1.9",
     "recharts": "^2.15.4",
     "redis": "^5.11.0",
+    "sharp": "^0.33.5",
     "sonner": "^1.7.4",
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
@@ -76,8 +82,5 @@
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.17",
     "typescript": "^5.8.3"
-  },
-  "optionalDependencies": {
-    "@next/swc-win32-x64-msvc": "14.2.35"
   }
 }

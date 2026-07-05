@@ -1,5 +1,10 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  // Emit a self-contained server bundle at .next/standalone/server.js so PM2
+  // (on Cloudways / DigitalOcean droplet) can run the app without needing
+  // node_modules or the `next` CLI. See scripts/copy-standalone-assets.mjs —
+  // it runs postbuild to copy public/ and .next/static/ into the standalone dir.
+  output: "standalone",
   compress: true,
   poweredByHeader: false,
   productionBrowserSourceMaps: false,
