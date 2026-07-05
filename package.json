@@ -6,6 +6,7 @@
     "dev": "cross-env NEXT_DISABLE_LOCKFILE_PATCH=1 next dev",
     "build": "next build",
     "postbuild": "node scripts/copy-standalone-assets.mjs",
+    "prestart": "next build",
     "start": "next start",
     "start:prod": "node .next/standalone/server.js",
     "lint": "next lint"
