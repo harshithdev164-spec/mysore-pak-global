@@ -112,23 +112,21 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // iOS Safari autoplay quirks:
-  //  - Muted must be set as a DOM property AND as an attribute (React only sets
-  //    the property, and iOS Safari checks the attribute before allowing autoplay).
-  //  - `webkit-playsinline` is required for iOS <10 and doesn't hurt on newer.
-  //  - The initial autoplay attribute alone is unreliable across the muted
-  //    property race — we explicitly call play() after mount and swallow the
-  //    NotAllowedError if it does fire (rare — usually Low Power Mode).
+  // Start the hero videos muted. Audio in the source file was causing playback
+  // hitches on lower-end devices, so we drop it entirely — muted autoplay is
+  // also the only mode all browsers unconditionally allow. iOS Safari checks
+  // the muted DOM property + attribute + playsinline before autoplay decisions,
+  // so we set all three defensively.
   useEffect(() => {
     [mobileVideoRef.current, desktopVideoRef.current].forEach((v) => {
       if (!v) return;
       v.muted = true;
       v.defaultMuted = true;
+      v.volume = 0;
       v.setAttribute("muted", "");
       v.setAttribute("playsinline", "");
       v.setAttribute("webkit-playsinline", "");
-      const p = v.play();
-      if (p && typeof p.catch === "function") p.catch(() => { /* iOS Low Power Mode */ });
+      v.play().catch(() => { /* iOS Low Power Mode — poster/still frame shows */ });
     });
   }, []);
 
@@ -159,6 +157,13 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
       ══════════════════════════════════════════ */}
       {/* Mobile: fixed-height e-commerce banner | Desktop: full-screen hero */}
       <section className="relative h-[70vh] sm:h-screen min-h-[320px] sm:min-h-[640px] overflow-hidden select-none">
+        {/* SEO-only H1 — visually hidden but present in the DOM so Google
+            picks up the homepage's primary heading. The hero is a full-bleed
+            video with no on-screen text, so a visible H1 would clutter the
+            design. */}
+        <h1 className="sr-only">
+          World of Mysore Pak — Traditional Sweets from Mysuru Delivered Pan-India
+        </h1>
         {/* Hero video — CSS-based responsive swap, no JS flash.
             Both videos autoplay muted + loop (browser requires muted for autoplay).
             Posters use the previous still images so nothing pops in blank while
@@ -167,7 +172,6 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
           {/* Mobile — vertical video, hidden on sm+ */}
           <video
             ref={mobileVideoRef}
-            poster="/mobile heroo.webp"
             autoPlay
             muted
             loop
@@ -184,7 +188,6 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
           {/* Desktop — landscape video, hidden below sm */}
           <video
             ref={desktopVideoRef}
-            poster="/pc heroo.webp"
             autoPlay
             muted
             loop

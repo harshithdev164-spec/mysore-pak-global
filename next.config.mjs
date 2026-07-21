@@ -25,6 +25,38 @@ const nextConfig = {
   },
 
   async redirects() {
+    // Legacy /pages/* URLs (from the old Shopify site) → new tour-guide routes.
+    // 301 permanent so Google transfers the ranking. Keep this list in sync
+    // with the places table id column — if a place gets a new id, add a
+    // redirect here for its old slug.
+    const legacyPagesRedirects = [
+      // slug on the left = old public URL; slug on the right = DB place id
+      ["wax-museum",                            "wax-museum"],
+      ["grs-fantasy-park",                      "grs-fantasy-park"],
+      ["shrirangapatna",                        "shrirangapatna"],
+      ["the-lalitha-mahal",                     "lalitha-mahal"],
+      ["nanjangudu",                            "nanjangudu"],
+      ["grs-updown-museum",                     "grs-updown-museum"],
+      ["the-mysore-zoo",                        "mysore-zoo"],
+      ["lokaranjan-aqua-world-underwater-zoo",  "lokaranjan-aqua"],
+      ["rail-museum",                           "rail-museum"],
+      ["st-philomenas-church",                  "st-philomena-church"],
+      ["shuka-vana",                            "shuka-vana"],
+      ["grs-snow-park",                         "grs-snow-park"],
+      ["jagan-mohan-palace",                    "jaganmohan-palace"],
+      ["ranganathittu",                         "ranganathittu"],
+      ["krs-brindavan-garden",                  "brindavan-gardens"],
+      ["mysore-palace",                         "mysore-palace"],
+      ["sand-museum",                           "sand-museum"],
+      ["silk-emporium",                         "silk-emporium"],
+      ["payana-vintage-car-museum",             "payana-vintage-cars"],
+      ["chamundi-hills",                        "chamundi-hills"],
+    ].map(([from, to]) => ({
+      source: `/pages/${from}`,
+      destination: `/tour-guide/place/${to}`,
+      permanent: true,
+    }));
+
     return [
       {
         // Old single-product URLs → new /products/:slug (301 permanent)
@@ -32,6 +64,13 @@ const nextConfig = {
         destination: "/products/:slug",
         permanent: true,
       },
+      // Legacy travel-guide index → new /tour-guide landing
+      {
+        source: "/pages/explore-mysore-travel-guide",
+        destination: "/tour-guide",
+        permanent: true,
+      },
+      ...legacyPagesRedirects,
     ];
   },
 
