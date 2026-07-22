@@ -1,11 +1,15 @@
 import { NextResponse } from "next/server";
 import type { NextRequest } from "next/server";
 import { ADMIN_COOKIE, verifyAdminSession } from "@/lib/admin-auth";
+import { canAccess, type AdminRole } from "@/lib/admin-permissions";
 
-// Paths that bypass the admin gate (login page + auth endpoints).
+// Paths that bypass the admin gate (login page + OTP endpoints + logout +
+// access-denied so a role-blocked user doesn't get bounced in a redirect loop).
 const PUBLIC_ADMIN_PATHS = new Set<string>([
   "/admin/login",
-  "/api/admin/auth/login",
+  "/admin/access-denied",
+  "/api/admin/auth/send-otp",
+  "/api/admin/auth/verify-otp",
   "/api/admin/auth/logout",
 ]);
 
@@ -44,6 +48,23 @@ export async function middleware(req: NextRequest) {
     const url = req.nextUrl.clone();
     url.pathname = "/admin/login";
     if (pathname !== "/admin") url.searchParams.set("next", pathname);
+    return NextResponse.redirect(url);
+  }
+
+  // Role-based access check. Legacy sessions (no role claim) are treated as
+  // super_admin — protects existing admin sessions from being locked out on
+  // the day this ships. New sessions always carry a role.
+  const role = (session.role as AdminRole | undefined) ?? "super_admin";
+  const pathToCheck = isAdminApi
+    ? pathname.replace(/^\/api\/admin/, "/admin") // API routes map to their admin page paths
+    : pathname;
+
+  if (!canAccess(role, pathToCheck)) {
+    if (isAdminApi) {
+      return NextResponse.json({ error: "Forbidden" }, { status: 403 });
+    }
+    const url = req.nextUrl.clone();
+    url.pathname = "/admin/access-denied";
     return NextResponse.redirect(url);
   }
 

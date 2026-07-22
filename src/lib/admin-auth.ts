@@ -44,16 +44,29 @@ function timingSafeEqual(a: Uint8Array, b: Uint8Array): boolean {
   return diff === 0;
 }
 
+import type { AdminRole } from "@/lib/admin-permissions";
+
 export interface AdminSession {
-  exp: number; // unix seconds
+  exp: number;         // unix seconds
+  sub?: string;        // admin_users.id — absent on legacy password sessions
+  role?: AdminRole;    // absent on legacy password sessions (treated as super_admin)
+  name?: string;       // display name — cached from admin_users
 }
+
+/** Standard TTLs so callers don't pass magic numbers around. */
+export const SESSION_TTL_STANDARD_S = 8 * 60 * 60;         // 8 hrs
+export const SESSION_TTL_REMEMBER_S = 30 * 24 * 60 * 60;   // 30 days
 
 export async function createAdminSession(
   secret: string,
-  ttlSeconds: number = 60 * 60 * 24 * 7 // 7 days
+  extra: { sub?: string; role?: AdminRole; name?: string; ttlSeconds?: number } = {}
 ): Promise<string> {
+  const ttl = extra.ttlSeconds ?? SESSION_TTL_STANDARD_S;
   const payload: AdminSession = {
-    exp: Math.floor(Date.now() / 1000) + ttlSeconds,
+    exp: Math.floor(Date.now() / 1000) + ttl,
+    ...(extra.sub  ? { sub: extra.sub } : {}),
+    ...(extra.role ? { role: extra.role } : {}),
+    ...(extra.name ? { name: extra.name } : {}),
   };
   const payloadStr = b64urlEncode(JSON.stringify(payload));
   const sig = await hmac(secret, payloadStr);

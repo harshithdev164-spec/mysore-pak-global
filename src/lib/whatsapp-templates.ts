@@ -86,6 +86,44 @@ export async function sendOrderDeliveredTemplate(opts: {
   }
 }
 
+/**
+ * Send the `admin_login_otp` authentication template. This template was
+ * submitted + auto-approved via Graph API on 2026-07-11 with:
+ *   - BODY.add_security_recommendation = true (auto body text)
+ *   - FOOTER.code_expiration_minutes = 5
+ *   - BUTTONS[0] = { type: OTP, otp_type: COPY_CODE, text: "Copy code" }
+ *
+ * The code goes as a body parameter AND as the button parameter (Meta
+ * requires the copy-code button to know the value to copy).
+ */
+export async function sendAdminOtpTemplate(opts: {
+  to: string;
+  code: string;
+}): Promise<{ ok: boolean; error?: string }> {
+  if (!isWhatsAppConfigured()) return { ok: false, error: "WhatsApp not configured" };
+  const templateName = process.env.WHATSAPP_ADMIN_OTP_TEMPLATE ?? "admin_login_otp";
+  try {
+    await sendWhatsAppTemplate(opts.to, {
+      name: templateName,
+      language: "en",
+      components: [
+        { type: "body", parameters: [{ type: "text", text: opts.code }] },
+        {
+          type: "button",
+          sub_type: "url",
+          index: 0,
+          parameters: [{ type: "text", text: opts.code }],
+        },
+      ],
+    });
+    return { ok: true };
+  } catch (err) {
+    const message = err instanceof Error ? err.message : String(err);
+    console.error("[whatsapp] admin_login_otp send failed:", message);
+    return { ok: false, error: message };
+  }
+}
+
 // Build a courier-specific public tracking URL from name + awb. Always
 // the courier's OFFICIAL tracking page so customers don't bounce through
 // a third party.
