@@ -2,6 +2,7 @@ export const dynamic = "force-dynamic";
 import { NextResponse } from "next/server";
 import crypto from "crypto";
 import { createAdminClient } from "@/lib/supabase";
+import { runPostPaymentHooks } from "@/lib/orders/post-payment-hooks";
 
 // POST /api/razorpay/webhook
 //
@@ -107,31 +108,43 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true, warning: "order not found" });
   }
 
-  // Idempotent: if already paid, just acknowledge.
-  if (order.payment_status === "paid") {
-    return NextResponse.json({ ok: true, already_paid: true });
+  const wasAlreadyPaid = order.payment_status === "paid";
+
+  if (!wasAlreadyPaid) {
+    const noteParts = [
+      razorpayPaymentId ? `razorpay_payment_id:${razorpayPaymentId}` : "",
+      razorpayOrderId ? `razorpay_order_id:${razorpayOrderId}` : "",
+      "source:webhook",
+    ].filter(Boolean);
+
+    const { error: updateErr } = await supabase
+      .from("orders")
+      .update({
+        payment_status: "paid",
+        status: order.status === "pending" ? "confirmed" : order.status,
+        notes: noteParts.join(" | "),
+      })
+      .eq("id", order.id);
+
+    if (updateErr) {
+      console.error("[rzp webhook] update failed:", updateErr);
+      return NextResponse.json({ error: "Update failed" }, { status: 500 });
+    }
+    console.log(`[rzp webhook] marked paid: order_id=${order.id} event=${event}`);
+  } else {
+    console.log(`[rzp webhook] already paid — re-running hooks for safety: order_id=${order.id}`);
   }
 
-  const noteParts = [
-    razorpayPaymentId ? `razorpay_payment_id:${razorpayPaymentId}` : "",
-    razorpayOrderId ? `razorpay_order_id:${razorpayOrderId}` : "",
-    "source:webhook",
-  ].filter(Boolean);
-
-  const { error: updateErr } = await supabase
-    .from("orders")
-    .update({
-      payment_status: "paid",
-      status: order.status === "pending" ? "confirmed" : order.status,
-      notes: noteParts.join(" | "),
-    })
-    .eq("id", order.id);
-
-  if (updateErr) {
-    console.error("[rzp webhook] update failed:", updateErr);
-    return NextResponse.json({ error: "Update failed" }, { status: 500 });
+  // Fire all post-payment hooks. Each individual hook is idempotent (dedup
+  // via column flags), so re-firing after verify already ran is safe. This
+  // is the critical fix: previously the webhook only updated the DB and
+  // skipped emails/WhatsApp/courier — customers who closed the tab got
+  // charged but never heard from us.
+  try {
+    const report = await runPostPaymentHooks(order.id);
+    return NextResponse.json({ ok: true, order_id: order.id, hooks: report });
+  } catch (err) {
+    console.error("[rzp webhook] hooks threw:", err);
+    return NextResponse.json({ ok: true, order_id: order.id, hooks_error: String(err) });
   }
-
-  console.log("[rzp webhook] marked paid:", { order_id: order.id, event });
-  return NextResponse.json({ ok: true, order_id: order.id, marked_paid: true });
 }

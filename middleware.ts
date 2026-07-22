@@ -11,6 +11,8 @@ const PUBLIC_ADMIN_PATHS = new Set<string>([
   "/api/admin/auth/send-otp",
   "/api/admin/auth/verify-otp",
   "/api/admin/auth/logout",
+  // Internal endpoints protected by shared secret, not admin session
+  "/api/internal/run-post-payment-hooks",
 ]);
 
 export async function middleware(req: NextRequest) {
