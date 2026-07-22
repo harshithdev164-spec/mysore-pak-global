@@ -27,20 +27,36 @@ const STEPS = [
 
 export default function Franchise() {
   const [form, setForm] = useState({ name: "", email: "", phone: "", city: "", message: "" });
+  const [submitting, setSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) {
     setForm((prev) => ({ ...prev, [e.target.name]: e.target.value }));
   }
 
-  function handleSubmit(e: React.FormEvent) {
+  async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    const subject = encodeURIComponent(`Franchise Enquiry — ${form.city}`);
-    const body = encodeURIComponent(
-      `Name: ${form.name}\nEmail: ${form.email}\nPhone: ${form.phone}\nCity: ${form.city}\n\nMessage:\n${form.message}`
-    );
-    window.location.href = `mailto:franchise@worldofmysorepak.com?subject=${subject}&body=${body}`;
-    setSubmitted(true);
+    if (submitting) return;
+    setSubmitError(null);
+    setSubmitting(true);
+    try {
+      const res = await fetch("/api/franchise-leads", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const j = await res.json().catch(() => ({} as { error?: string }));
+      if (!res.ok) {
+        setSubmitError(j.error ?? "Something went wrong. Please try again.");
+        return;
+      }
+      setSubmitted(true);
+    } catch {
+      setSubmitError("Network error. Please try again in a moment.");
+    } finally {
+      setSubmitting(false);
+    }
   }
 
   return (
@@ -268,12 +284,18 @@ export default function Franchise() {
               </div>
               <motion.button
                 type="submit"
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="mt-2 w-full bg-[#1B3A2D] text-[#FBF7F0] font-body font-bold text-sm py-4 rounded-full hover:bg-[#2D5A3D] transition-colors flex items-center justify-center gap-2"
+                disabled={submitting}
+                whileHover={submitting ? {} : { scale: 1.02 }}
+                whileTap={submitting ? {} : { scale: 0.98 }}
+                className="mt-2 w-full bg-[#1B3A2D] text-[#FBF7F0] font-body font-bold text-sm py-4 rounded-full hover:bg-[#2D5A3D] disabled:opacity-60 disabled:cursor-not-allowed transition-colors flex items-center justify-center gap-2"
               >
-                Submit Franchise Enquiry <ArrowRight className="w-4 h-4" />
+                {submitting ? "Sending…" : (
+                  <>Submit Franchise Enquiry <ArrowRight className="w-4 h-4" /></>
+                )}
               </motion.button>
+              {submitError && (
+                <p className="text-xs text-red-600 text-center" role="alert">{submitError}</p>
+              )}
 
               <div className="flex flex-col sm:flex-row gap-4 mt-2 text-center sm:text-left">
                 <a href="tel:+916364895255" className="flex items-center justify-center gap-2 font-body text-xs text-[#1B3A2D]/50 hover:text-[#1B3A2D] transition-colors">
