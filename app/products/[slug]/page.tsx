@@ -5,6 +5,7 @@ import ProductActions from "@/components/ProductActions";
 import RichProductDetail, { type SeoContent } from "@/components/RichProductDetail";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import ProductReviews from "@/components/ProductReviews";
+import SocialProofBadge from "@/components/SocialProofBadge";
 import { products, type Product } from "@/data/products";
 import type { Metadata } from "next";
 
@@ -154,6 +155,25 @@ export default async function ProductDetailPage({ params }: PageProps) {
 
   if (error || !p) notFound();
 
+  // Social-proof: real count of paid orders containing this product in the
+  // last 30 days. Runs alongside the main query so it's essentially free
+  // (both hit the same connection pool). Fails silently to 0 so a stale
+  // orders permission doesn't 500 the whole PDP.
+  const thirtyDaysAgo = new Date(Date.now() - 30 * 86_400_000).toISOString();
+  let soldLast30d = 0;
+  try {
+    const { count } = await supabase
+      .from("order_items")
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
+      .select("id, orders!inner(payment_status, created_at)", { count: "exact", head: true } as any)
+      .eq("product_id", p.id)
+      .eq("orders.payment_status", "paid")
+      .gte("orders.created_at", thirtyDaysAgo);
+    soldLast30d = count ?? 0;
+  } catch {
+    soldLast30d = 0;
+  }
+
   const product: Product = {
     id: p.id,
     name: p.name,
@@ -221,7 +241,12 @@ export default async function ProductDetailPage({ params }: PageProps) {
         {seoContent.faqs && seoContent.faqs.length > 0 && (
           <JsonLd data={buildFaqSchema(seoContent.faqs)} />
         )}
-        <RichProductDetail product={product} related={related} content={seoContent} />
+        <RichProductDetail
+          product={product}
+          related={related}
+          content={seoContent}
+          soldLast30d={soldLast30d}
+        />
       </>
     );
   }
@@ -258,7 +283,10 @@ export default async function ProductDetailPage({ params }: PageProps) {
             </div>
 
             {/* Interactive part: weight selector, add to cart, tabs */}
-            <ProductActions product={product} />
+            <div>
+              <SocialProofBadge productSlug={product.slug} soldLast30d={soldLast30d} />
+              <ProductActions product={product} />
+            </div>
           </div>
         </div>
 

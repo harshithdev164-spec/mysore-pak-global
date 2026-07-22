@@ -10,6 +10,7 @@ import ProductCard from "@/components/ProductCard";
 import Breadcrumbs from "@/components/Breadcrumbs";
 import RichProductFaq from "@/components/RichProductFaq";
 import RichProductReviews from "@/components/RichProductReviews";
+import SocialProofBadge from "@/components/SocialProofBadge";
 
 export interface SeoContent {
   h2?: string;
@@ -25,13 +26,15 @@ interface Props {
   product: Product;
   related: Product[];
   content: SeoContent;
+  /** Paid-order count in last 30 days, for the social-proof badge. */
+  soldLast30d?: number;
 }
 
 // Long-form PDP driven by products.seo_content. Any product row with a
 // populated seo_content column gets this layout automatically via the branch
 // in app/products/[slug]/page.tsx. Products with NULL seo_content still see
 // the simple two-column PDP that was there before.
-export default function RichProductDetail({ product, related, content }: Props) {
+export default function RichProductDetail({ product, related, content, soldLast30d = 0 }: Props) {
   return (
     <div className="min-h-screen bg-[#FBF7F0]">
       <Breadcrumbs
@@ -89,6 +92,7 @@ export default function RichProductDetail({ product, related, content }: Props) 
           </div>
 
           <div>
+            <SocialProofBadge productSlug={product.slug} soldLast30d={soldLast30d} />
             <ProductActions product={product} />
           </div>
         </div>

@@ -31,6 +31,8 @@ interface ProductData {
   image: string | null;
   badge: string | null;
   is_active: boolean;
+  is_bestseller: boolean;
+  is_recommended: boolean;
   weights: WeightRow[];
 }
 
@@ -61,6 +63,8 @@ export default function EditProductPage() {
     image: "",
     badge: "",
     is_active: true,
+    is_bestseller: false,
+    is_recommended: false,
   });
 
   const [weights, setWeights] = useState<WeightRow[]>([]);
@@ -84,6 +88,8 @@ export default function EditProductPage() {
           image: p.image ?? "",
           badge: p.badge ?? "",
           is_active: p.is_active,
+          is_bestseller: !!p.is_bestseller,
+          is_recommended: !!p.is_recommended,
         });
         setWeights(p.weights ?? []);
       }
@@ -164,6 +170,8 @@ export default function EditProductPage() {
         image: form.image || null,
         badge: form.badge || null,
         is_active: form.is_active,
+        is_bestseller: form.is_bestseller,
+        is_recommended: form.is_recommended,
         weights: weights.map((w) => ({
           label: w.label,
           weight_grams: Number(w.weight_grams),
@@ -363,15 +371,37 @@ export default function EditProductPage() {
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
-            <input
-              type="checkbox"
-              id="is_active"
-              checked={form.is_active}
-              onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))}
-              className="w-4 h-4 rounded accent-amber-600"
-            />
-            <label htmlFor="is_active" className="text-sm text-gray-700">Active (visible in store)</label>
+          <div className="grid sm:grid-cols-3 gap-3">
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="is_active"
+                checked={form.is_active}
+                onChange={(e) => setForm((f) => ({ ...f, is_active: e.target.checked }))}
+                className="w-4 h-4 rounded accent-amber-600"
+              />
+              <label htmlFor="is_active" className="text-sm text-gray-700">Active (visible in store)</label>
+            </div>
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="is_bestseller"
+                checked={form.is_bestseller}
+                onChange={(e) => setForm((f) => ({ ...f, is_bestseller: e.target.checked }))}
+                className="w-4 h-4 rounded accent-amber-600"
+              />
+              <label htmlFor="is_bestseller" className="text-sm text-gray-700">Best seller (shop chip)</label>
+            </div>
+            <div className="flex items-center gap-3">
+              <input
+                type="checkbox"
+                id="is_recommended"
+                checked={form.is_recommended}
+                onChange={(e) => setForm((f) => ({ ...f, is_recommended: e.target.checked }))}
+                className="w-4 h-4 rounded accent-amber-600"
+              />
+              <label htmlFor="is_recommended" className="text-sm text-gray-700">Our recommendation</label>
+            </div>
           </div>
         </div>
 

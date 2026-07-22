@@ -32,7 +32,7 @@ export async function GET(
     .select(`
       id, name, slug, description, ingredients, storage,
       base_price, original_price, image, badge, rating, review_count,
-      is_active, category_id,
+      is_active, is_bestseller, is_recommended, category_id,
       category:categories(id, name, slug),
       weights:product_weights(id, label, weight_grams, price, stock_quantity),
       reviews(id, customer_name, customer_location, rating, review_text, created_at)

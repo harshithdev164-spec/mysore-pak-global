@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { motion } from "framer-motion";
 import ProductCard from "@/components/ProductCard";
 import type { Product } from "@/data/products";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Flame, Heart, Sparkles } from "lucide-react";
 
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 type RawProduct = any;
@@ -36,14 +36,22 @@ function mapApiProduct(p: any): Product {
   };
 }
 
-// ── Hardcoded sidebar categories — same images as homepage, independent of DB ──
-const SIDEBAR_CATEGORIES = [
+// ── Hardcoded sidebar categories — same images as homepage, independent of DB.
+//    `comingSoon` items don't filter products — they route to the coming-soon
+//    page instead of updating the ?category= query param.
+type SidebarCategory = {
+  slug: string;
+  name: string;
+  image: string;
+  comingSoon?: boolean;
+  href?: string;
+};
+const SIDEBAR_CATEGORIES: readonly SidebarCategory[] = [
   { slug: "mysore-pak",  name: "Mysore Pak",  image: "/mysoree paak.png" },
   { slug: "ghee-sweets", name: "Ghee Sweets", image: "/ghee-sweets.webp" },
-  { slug: "gift-boxes",  name: "Gift Boxes",  image: "/Gift Boxes.webp" },
   { slug: "namkeens",    name: "Namkeens",    image: "/Namkeen.webp" },
-  { slug: "chocolates",  name: "Chocolates",  image: "/chocolates.webp" },
-] as const;
+  { slug: "gift-boxes",  name: "Gift Boxes",  image: "/Gift Boxes.webp", comingSoon: true, href: "/gift-hampers" },
+];
 
 const SORT_OPTIONS = [
   { value: "default",    label: "Recommended" },
@@ -52,12 +60,25 @@ const SORT_OPTIONS = [
   { value: "rating",     label: "Top Rated" },
 ];
 
+// Editorial filter chips shown above the products grid. Single-select: tap
+// an active chip to clear it.
+//   - bestsellers  → is_bestseller = true
+//   - fav          → order by rating desc (no schema flag needed)
+//   - recommended  → is_recommended = true
+const FILTER_CHIPS = [
+  { value: "bestsellers", label: "Best Sellers",       Icon: Flame,    accent: "#C4512A" },
+  { value: "fav",         label: "Customer Fav",       Icon: Heart,    accent: "#C9972D" },
+  { value: "recommended", label: "Our Recommendation", Icon: Sparkles, accent: "#1B3A2D" },
+] as const;
+type FilterValue = typeof FILTER_CHIPS[number]["value"];
+
 /* ── Horizontal pill used in the mobile top strip ── */
 function MobileCatPill({
-  name, image, selected, onClick,
+  name, image, selected, onClick, comingSoon = false,
 }: {
   name: string; image: string | null;
   selected: boolean; onClick: () => void;
+  comingSoon?: boolean;
 }) {
   return (
     <button
@@ -65,12 +86,19 @@ function MobileCatPill({
       className="flex flex-col items-center gap-1.5 shrink-0 snap-start w-[68px]"
     >
       <div
-        className={`w-14 h-14 rounded-full overflow-hidden border-2 transition-all duration-200 ${
+        className={`relative w-14 h-14 rounded-full overflow-hidden border-2 transition-all duration-200 ${
           selected
             ? "border-[#C9972D] shadow-md shadow-[#C9972D]/30"
             : "border-[#1B3A2D]/10"
         }`}
       >
+        {comingSoon && (
+          <span className="absolute inset-0 z-10 flex items-center justify-center bg-[#1B3A2D]/70 rounded-full pointer-events-none">
+            <span className="font-body text-[7px] font-bold uppercase tracking-wider text-[#C9972D] text-center leading-tight px-1">
+              Coming<br />Soon
+            </span>
+          </span>
+        )}
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={image} alt={name} className="w-full h-full object-cover" loading="lazy" />
@@ -95,10 +123,11 @@ function MobileCatPill({
 
 /* ── Sidebar category button ── */
 function CatItem({
-  slug, name, image, selected, onClick,
+  slug, name, image, selected, onClick, comingSoon = false,
 }: {
   slug: string; name: string; image: string | null;
   selected: boolean; onClick: () => void;
+  comingSoon?: boolean;
 }) {
   return (
     <motion.button
@@ -111,13 +140,20 @@ function CatItem({
       }`}
     >
       <div
-        className={`w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full overflow-hidden border-2 transition-all duration-200 flex-shrink-0 ${
+        className={`relative w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full overflow-hidden border-2 transition-all duration-200 flex-shrink-0 ${
           selected
             ? "border-[#C9972D] shadow-md shadow-[#C9972D]/30 scale-105"
             : "border-[#1B3A2D]/10 group-hover:border-[#C9972D]/40"
         }`}
         style={selected ? {} : undefined}
       >
+        {comingSoon && (
+          <span className="absolute inset-0 z-10 flex items-center justify-center bg-[#1B3A2D]/70 rounded-full pointer-events-none">
+            <span className="font-body text-[6px] sm:text-[7px] lg:text-[8px] font-bold uppercase tracking-wider text-[#C9972D] text-center leading-tight px-0.5">
+              Coming<br />Soon
+            </span>
+          </span>
+        )}
         {image ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img
@@ -168,6 +204,7 @@ const Shop = ({ initialProducts }: Props) => {
 
   const urlCategory = searchParams.get("category") ?? "mysore-pak";
   const urlSort     = searchParams.get("sort")     ?? "default";
+  const urlFilter   = (searchParams.get("filter") ?? "") as FilterValue | "";
 
   const products = useMemo<Product[]>(() => {
     let data: RawProduct[] = initialProducts;
@@ -180,15 +217,40 @@ const Shop = ({ initialProducts }: Props) => {
       return catSlug === target || catName === target;
     });
 
+    // Layered editorial filter (chip row). `fav` is a sort-only filter — it
+    // shows all category products but ordered by rating. The other two hide
+    // any product that isn't flagged in the DB.
+    if (urlFilter === "bestsellers") {
+      data = data.filter((p: RawProduct) => !!p.is_bestseller);
+    } else if (urlFilter === "recommended") {
+      data = data.filter((p: RawProduct) => !!p.is_recommended);
+    }
+
     const sorted = [...data];
-    switch (urlSort) {
-      case "price-low":  sorted.sort((a, b) => a.base_price - b.base_price); break;
-      case "price-high": sorted.sort((a, b) => b.base_price - a.base_price); break;
-      case "rating":     sorted.sort((a, b) => b.rating - a.rating); break;
+    if (urlFilter === "fav") {
+      sorted.sort(
+        (a, b) => (b.rating ?? 0) - (a.rating ?? 0) || (b.review_count ?? 0) - (a.review_count ?? 0)
+      );
+    } else {
+      switch (urlSort) {
+        case "price-low":  sorted.sort((a, b) => a.base_price - b.base_price); break;
+        case "price-high": sorted.sort((a, b) => b.base_price - a.base_price); break;
+        case "rating":     sorted.sort((a, b) => b.rating - a.rating); break;
+      }
     }
 
     return sorted.map(mapApiProduct);
-  }, [initialProducts, urlCategory, urlSort]);
+  }, [initialProducts, urlCategory, urlSort, urlFilter]);
+
+  function selectFilter(value: FilterValue) {
+    const params = new URLSearchParams(searchParams.toString());
+    if (urlFilter === value) {
+      params.delete("filter");
+    } else {
+      params.set("filter", value);
+    }
+    router.replace(`/shop?${params.toString()}`, { scroll: false });
+  }
 
   function selectCategory(slug: string) {
     const params = new URLSearchParams(searchParams.toString());
@@ -263,8 +325,11 @@ const Shop = ({ initialProducts }: Props) => {
               key={cat.slug}
               name={cat.name}
               image={cat.image}
-              selected={urlCategory === cat.slug}
-              onClick={() => selectCategory(cat.slug)}
+              selected={!cat.comingSoon && urlCategory === cat.slug}
+              comingSoon={!!cat.comingSoon}
+              onClick={() => cat.comingSoon && cat.href
+                ? router.push(cat.href)
+                : selectCategory(cat.slug)}
             />
           ))}
         </div>
@@ -281,14 +346,46 @@ const Shop = ({ initialProducts }: Props) => {
               slug={cat.slug}
               name={cat.name}
               image={cat.image}
-              selected={urlCategory === cat.slug}
-              onClick={() => selectCategory(cat.slug)}
+              selected={!cat.comingSoon && urlCategory === cat.slug}
+              comingSoon={!!cat.comingSoon}
+              onClick={() => cat.comingSoon && cat.href
+                ? router.push(cat.href)
+                : selectCategory(cat.slug)}
             />
           ))}
         </aside>
 
         {/* ── Products area — ONLY this scrolls ── */}
         <div className="flex-1 min-w-0 overflow-y-auto px-2 sm:px-4 lg:px-8 py-4 sm:py-6">
+
+          {/* Filter chips — editorial merchandising */}
+          <div
+            className="
+              flex gap-2 mb-3 overflow-x-auto
+              -mx-2 sm:-mx-4 lg:-mx-8 px-2 sm:px-4 lg:px-8 pb-1
+              [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden
+            "
+          >
+            {FILTER_CHIPS.map(({ value, label, Icon, accent }) => {
+              const active = urlFilter === value;
+              return (
+                <button
+                  key={value}
+                  onClick={() => selectFilter(value)}
+                  aria-pressed={active}
+                  className={`shrink-0 inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full font-body text-[11px] font-bold uppercase tracking-wider whitespace-nowrap transition-all ${
+                    active
+                      ? "text-white shadow-md"
+                      : "bg-white text-[#1B3A2D]/60 border border-[#1B3A2D]/10 hover:border-[#C9972D]/40"
+                  }`}
+                  style={active ? { backgroundColor: accent } : undefined}
+                >
+                  <Icon className="h-3.5 w-3.5" />
+                  {label}
+                </button>
+              );
+            })}
+          </div>
 
           {/* Sort + count bar */}
           <div className="flex items-center justify-between mb-5 gap-4">

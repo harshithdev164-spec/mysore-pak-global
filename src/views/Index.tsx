@@ -257,15 +257,18 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
           </motion.div>
 
           {/* Mobile: horizontal snap-scroll with 3.2 items visible (peek for discoverability)
-              Desktop: balanced 5-column grid centered with comfortable gutters */}
+              Desktop: balanced 4-column grid centered with comfortable gutters.
+              Note: column count MUST match the array below — an over-sized
+              grid leaves an empty trailing column and left-justifies the tiles. */}
           <motion.div
             className="
-              flex sm:grid sm:grid-cols-5
+              flex sm:grid sm:grid-cols-4
               overflow-x-auto sm:overflow-visible
               snap-x snap-mandatory sm:snap-none
-              gap-5 sm:gap-6 lg:gap-8
+              gap-5 sm:gap-8 lg:gap-12
               -mx-4 sm:mx-0 px-4 sm:px-0
               pb-4 sm:pb-0
+              sm:max-w-4xl sm:mx-auto
               [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden
             "
             variants={{ hidden: {}, show: { transition: { staggerChildren: 0.07 } } }}
@@ -274,18 +277,17 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
             viewport={{ once: true, margin: "-40px" }}
           >
             {[
-              { name: "Mysore Pak",  slug: "mysore-pak",  img: "/mysoree paak.png",   accent: "#C9972D" },
-              { name: "Gift Boxes",  slug: "gift-boxes",  img: "/Gift Boxes.webp",   accent: "#C4512A" },
-              { name: "Ghee Sweets", slug: "ghee-sweets", img: "/ghee-sweets.webp",  accent: "#1B3A2D" },
-              { name: "Namkeens",    slug: "namkeens",    img: "/Namkeen.webp",       accent: "#1B3A2D" },
-              { name: "Chocolates",  slug: "chocolates",  img: "/chocolates.webp",     accent: "#C9972D" },
+              { name: "Mysore Pak",  slug: "mysore-pak",  img: "/mysoree paak.png",   accent: "#C9972D", href: "/shop?category=mysore-pak" },
+              { name: "Ghee Sweets", slug: "ghee-sweets", img: "/ghee-sweets.webp",  accent: "#1B3A2D", href: "/shop?category=ghee-sweets" },
+              { name: "Namkeens",    slug: "namkeens",    img: "/Namkeen.webp",       accent: "#1B3A2D", href: "/shop?category=namkeens" },
+              { name: "Gift Boxes",  slug: "gift-boxes",  img: "/Gift Boxes.webp",   accent: "#C4512A", href: "/gift-hampers", comingSoon: true },
             ].map((cat) => (
               <motion.div
                 key={cat.slug}
                 variants={{ hidden: { opacity: 0, y: 8 }, show: { opacity: 1, y: 0, transition: { duration: 0.4 } } }}
                 className="snap-start shrink-0 sm:shrink basis-[28%] sm:basis-auto min-w-[112px] sm:min-w-0"
               >
-                <Link href={`/shop?category=${cat.slug}`} className="group flex flex-col items-center gap-3 sm:gap-4">
+                <Link href={cat.href} className="group flex flex-col items-center gap-3 sm:gap-4">
                   <motion.div
                     whileHover={{ scale: 1.06, y: -4 }}
                     whileTap={{ scale: 0.96 }}
@@ -298,13 +300,21 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
                       alt={cat.name}
                       fill
                       sizes="(max-width: 640px) 96px, (max-width: 1024px) 128px, 144px"
-                      className="object-cover transition-transform duration-500 group-hover:scale-110"
+                      className={`object-cover transition-transform duration-500 group-hover:scale-110 ${cat.comingSoon ? "opacity-70" : ""}`}
                     />
                     {/* Hover wash — subtle tint of the accent colour */}
                     <div
                       className="absolute inset-0 rounded-full opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                       style={{ background: `${cat.accent}1f` }}
                     />
+                    {/* Coming Soon overlay badge */}
+                    {cat.comingSoon && (
+                      <div className="absolute inset-0 rounded-full flex items-center justify-center pointer-events-none">
+                        <span className="bg-[#1B3A2D] text-[#C9972D] font-body text-[9px] sm:text-[10px] font-bold uppercase tracking-[0.15em] px-2.5 py-1 rounded-full shadow-lg whitespace-nowrap">
+                          Coming Soon
+                        </span>
+                      </div>
+                    )}
                   </motion.div>
                   <div className="flex flex-col items-center gap-1.5">
                     <span className="font-body text-[12px] sm:text-sm lg:text-[15px] font-bold text-[#1B3A2D] tracking-wide group-hover:text-[#C9972D] transition-colors duration-300 text-center leading-tight whitespace-nowrap">
@@ -459,10 +469,10 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
 
           <div className="grid sm:grid-cols-2 gap-4 sm:gap-5">
             {[
-              { img: "/mysoree paak.png",  name: "Classic Mysore Pak",    sub: "The original, perfected"     },
-              { img: "/Gift Boxes.webp",  name: "Premium Gift Hampers",  sub: "For every celebration"       },
-              { img: "/ghee-sweets.webp", name: "Ghee Sweet Selection",  sub: "Hand-stirred in copper"      },
-              { img: "/chocolates.webp",   name: "Flavored Collection",   sub: "Bold new combinations"       },
+              { img: "/mysoree paak.png",  name: "Classic Mysore Pak",    sub: "The original, perfected",     href: "/shop?category=mysore-pak" },
+              { img: "/ghee-sweets.webp", name: "Ghee Sweet Selection",  sub: "Hand-stirred in copper",      href: "/shop?category=ghee-sweets" },
+              { img: "/Namkeen.webp",     name: "Mysuru Namkeens",       sub: "Crispy, freshly fried",       href: "/shop?category=namkeens" },
+              { img: "/Gift Boxes.webp",  name: "Premium Gift Hampers",  sub: "For every celebration",       href: "/gift-hampers", comingSoon: true },
             ].map((col, i) => (
               <motion.div
                 key={i}
@@ -471,14 +481,21 @@ const Index = ({ initialFeatured = [] }: { initialFeatured?: any[] }) => {
                 viewport={{ once: true, margin: "-50px" }}
                 transition={{ duration: 0.6, delay: (i % 2) * 0.1 }}
               >
-                <Link href="/shop" className="group block relative overflow-hidden rounded-2xl aspect-video">
+                <Link href={col.href} className="group block relative overflow-hidden rounded-2xl aspect-video">
                   <Image src={col.img} alt={col.name} fill sizes="(max-width: 768px) 100vw, 50vw" className="object-cover transition-transform duration-700 group-hover:scale-110" />
                   <div className="absolute inset-0 bg-gradient-to-t from-[#1B3A2D]/85 via-[#1B3A2D]/20 to-transparent" />
+                  {col.comingSoon && (
+                    <span className="absolute top-4 right-4 bg-[#C9972D] text-[#1B3A2D] font-body text-[10px] font-bold uppercase tracking-[0.2em] px-3 py-1.5 rounded-full shadow-lg">
+                      Coming Soon
+                    </span>
+                  )}
                   <div className="absolute bottom-0 left-0 right-0 p-5 sm:p-6">
                     <h3 className="font-heading text-xl sm:text-2xl font-bold text-[#FBF7F0] mb-1">{col.name}</h3>
                     <p className="font-body text-xs text-[#C9972D] uppercase tracking-wider mb-3">{col.sub}</p>
                     <div className="flex items-center gap-1 text-[#FBF7F0]/50 group-hover:text-[#C9972D] group-hover:gap-2 transition-all duration-300">
-                      <span className="font-body text-xs uppercase tracking-wider">Shop Collection</span>
+                      <span className="font-body text-xs uppercase tracking-wider">
+                        {col.comingSoon ? "Notify me" : "Shop Collection"}
+                      </span>
                       <ArrowRight className="w-3 h-3" />
                     </div>
                   </div>

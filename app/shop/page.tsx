@@ -70,17 +70,40 @@ export default async function ShopPage({
 }) {
   const supabase = createServerClient();
 
-  const [{ data: products }, { data: categories }] = await Promise.all([
-    supabase
+  // Products query — try to include the editorial flag columns first. If the
+  // add_product_flags migration hasn't been run yet, the flags don't exist
+  // and the whole query fails, which would blank out the shop. Fall back to
+  // the base column set in that case so the shop keeps working; filter
+  // chips will just find no matches until the migration is run.
+  const withFlagsSelect =
+    "id, name, slug, base_price, original_price, image, badge, rating, review_count, is_bestseller, is_recommended, category:categories(id, name, slug), weights:product_weights(id, label, price, stock_quantity)";
+  const baseSelect =
+    "id, name, slug, base_price, original_price, image, badge, rating, review_count, category:categories(id, name, slug), weights:product_weights(id, label, price, stock_quantity)";
+
+  // eslint-disable-next-line prefer-const
+  let { data: productsData, error: productsError } = await supabase
+    .from("products")
+    .select(withFlagsSelect)
+    .eq("is_active", true)
+    .order("created_at", { ascending: false });
+
+  if (productsError) {
+    console.warn("[shop] falling back — missing product columns:", productsError.message);
+    const retry = await supabase
       .from("products")
-      .select("id, name, slug, base_price, original_price, image, badge, rating, review_count, category:categories(id, name, slug), weights:product_weights(id, label, price, stock_quantity)")
+      .select(baseSelect)
       .eq("is_active", true)
-      .order("created_at", { ascending: false }),
-    supabase
-      .from("categories")
-      .select("id, name, slug, image")
-      .order("name"),
-  ]);
+      .order("created_at", { ascending: false });
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    productsData = retry.data as any;
+  }
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const products = (productsData ?? []) as any[];
+
+  const { data: categories } = await supabase
+    .from("categories")
+    .select("id, name, slug, image")
+    .order("name");
 
   // BreadcrumbList JSON-LD — varies by ?category= so each category URL gets
   // its own SERP breadcrumb chip. Default /shop = Mysore Pak (Shop → Mysore Pak).
@@ -118,7 +141,7 @@ export default async function ShopPage({
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
       <Suspense>
-        <Shop initialProducts={products ?? []} initialCategories={categories ?? []} />
+        <Shop initialProducts={products} initialCategories={categories ?? []} />
       </Suspense>
     </>
   );

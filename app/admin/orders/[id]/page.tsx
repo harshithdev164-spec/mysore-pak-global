@@ -23,6 +23,7 @@ interface Order {
   status: string;
   payment_status: string;
   payment_method: string | null;
+  confirmation_email_sent_at?: string | null;
   subtotal: number;
   shipping_cost: number;
   discount: number;
@@ -586,6 +587,10 @@ export default function AdminOrderDetailPage() {
             </div>
           </div>
 
+          {/* Confirmation email panel — status + admin resend button */}
+          <ConfirmationEmailPanel order={order} />
+
+
           {/* Order Meta */}
           <div className="bg-white rounded-xl border border-gray-200 p-6">
             <h2 className="font-semibold text-gray-900 mb-3">Details</h2>
@@ -605,6 +610,88 @@ export default function AdminOrderDetailPage() {
             </div>
           </div>
         </div>
+      </div>
+    </div>
+  );
+}
+
+// ── Confirmation email status + resend button ─────────────────────────────
+// Compact panel shown in the right column of the order detail page. Displays
+// green tick + timestamp when the ZeptoMail order-confirmation email has
+// gone out, and a Resend button that always re-fires (force: true) — useful
+// when a customer says they never received the email.
+function ConfirmationEmailPanel({ order }: { order: Order }) {
+  const [sending, setSending] = useState(false);
+  const [msg, setMsg] = useState<{ kind: "ok" | "err"; text: string } | null>(null);
+  const sentAt = order.confirmation_email_sent_at;
+
+  async function resend() {
+    setSending(true);
+    setMsg(null);
+    try {
+      const res = await fetch(`/api/admin/orders/${order.id}/resend-confirmation`, {
+        method: "POST",
+      });
+      const j = await res.json().catch(() => ({} as { error?: string }));
+      if (!res.ok) {
+        setMsg({ kind: "err", text: j.error ?? `Failed (${res.status})` });
+      } else {
+        setMsg({ kind: "ok", text: "Email re-sent to " + order.customer_email });
+        invalidateCache(`/api/orders/${order.id}`);
+      }
+    } catch (err) {
+      setMsg({ kind: "err", text: err instanceof Error ? err.message : "Failed" });
+    } finally {
+      setSending(false);
+    }
+  }
+
+  return (
+    <div className="bg-white rounded-xl border border-gray-200 p-6">
+      <h2 className="font-semibold text-gray-900 mb-3">Confirmation Email</h2>
+      <div className="text-sm space-y-3">
+        {sentAt ? (
+          <div className="flex items-start gap-2">
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-emerald-100 text-emerald-700 shrink-0 mt-0.5">
+              <svg viewBox="0 0 20 20" fill="currentColor" className="w-3.5 h-3.5">
+                <path fillRule="evenodd" d="M16.7 5.3a1 1 0 010 1.4l-7 7a1 1 0 01-1.4 0l-4-4a1 1 0 011.4-1.4L9 11.6l6.3-6.3a1 1 0 011.4 0z" clipRule="evenodd"/>
+              </svg>
+            </span>
+            <div>
+              <div className="text-gray-900 font-medium">Sent</div>
+              <div className="text-xs text-gray-500">
+                {new Date(sentAt).toLocaleString("en-IN", { dateStyle: "medium", timeStyle: "short" })}
+              </div>
+            </div>
+          </div>
+        ) : (
+          <div className="flex items-start gap-2">
+            <span className="inline-flex items-center justify-center w-5 h-5 rounded-full bg-yellow-100 text-yellow-700 shrink-0 mt-0.5">•</span>
+            <div>
+              <div className="text-gray-900 font-medium">Not sent yet</div>
+              <div className="text-xs text-gray-500">
+                Sends automatically after payment is verified.
+              </div>
+            </div>
+          </div>
+        )}
+
+        <button
+          onClick={resend}
+          disabled={sending || !order.customer_email}
+          className="w-full mt-1 inline-flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg border border-gray-200 text-xs font-semibold uppercase tracking-wider text-gray-700 hover:bg-gray-50 hover:border-gray-300 disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+        >
+          {sending ? "Sending…" : sentAt ? "Resend email" : "Send email now"}
+        </button>
+
+        {!order.customer_email && (
+          <p className="text-xs text-red-600">No email on file for this customer.</p>
+        )}
+        {msg && (
+          <p className={`text-xs ${msg.kind === "ok" ? "text-emerald-700" : "text-red-600"}`}>
+            {msg.text}
+          </p>
+        )}
       </div>
     </div>
   );

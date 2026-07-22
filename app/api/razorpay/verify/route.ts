@@ -10,6 +10,7 @@ import {
   sendOrderShippedTemplate,
   trackingUrlFor,
 } from "@/lib/whatsapp-templates";
+import { sendOrderConfirmation } from "@/lib/emails/send-order-confirmation";
 
 export async function POST(request: Request) {
   const keySecret = process.env.RAZORPAY_KEY_SECRET;
@@ -117,6 +118,18 @@ export async function POST(request: Request) {
     }
   } catch (err) {
     console.error("[verify] order_confirmed whatsapp failed:", err);
+  }
+
+  // ── Order confirmation email via ZeptoMail ────────────────────────
+  // Same best-effort contract as WhatsApp — never blocks the response.
+  // Dedup handled inside sendOrderConfirmation via confirmation_email_sent_at.
+  try {
+    const emailResult = await sendOrderConfirmation(db_order_id);
+    if (!emailResult.ok && emailResult.error) {
+      console.error("[verify] confirmation email failed:", emailResult.error);
+    }
+  } catch (err) {
+    console.error("[verify] confirmation email threw:", err);
   }
 
   // Auto-create courier shipment (best-effort — payment is already confirmed above).

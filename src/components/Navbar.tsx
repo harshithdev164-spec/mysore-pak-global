@@ -11,6 +11,7 @@ const navLinks = [
   { label: "Home", to: "/" },
   { label: "Our Story", to: "/our-story" },
   { label: "Shop", to: "/shop" },
+  { label: "Franchise", to: "/franchise" },
   { label: "Careers", to: "/careers" },
 ];
 
@@ -21,7 +22,7 @@ const Navbar = () => {
 
   return (
     <>
-      <nav className="fixed top-8 left-0 right-0 z-50 bg-[#FBF7F0] shadow-sm shadow-black/5">
+      <nav className="fixed top-0 left-0 right-0 z-50 bg-[#FBF7F0] shadow-sm shadow-black/5">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center h-20 sm:h-28">
 
@@ -177,7 +178,7 @@ const Navbar = () => {
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: -8 }}
               transition={{ duration: 0.22, ease: "easeOut" }}
-              className="fixed top-[calc(2rem+5rem)] left-0 right-0 z-40 bg-[#FBF7F0] border-b border-[#1B3A2D]/10 shadow-lg md:hidden"
+              className="fixed top-[5rem] left-0 right-0 z-40 bg-[#FBF7F0] border-b border-[#1B3A2D]/10 shadow-lg md:hidden"
             >
               <div className="px-6 py-6 flex flex-col gap-1">
                 {navLinks.map((link) => (
