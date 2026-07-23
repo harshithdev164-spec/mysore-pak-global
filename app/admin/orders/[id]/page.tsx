@@ -37,6 +37,7 @@ interface Order {
   // Tracking — awb_code is the single canonical AWB column
   awb_code: string | null;
   courier_name: string | null;
+  courier_id?: number | null;   // 100 = DHL Express, 200 = DTDC, else Delhivery
   // Optional convenience columns from migrations that may not be present
   delhivery_package_id?: string | null;
   delhivery_waybill?: string | null;

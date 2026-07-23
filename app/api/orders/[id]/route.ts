@@ -19,7 +19,7 @@ export async function GET(
       id, order_number, customer_name, customer_email, customer_phone,
       status, subtotal, shipping_cost, discount, total,
       payment_method, payment_status, shipping_address, notes, created_at, updated_at,
-      awb_code, courier_name, tracking_url, confirmation_email_sent_at,
+      awb_code, courier_name, courier_id, tracking_url, confirmation_email_sent_at,
       items:order_items(
         id, product_name, weight_label, quantity, unit_price, total_price,
         product:products(id, name, slug, image)
