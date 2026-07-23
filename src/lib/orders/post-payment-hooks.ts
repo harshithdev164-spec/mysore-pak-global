@@ -50,20 +50,51 @@ export async function runPostPaymentHooks(orderId: string): Promise<PostPaymentR
 
   const supabase = createAdminClient();
 
-  // Pull everything we need in one round-trip
-  const { data, error: fetchErr } = await supabase
+  // Pull everything we need in one round-trip. Try with the newer optional
+  // columns (whatsapp_confirmation_sent_at from migration add_whatsapp_...);
+  // if the migration hasn't been run, fall back to the base column set so
+  // the entire hook chain doesn't die. Missing dedup just means we treat
+  // "sent" as unknown → best-effort re-send guarded by the WhatsApp
+  // template's own natural dedup (Meta rejects duplicates within seconds).
+  const withDedupSelect = `
+    id, order_number, customer_name, customer_email, customer_phone,
+    subtotal, shipping_cost, discount, total, courier_id,
+    shipping_address, created_at, payment_status,
+    awb_code, courier_name,
+    confirmation_email_sent_at, whatsapp_confirmation_sent_at,
+    notes,
+    items:order_items(id, product_name, weight_label, quantity, unit_price, product_weight_id)
+  `;
+  const baseSelect = `
+    id, order_number, customer_name, customer_email, customer_phone,
+    subtotal, shipping_cost, discount, total, courier_id,
+    shipping_address, created_at, payment_status,
+    awb_code, courier_name,
+    confirmation_email_sent_at,
+    notes,
+    items:order_items(id, product_name, weight_label, quantity, unit_price, product_weight_id)
+  `;
+
+  let { data, error: fetchErr } = await supabase
     .from("orders")
-    .select(`
-      id, order_number, customer_name, customer_email, customer_phone,
-      subtotal, shipping_cost, discount, total, courier_id,
-      shipping_address, created_at, payment_status,
-      awb_code, courier_name,
-      confirmation_email_sent_at, whatsapp_confirmation_sent_at,
-      notes,
-      items:order_items(id, product_name, weight_label, quantity, unit_price, product_weight_id)
-    `)
+    .select(withDedupSelect)
     .eq("id", orderId)
     .single();
+
+  if (fetchErr && /whatsapp_confirmation_sent_at/.test(fetchErr.message ?? "")) {
+    console.warn(
+      `[post-payment ${orderId}] migration add_whatsapp_confirmation_sent_at not applied — ` +
+      `falling back. Run supabase/add_whatsapp_confirmation_sent_at.sql to enable WhatsApp dedup.`
+    );
+    const retry = await supabase
+      .from("orders")
+      .select(baseSelect)
+      .eq("id", orderId)
+      .single();
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    data = retry.data as any;
+    fetchErr = retry.error;
+  }
 
   if (fetchErr || !data) {
     report.errors.fetch = fetchErr?.message ?? "order not found";
@@ -131,10 +162,19 @@ export async function runPostPaymentHooks(orderId: string): Promise<PostPaymentR
         order_number: order.order_number,
         total: Math.round(Number(order.total ?? 0)),
       });
-      await supabase
+      // Best-effort dedup stamp — swallow the "column doesn't exist" error
+      // that happens when the migration hasn't been applied. Log for the
+      // ops team, don't fail the send.
+      const stampRes = await supabase
         .from("orders")
         .update({ whatsapp_confirmation_sent_at: new Date().toISOString() })
         .eq("id", orderId);
+      if (stampRes.error && /whatsapp_confirmation_sent_at/.test(stampRes.error.message ?? "")) {
+        console.warn(
+          `[post-payment ${order.order_number}] whatsapp sent but dedup column missing — ` +
+          `run add_whatsapp_confirmation_sent_at.sql to prevent duplicate sends`
+        );
+      }
       report.whatsapp_sent = true;
       console.log(`[post-payment ${order.order_number}] whatsapp sent to ${order.customer_phone}`);
     } catch (err) {
